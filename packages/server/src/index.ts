@@ -259,10 +259,8 @@ export class App {
         // Serve UI static
         // ----------------------------------------
 
-        const packagePath = path.resolve(__dirname, '../../ui')
-        console.log('Resolved flowise-ui path:', packagePath)
-        const uiBuildPath = path.join(packagePath, 'build')
-        const uiHtmlPath = path.join(packagePath, 'build', 'index.html')
+        const uiBuildPath = path.resolve(__dirname, '../../../flowise-ui/build')
+        const uiHtmlPath = path.resolve(__dirname, '../../../flowise-ui/build/index.html')
 
         this.app.use('/', express.static(uiBuildPath))
 
@@ -294,7 +292,7 @@ let serverApp: App | undefined
 export async function start(): Promise<void> {
     serverApp = new App()
 
-    const port = parseInt(process.env.PORT || '3000', 10)
+    const port = parseInt(process.env.PORT || '10000', 10)
     const host = '0.0.0.0'
     const server = http.createServer(serverApp.app)
 
