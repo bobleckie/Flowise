@@ -308,3 +308,7 @@ export async function start(): Promise<void> {
 export function getInstance(): App | undefined {
     return serverApp
 }
+start().catch((err) => {
+    console.error('❌ Error starting the server:', err)
+    process.exit(1)
+})
