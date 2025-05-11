@@ -260,6 +260,7 @@ export class App {
         // ----------------------------------------
 
         const packagePath = getNodeModulesPackagePath('flowise-ui')
+        console.log('Resolved flowise-ui path:', packagePath)
         const uiBuildPath = path.join(packagePath, 'build')
         const uiHtmlPath = path.join(packagePath, 'build', 'index.html')
 
