@@ -13,13 +13,13 @@ the actual product; Phase 3 is cities.
 | M0 — Skeleton | Built, awaiting acceptance | Packs load, Build Wand opens a menu, selection prints to chat. |
 | M1 — Structure Emitter | Built, awaiting acceptance | Both converters, palette tokens. Needs a real in-game capture to accept. |
 | M2 — Rotation Correctness | **Built, awaiting acceptance** | Rotation table + engine + 61 offline tests + in-game probe harness. 4 encodings still need measuring. |
-| M3 — Assembler | Not started | |
+| M3 — Assembler | **Built, awaiting acceptance** | Parameterized generator: all 68 buildings generate, render and compile. |
 | M4 — Animated Construction | Not started | |
 | M5 — Elevators | Not started | |
 | M6 — Interior Fitout | Not started | Gates the content library — without it every room is furnished by hand. |
 | M7 — Impostor Interiors | Not started | |
 | **Phase 2 — Content** | | |
-| M8 — Building Preset Library | Not started | 40 presets, composed + monolithic tiers. |
+| M8 — Building Preset Library | **Catalog + geometry built** | 68 presets, all generating as placeable geometry. |
 | M9 — Street & Infrastructure Kit | Not started | Streets, crosswalks, lighting, signals, bus stops, parking. |
 | M10 — Transit | Not started | Subway, light rail, stations. |
 | M11 — District Tiles | Not started | The unit that makes Realm placement possible. |
@@ -136,6 +136,19 @@ Beta APIs are **not** used, so the world does **not** need the "Beta APIs"
 experimental toggle.
 
 ---
+
+## What the premortem said, and where it now stands
+
+| Premortem finding | Status |
+|---|---|
+| 357 generators specified, none exist | **Answered.** Facade systems are data and window patterns reduce to 8 geometric families. One generator + two tables covers all 68 buildings. |
+| Palette cannot express 51 facade systems | **Answered by measurement.** All 51 bind to real blocks; 51 of 51 are distinguishable. `node tools/palette-check.mjs`. Colour alone gives only 15 — trim, accent and glazing carry the rest. |
+| Catalog is a bill of materials, not buildings | **Answered.** Every entry now produces geometry, a `.mcstructure`, and a preview image. |
+| No way to verify without the owner in-game | **Partly answered.** `tools/render-preview.mjs` draws the block data isometrically, so obvious defects are caught before they reach you. Not a substitute for in-game judgement. |
+| Buildings exceed structure-block limits | **Quantified.** Bedrock structure blocks cap at 64x384x64; `build-preset.mjs` reports which presets exceed it and must be script-placed. |
+| Supertall 2-block interiors | Still open — a decision for you, not a bug. |
+| Curved buildings on a rectilinear engine | Still open. |
+| Realm storage never measured | Still open. |
 
 ## Change log
 
