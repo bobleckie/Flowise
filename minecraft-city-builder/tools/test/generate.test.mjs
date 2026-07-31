@@ -422,3 +422,73 @@ test('the shaft is actually hollow where the lift runs', () => {
         }
     }
 })
+
+// --- fitout ----------------------------------------------------------------
+
+test('every bed is a complete, paired bed', async () => {
+    // Half a bed is a broken block in-game, not a short bed.
+    for (const entry of catalog) {
+        const beds = generateBuilding(entry).blocks.filter((b) => b.block === 'minecraft:bed')
+        const feet = beds.filter((b) => b.state?.head_piece_bit === false)
+        const heads = beds.filter((b) => b.state?.head_piece_bit === true)
+        assert.equal(feet.length, heads.length, `${entry.id}: ${feet.length} bed feet, ${heads.length} heads`)
+
+        // Each foot must have its head in the adjacent cell its facing implies.
+        const headAt = new Set(heads.map((h) => h.pos.join(',')))
+        for (const foot of feet) {
+            const [x, y, z] = foot.pos
+            assert.ok(
+                headAt.has(`${x},${y},${z + 1}`) || headAt.has(`${x},${y},${z - 1}`),
+                `${entry.id}: bed foot at ${foot.pos} has no adjacent head`
+            )
+        }
+    }
+})
+
+test('rooms people sleep in actually have beds', async () => {
+    const { hasFitout } = await import('../lib/fitout.mjs')
+    const SLEEPING = ['bedroom', 'hotel_room', 'apartment', 'living', 'penthouse', 'ward']
+
+    for (const entry of catalog) {
+        if (!(entry.program ?? []).some((b) => SLEEPING.includes(b.use))) continue
+        assert.ok(hasFitout(entry.program.find((b) => SLEEPING.includes(b.use)).use))
+
+        const beds = generateBuilding(entry).blocks.filter((b) => b.block === 'minecraft:bed').length / 2
+        assert.ok(beds > 0, `${entry.id} has sleeping rooms and no beds`)
+    }
+})
+
+test('furniture never displaces structure', async () => {
+    // The fitout only fills cells the shell left empty, so adding it must not
+    // change the count of any structural element.
+    const { fitoutRoomTypes } = await import('../lib/fitout.mjs')
+    assert.ok(fitoutRoomTypes().length >= 20, 'fitout should cover the common room types')
+
+    for (const id of ['loop_greystone_commercial', 'chicago_bungalow', 'hotel_tower_convention']) {
+        const entry = catalog.find((e) => e.id === id)
+        const module = generateBuilding(entry)
+
+        // Doors and stairs survive the fitout pass intact.
+        const doors = module.blocks.filter((b) => b.block.endsWith('_door'))
+        assert.ok(doors.length >= 2, `${id}: fitout ate the doors`)
+        assert.equal(
+            doors.filter((d) => d.state.upper_block_bit === false).length * 2,
+            doors.length,
+            `${id}: fitout unpaired a door`
+        )
+
+        if (entry.massing.floors > 1) {
+            assert.ok(module.blocks.some((b) => b.block.endsWith('_stairs')), `${id}: fitout ate the stairs`)
+        }
+    }
+})
+
+test('a house is rooms, not a dormitory', async () => {
+    // The failure this guards against: every grid cell getting the same bedroom.
+    for (const id of ['chicago_bungalow', 'suburban_ranch', 'workers_cottage']) {
+        const entry = catalog.find((e) => e.id === id)
+        const beds = generateBuilding(entry).blocks.filter((b) => b.block === 'minecraft:bed').length / 2
+        const area = entry.massing.footprint[0] * entry.massing.footprint[1]
+        assert.ok(beds <= 10, `${id} has ${beds} beds in ${area} blocks² — that is a dormitory`)
+    }
+})

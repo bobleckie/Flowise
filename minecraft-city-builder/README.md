@@ -198,6 +198,30 @@ Placement times at the default 400 blocks/tick: most buildings land in under 10
 seconds; the largest supertall takes about a minute. Raise the budget in
 Settings to trade smoothness for speed.
 
+## Interiors and fitout
+
+Buildings are not shells. Every floor gets a walkable surface, the stair core
+connects top to bottom, entrances are cut through the facade, lift shafts run
+the full height with a landing door on each floor, and ceiling lights mean the
+interior is not a black box.
+
+Furniture is rule-driven, keyed to **room type** rather than to building
+(`tools/lib/fitout.mjs`). 26 rules cover offices, apartments, hotel rooms,
+classrooms, wards, lobbies, restaurants, retail, workshops, platforms and
+sanctuaries. That is the answer to the premortem's finding that 108 named
+fitouts across 68 buildings was hand-authoring with extra steps: a 1920s office
+and a 1970s office are the same rule with different materials.
+
+Three rules the fitout follows, each learned from a bug:
+
+- **Furniture only fills cells the shell left empty**, so it can never displace
+  a stair, a doorway, a partition or a lift shaft.
+- **Multi-cell items are placed all-or-nothing.** Half a bed is a broken block
+  in-game, not a short bed.
+- **If the grid point is occupied, it nudges** to a nearby free spot rather than
+  dropping the room. The fitout grid and the partition grid land on the same
+  column often enough that this matters.
+
 ## Install (Windows / Bedrock)
 
 1. `node tools/build.mjs`

@@ -138,6 +138,19 @@ export const BLOCK_COLORS = {
     'minecraft:ladder': [140, 110, 65],
     'minecraft:scaffolding': [180, 145, 85],
 
+    // furniture
+    'minecraft:bed': [165, 42, 42],
+    'minecraft:bookshelf': [110, 86, 53],
+    'minecraft:chest': [141, 105, 54],
+    'minecraft:barrel': [111, 83, 47],
+    'minecraft:lectern': [154, 121, 71],
+    'minecraft:cauldron': [60, 60, 62],
+    'minecraft:blast_furnace': [79, 79, 82],
+    'minecraft:flower_pot': [124, 73, 56],
+    'minecraft:red_wool': [160, 39, 34],
+    'minecraft:red_carpet': [160, 39, 34],
+    'minecraft:white_wool': [233, 236, 236],
+
     // misc
     'minecraft:prismarine': [99, 156, 151],
     'minecraft:dark_prismarine': [51, 91, 75],

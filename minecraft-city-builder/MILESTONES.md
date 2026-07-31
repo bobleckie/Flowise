@@ -16,7 +16,7 @@ the actual product; Phase 3 is cities.
 | M3 — Assembler | **Built, awaiting acceptance** | Parameterized generator: all 68 buildings generate, render and compile. |
 | M4 — Animated Construction | **Placement queue built** | Tick-budgeted placer with air-run bulk clearing, progress, cancel, undo. Scaffolding animation still to do. |
 | M5 — Elevators | **Built, awaiting acceptance** | Shafts registered on placement; floor panel on the wand; smooth ride. Moves the player rather than a rideable cab — see note. |
-| M6 — Interior Fitout | **Partly built** | Floors, stairs, entrances, core doors, lift shafts, lighting, partitions. Furniture still to do. |
+| M6 — Interior Fitout | **Built, awaiting acceptance** | 26 room-type rules covering floors, stairs, entrances, lighting, partitions and furniture. |
 | M7 — Impostor Interiors | Not started | |
 | **Phase 2 — Content** | | |
 | M8 — Building Preset Library | **Catalog + geometry built** | 68 presets, all generating as placeable geometry. |

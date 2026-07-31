@@ -291,7 +291,15 @@ export function generateBuilding(entry, { interior = true, shellOnly = false } =
 
     // Interiors run after the shell: hollowing clears the volume, so anything
     // placed inside must come afterwards or it is erased.
-    if (interior && !shellOnly) buildInterior(entry, put, palette, plates, [bx, bz])
+    //
+    // `free` reports cells the shell left empty, so the fitout can furnish a
+    // room without overwriting a stair, a partition, a door or a lift shaft.
+    const free = (x, y, z) => {
+        const cell = cells.get(`${Math.round(x)},${Math.round(y)},${Math.round(z)}`)
+        return cell !== undefined && cell.block === 'minecraft:air'
+    }
+
+    if (interior && !shellOnly) buildInterior(entry, put, palette, plates, [bx, bz], free)
 
     // --- roof
     const top = plates[plates.length - 1]
@@ -535,12 +543,14 @@ function buildRoof(entry, put, palette, top, roofBase) {
             for (let y = 1; y <= steps; y++) {
                 const inset = type === 'gable' ? 0 : y
                 if (inset * 2 >= Math.min(sx, sz)) break
+                // Pitched roofs are roofing material, not facade trim — a
+                // limestone-coloured shingle roof reads as unfinished.
                 if (type === 'gable') {
                     for (let x = y; x < sx - y; x++) {
-                        for (let z = 0; z < sz; z++) put(ox + x, roofBase + y, oz + z, palette.trim)
+                        for (let z = 0; z < sz; z++) put(ox + x, roofBase + y, oz + z, ROOFING)
                     }
                 } else {
-                    deck(roofBase + y, inset, palette.trim)
+                    deck(roofBase + y, inset, ROOFING)
                 }
             }
             break

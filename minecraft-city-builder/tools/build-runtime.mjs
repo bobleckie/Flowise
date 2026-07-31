@@ -68,13 +68,13 @@ writeFileSync(join(LIB, 'catalog_data.js'), data)
 // are copied verbatim rather than transpiled. If either ever grows a `node:`
 // import this build fails loudly instead of shipping a pack that will not load.
 
-for (const name of ['generate.mjs', 'interior.mjs', 'rotation.mjs']) {
+for (const name of ['generate.mjs', 'interior.mjs', 'rotation.mjs', 'fitout.mjs']) {
     const source = readFileSync(join(ROOT, 'tools', 'lib', name), 'utf8')
     if (/from ['"]node:/.test(source)) {
         console.error(`lib/${name} imports a node: module and cannot run inside Bedrock.`)
         process.exit(1)
     }
-    writeFileSync(join(LIB, name.replace('.mjs', '.js')), source.replace(/from '\.\/interior\.mjs'/g, "from './interior.js'"))
+    writeFileSync(join(LIB, name.replace('.mjs', '.js')), source.replace(/from '(\.\/[\w-]+)\.mjs'/g, "from '$1.js'"))
 }
 
 const bytes = (path) => readFileSync(path).length
@@ -83,3 +83,4 @@ console.log(`  scripts/lib/catalog_data.js  ${(bytes(join(LIB, 'catalog_data.js'
 console.log(`  scripts/lib/generate.js      ${(bytes(join(LIB, 'generate.js')) / 1024).toFixed(0)} KB`)
 console.log(`  scripts/lib/interior.js      ${(bytes(join(LIB, 'interior.js')) / 1024).toFixed(0)} KB`)
 console.log(`  scripts/lib/rotation.js      ${(bytes(join(LIB, 'rotation.js')) / 1024).toFixed(0)} KB`)
+console.log(`  scripts/lib/fitout.js        ${(bytes(join(LIB, 'fitout.js')) / 1024).toFixed(0)} KB`)

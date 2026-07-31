@@ -12,6 +12,8 @@
  *   5. corridors and partitions, so a floor reads as rooms rather than a hall
  */
 
+import { fitoutFloor } from './fitout.mjs'
+
 /** Bedrock stair facing: weirdo_direction 0=east, 1=west, 2=south, 3=north. */
 export const STAIR_FACING = { east: 0, west: 1, south: 2, north: 3 }
 
@@ -55,7 +57,7 @@ export function coreRect(entry, [bx, bz]) {
  * @param put   (x, y, z, block, state?) => void from the generator
  * @param plates floor plates from `floorPlates()`
  */
-export function buildInterior(entry, put, palette, plates, footprint) {
+export function buildInterior(entry, put, palette, plates, footprint, free) {
     const [bx, bz] = footprint
     const core = coreRect(entry, footprint)
     const stairs = entry.vertical?.stairs ?? 1
@@ -82,6 +84,10 @@ export function buildInterior(entry, put, palette, plates, footprint) {
         if (shaftD > 0) liftShaft(put, plate, core, stairD, shaftD, interiorHeight)
         if (shaftD > 0) liftDoors(put, plate, core, stairD)
         coreDoors(put, plate, core, stairW)
+
+        // Furniture last of all: it only fills cells still empty after every
+        // structural pass, so it can never displace a stair or a doorway.
+        if (free && band) fitoutFloor(put, free, plate, core, band, interiorHeight)
     }
 
     entrances(put, plates[0], footprint, entry)
