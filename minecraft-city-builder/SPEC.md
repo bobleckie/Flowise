@@ -142,7 +142,7 @@ Pre-pass over OSM data for a selected bounding box:
 1. Compute `max(street_elevation + building_height)` across all buildings in the box
 2. Add subsurface budget (subway alignments + foundations + parking)
 3. Compare required envelope against available world range
-4. If insufficient, emit a height behavior pack rounded to the next multiple of 16
+4. If insufficient, **compress floor counts or floor heights** — see §4.5. There is no other lever.
 5. Set street datum at `world_min + subsurface_budget`
 6. Rebase terrain — preserve real relief, shift the surface so the lowest street point lands on datum. Do not flatten.
 7. Excavate the full box to datum and fill
@@ -204,7 +204,9 @@ Categories: `interior`, `facade`, `roof`, `core`, `fixture`, `building` (a compl
 
 ### 4.2 Footprints — two tiers
 
-**Tier 1, composed.** For buildings with repeating floors. Fixed and not varied: interior modules 7×11 and 7×7, facade bays 5 blocks wide, floor height 4 blocks (3 interior + 1 structural slab). Consistent dimensions are what make the assembler tractable; irregular module sizes turn floor planning into a bin-packing problem and are not worth it.
+**Tier 1, composed.** For buildings with repeating floors. Fixed and not varied: interior modules 7×11 and 7×7, facade bays 5 blocks wide. Consistent dimensions are what make the assembler tractable; irregular module sizes turn floor planning into a bin-packing problem and are not worth it.
+
+**Floor height is 4 blocks (3 interior + 1 structural slab) — except above 60 storeys, where it must be 3.** This is arithmetic, not preference. See §4.5: at 4 blocks the Bedrock ceiling is 86 storeys, and Chicago has four towers above that. A 3-block floor gives 2 blocks of interior, which is walkable but cramped, so it is used only where the envelope forces it. Modules therefore ship in 4-block and 3-block variants.
 
 **Tier 2, monolithic.** For buildings without repeating floors — a gas station canopy, a diner, a ranch house. These have no meaningful module grid and forcing them onto one produces worse buildings for no benefit. Authored at their natural size, bounded at 64×48×64 so they stay placeable and reviewable.
 
@@ -221,6 +223,39 @@ Repetitive content — cubicle grids, desk rows, corridors, hotel floors, parkin
 - Impostor depth: 3 blocks
 - Target: no frame below 50 FPS on RTX 5060 at 16 chunk render distance
 - District tile: sized so a Realm can hold a useful number of them (fixed at M11)
+
+### 4.5 The Vertical Envelope — a hard constraint
+
+Bedrock's build range is **fixed at Y −64..319, 384 blocks**, and **an add-on
+cannot extend it.** There is no Bedrock equivalent of Java's custom dimension
+height; no behavior pack, manifest field, or experimental toggle changes it.
+(An earlier revision of this document claimed otherwise. That was wrong.)
+
+The only lever is where the street sits. Digging the datum down buys headroom
+above it, and nothing else does.
+
+With a 28-block subsurface budget (foundation, two basements, subway mezzanine
+and tunnel), the datum lands at Y −36 and leaves **355 blocks above street**:
+
+| Floor height | Max storeys | With a 40-block antenna |
+|---|---|---|
+| 3 blocks | 115 | 102 |
+| 4 blocks | 86 | 76 |
+| 5 blocks | 69 | 61 |
+
+**Consequence:** at the 4-block floor height, Willis Tower (108), Hancock (100),
+St Regis (101) and Trump Chicago (98) are all impossible. Chicago does not fit
+until supertalls drop to 3-block floors, and even then Willis needs its rendered
+floor count compressed from 108 to 100.
+
+Compression is legitimate but must be **declared**, never silent: the catalog's
+`massing.floors_actual` records the real building whenever fewer floors are
+rendered.
+
+`tools/lib/envelope.mjs` solves this, `node tools/catalog-report.mjs --envelope`
+reports it, and `npm test` fails if any catalog entry stops fitting. Re-solve
+whenever the catalog changes — the current margin across all 68 buildings is
+**2 blocks**.
 
 ---
 

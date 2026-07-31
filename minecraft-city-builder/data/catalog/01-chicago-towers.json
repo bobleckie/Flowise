@@ -1,0 +1,805 @@
+{
+  "$comment": "Chicago supertall and high-rise towers. Floor heights of 3 are forced by the Bedrock envelope (see tools/envelope-solver.mjs); anything under ~40 floors gets 4 for walkable interiors. `floors_actual` records the real building whenever we render fewer.",
+  "buildings": [
+    {
+      "id": "willis_bundled_tube",
+      "name": "Bundled-Tube Supertall",
+      "type": "office",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Willis (Sears) Tower, Chicago",
+        "city": "Chicago",
+        "completed": 1973,
+        "era": "structural_expressionism",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "personal_only"
+      },
+      "massing": {
+        "footprint": [ 69, 69 ],
+        "floors": 100,
+        "floors_actual": 108,
+        "floor_height": 3,
+        "ground_floor_height": 8,
+        "setbacks": [
+          { "at_floor": 50, "footprint": [ 69, 46 ] },
+          { "at_floor": 66, "footprint": [ 46, 46 ] },
+          { "at_floor": 90, "footprint": [ 46, 23 ] }
+        ],
+        "roof": {
+          "type": "flat_mechanical",
+          "height": 8,
+          "antennas": [ { "height": 40, "count": 2 } ],
+          "features": [ "window_washing_track", "aviation_lights" ]
+        }
+      },
+      "below_grade": {
+        "levels": 3,
+        "level_height": 5,
+        "uses": [ "parking_deck", "loading_dock", "mechanical" ],
+        "transit": "subway_mezzanine"
+      },
+      "structure": {
+        "bay": 5,
+        "column_grid": [ 23, 23 ],
+        "core": { "footprint": [ 23, 23 ], "position": "center" },
+        "note": "Nine 23-block tubes on a 3x3 grid; tubes drop away at each setback."
+      },
+      "vertical": { "passenger_elevators": 16, "service_elevators": 4, "stairs": 3, "sky_lobbies": [ 33, 66 ] },
+      "facade": {
+        "system": "curtain_wall_dark",
+        "window_pattern": "ribbon",
+        "spandrel": "black_anodized",
+        "mullion": "bronze",
+        "ground_treatment": "plaza_colonnade",
+        "cornice": "none"
+      },
+      "program": [
+        { "floors": [ 1, 3 ], "use": "lobby" },
+        { "floors": [ 4, 32 ], "use": "office_open" },
+        { "floors": [ 33, 33 ], "use": "sky_lobby" },
+        { "floors": [ 34, 65 ], "use": "office_open" },
+        { "floors": [ 66, 66 ], "use": "sky_lobby" },
+        { "floors": [ 67, 88 ], "use": "office_open" },
+        { "floors": [ 89, 89 ], "use": "mechanical" },
+        { "floors": [ 90, 98 ], "use": "office_open" },
+        { "floors": [ 99, 100 ], "use": "gallery" }
+      ],
+      "fitout": {
+        "lobby": "lobby_granite_modern",
+        "office_open": "office_1970s_open",
+        "sky_lobby": "sky_lobby_modern",
+        "gallery": "observation_deck"
+      }
+    },
+    {
+      "id": "aon_white_shaft",
+      "name": "White Shaft Tower",
+      "type": "office",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Aon Center, Chicago",
+        "city": "Chicago",
+        "completed": 1973,
+        "era": "late_modern",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "personal_only"
+      },
+      "massing": {
+        "footprint": [ 58, 58 ],
+        "floors": 83,
+        "floor_height": 3,
+        "ground_floor_height": 9,
+        "roof": { "type": "flat_mechanical", "height": 10, "antennas": [ { "height": 12, "count": 1 } ] }
+      },
+      "below_grade": { "levels": 2, "level_height": 5, "uses": [ "parking_deck", "loading_dock" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 20, 20 ], "core": { "footprint": [ 20, 20 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 12, "service_elevators": 3, "stairs": 3, "sky_lobbies": [ 42 ] },
+      "facade": {
+        "system": "stone_clad_pier",
+        "window_pattern": "vertical_slot",
+        "spandrel": "white_granite",
+        "ground_treatment": "raised_plaza",
+        "cornice": "none",
+        "note": "Full-height white piers with narrow recessed glazing — reads as vertical stripes."
+      },
+      "program": [
+        { "floors": [ 1, 2 ], "use": "lobby" },
+        { "floors": [ 3, 41 ], "use": "office_open" },
+        { "floors": [ 42, 42 ], "use": "sky_lobby" },
+        { "floors": [ 43, 80 ], "use": "office_open" },
+        { "floors": [ 81, 82 ], "use": "mechanical" },
+        { "floors": [ 83, 83 ], "use": "restaurant_dining" }
+      ],
+      "fitout": {
+        "lobby": "lobby_travertine",
+        "office_open": "office_corporate_open",
+        "restaurant_dining": "restaurant_fine_dining",
+        "sky_lobby": "sky_lobby_modern"
+      }
+    },
+    {
+      "id": "hancock_tapered_tower",
+      "name": "Tapered X-Braced Tower",
+      "type": "mixed_use",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "875 North Michigan Avenue (John Hancock Center), Chicago",
+        "city": "Chicago",
+        "completed": 1969,
+        "era": "structural_expressionism",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "personal_only"
+      },
+      "massing": {
+        "footprint": [ 80, 50 ],
+        "floors": 99,
+        "floors_actual": 100,
+        "floor_height": 3,
+        "ground_floor_height": 8,
+        "setbacks": [
+          { "at_floor": 30, "footprint": [ 66, 42 ] },
+          { "at_floor": 60, "footprint": [ 50, 33 ] },
+          { "at_floor": 85, "footprint": [ 38, 25 ] }
+        ],
+        "roof": { "type": "flat_mechanical", "height": 6, "antennas": [ { "height": 45, "count": 2 } ] }
+      },
+      "below_grade": {
+        "levels": 2,
+        "level_height": 5,
+        "uses": [ "parking_deck", "loading_dock", "mechanical" ],
+        "transit": "none"
+      },
+      "structure": {
+        "bay": 5,
+        "column_grid": [ 20, 20 ],
+        "core": { "footprint": [ 20, 16 ], "position": "center" },
+        "note": "Exterior X-bracing across roughly every 18 floors — a facade feature, not a hidden frame."
+      },
+      "vertical": { "passenger_elevators": 14, "service_elevators": 3, "stairs": 3, "sky_lobbies": [ 44 ] },
+      "facade": {
+        "system": "black_steel_frame",
+        "window_pattern": "grid_with_x_bracing",
+        "spandrel": "black_aluminium",
+        "ground_treatment": "sunken_plaza",
+        "cornice": "none"
+      },
+      "program": [
+        { "floors": [ 1, 5 ], "use": "retail_floor" },
+        { "floors": [ 6, 12 ], "use": "parking_deck" },
+        { "floors": [ 13, 41 ], "use": "office_open" },
+        { "floors": [ 42, 43 ], "use": "mechanical" },
+        { "floors": [ 44, 44 ], "use": "sky_lobby" },
+        { "floors": [ 45, 92 ], "use": "apartment" },
+        { "floors": [ 93, 94 ], "use": "restaurant_dining" },
+        { "floors": [ 95, 96 ], "use": "gallery" },
+        { "floors": [ 97, 99 ], "use": "mechanical" }
+      ],
+      "fitout": {
+        "retail_floor": "retail_mall_upscale",
+        "office_open": "office_corporate_open",
+        "apartment": "apartment_highrise_1970s",
+        "restaurant_dining": "restaurant_fine_dining",
+        "gallery": "observation_deck",
+        "parking_deck": "parking_deck_marked",
+        "sky_lobby": "sky_lobby_modern"
+      }
+    },
+    {
+      "id": "lake_point_curved_tower",
+      "name": "Curved Trilobal Tower",
+      "type": "residential",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Lake Point Tower, Chicago",
+        "city": "Chicago",
+        "completed": 1968,
+        "era": "expressionist_modern",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "personal_only"
+      },
+      "massing": {
+        "footprint": [ 58, 58 ],
+        "floors": 70,
+        "floor_height": 3,
+        "ground_floor_height": 6,
+        "roof": { "type": "flat_parapet", "height": 4 },
+        "plan": "trilobal",
+        "note": "Three curved lobes at 120 degrees around a central core — the only curved-plan tower in the catalog."
+      },
+      "below_grade": { "levels": 2, "level_height": 5, "uses": [ "parking_deck", "storage" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 16, 16 ], "core": { "footprint": [ 18, 18 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 8, "service_elevators": 2, "stairs": 3 },
+      "facade": {
+        "system": "bronze_curtain_wall",
+        "window_pattern": "continuous_curved_glazing",
+        "spandrel": "bronze_anodized",
+        "ground_treatment": "landscaped_podium",
+        "cornice": "none"
+      },
+      "program": [
+        { "floors": [ 1, 2 ], "use": "lobby" },
+        { "floors": [ 3, 6 ], "use": "parking_deck" },
+        { "floors": [ 7, 68 ], "use": "apartment" },
+        { "floors": [ 69, 70 ], "use": "penthouse" }
+      ],
+      "fitout": {
+        "lobby": "lobby_midcentury",
+        "apartment": "apartment_highrise_1970s",
+        "penthouse": "penthouse_luxury",
+        "parking_deck": "parking_deck_marked"
+      }
+    },
+    {
+      "id": "marina_city_corncob",
+      "name": "Circular Balcony Tower",
+      "type": "mixed_use",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Marina City, Chicago",
+        "city": "Chicago",
+        "completed": 1964,
+        "era": "expressionist_modern",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "personal_only"
+      },
+      "massing": {
+        "footprint": [ 35, 35 ],
+        "floors": 65,
+        "floor_height": 3,
+        "ground_floor_height": 5,
+        "roof": { "type": "flat_parapet", "height": 3 },
+        "plan": "circular",
+        "note": "Petal-shaped balconies ring every residential floor; the lower 19 floors are an open spiral parking ramp."
+      },
+      "below_grade": { "levels": 1, "level_height": 5, "uses": [ "mechanical", "storage" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 12, 12 ], "core": { "footprint": [ 12, 12 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 5, "service_elevators": 1, "stairs": 2 },
+      "facade": {
+        "system": "exposed_concrete",
+        "window_pattern": "radial_balcony_bays",
+        "spandrel": "concrete",
+        "ground_treatment": "riverfront_podium",
+        "cornice": "none"
+      },
+      "program": [
+        { "floors": [ 1, 2 ], "use": "lobby" },
+        { "floors": [ 3, 19 ], "use": "parking_deck" },
+        { "floors": [ 20, 20 ], "use": "sky_lobby" },
+        { "floors": [ 21, 63 ], "use": "apartment" },
+        { "floors": [ 64, 65 ], "use": "mechanical" }
+      ],
+      "fitout": {
+        "lobby": "lobby_midcentury",
+        "apartment": "apartment_compact_wedge",
+        "parking_deck": "parking_spiral_open",
+        "sky_lobby": "sky_lobby_modern"
+      }
+    },
+    {
+      "id": "daley_corten_civic",
+      "name": "Cor-Ten Civic Tower",
+      "type": "civic",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Richard J. Daley Center, Chicago",
+        "city": "Chicago",
+        "completed": 1965,
+        "era": "miesian",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "personal_only"
+      },
+      "massing": {
+        "footprint": [ 66, 44 ],
+        "floors": 31,
+        "floor_height": 6,
+        "ground_floor_height": 10,
+        "roof": { "type": "flat_mechanical", "height": 6 },
+        "note": "Exceptionally deep floor-to-floor — courtrooms. The 6-block floor height is the point of the building."
+      },
+      "below_grade": {
+        "levels": 2,
+        "level_height": 5,
+        "uses": [ "parking_deck", "storage", "mechanical" ],
+        "transit": "subway_mezzanine"
+      },
+      "structure": { "bay": 11, "column_grid": [ 29, 29 ], "core": { "footprint": [ 22, 18 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 12, "service_elevators": 2, "stairs": 4 },
+      "facade": {
+        "system": "corten_steel_frame",
+        "window_pattern": "wide_bay_bronze_glass",
+        "spandrel": "corten",
+        "ground_treatment": "civic_plaza",
+        "cornice": "none"
+      },
+      "program": [
+        { "floors": [ 1, 2 ], "use": "lobby" },
+        { "floors": [ 3, 28 ], "use": "office_private" },
+        { "floors": [ 29, 30 ], "use": "office_open" },
+        { "floors": [ 31, 31 ], "use": "mechanical" }
+      ],
+      "fitout": {
+        "lobby": "lobby_civic_stone",
+        "office_private": "courtroom_panelled",
+        "office_open": "office_government"
+      }
+    },
+    {
+      "id": "federal_black_steel",
+      "name": "Black Steel Federal Tower",
+      "type": "civic",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Kluczynski Federal Building, Chicago",
+        "city": "Chicago",
+        "completed": 1974,
+        "era": "miesian",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 55, 55 ],
+        "floors": 45,
+        "floor_height": 4,
+        "ground_floor_height": 10,
+        "roof": { "type": "flat_parapet", "height": 3 }
+      },
+      "below_grade": {
+        "levels": 2,
+        "level_height": 5,
+        "uses": [ "parking_deck", "loading_dock" ],
+        "transit": "subway_mezzanine"
+      },
+      "structure": { "bay": 5, "column_grid": [ 20, 20 ], "core": { "footprint": [ 20, 20 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 10, "service_elevators": 2, "stairs": 3 },
+      "facade": {
+        "system": "black_steel_curtain_wall",
+        "window_pattern": "regular_grid",
+        "spandrel": "black_steel",
+        "mullion": "black_i_beam",
+        "ground_treatment": "open_colonnade_plaza",
+        "cornice": "none"
+      },
+      "program": [
+        { "floors": [ 1, 1 ], "use": "lobby" },
+        { "floors": [ 2, 43 ], "use": "office_open" },
+        { "floors": [ 44, 45 ], "use": "mechanical" }
+      ],
+      "fitout": { "lobby": "lobby_miesian_glass", "office_open": "office_government" }
+    },
+    {
+      "id": "riverfront_mies_slab",
+      "name": "Riverfront Miesian Slab",
+      "type": "office",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "IBM Building (330 North Wabash), Chicago",
+        "city": "Chicago",
+        "completed": 1972,
+        "era": "miesian",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 60, 40 ],
+        "floors": 52,
+        "floor_height": 4,
+        "ground_floor_height": 9,
+        "roof": { "type": "flat_parapet", "height": 3 }
+      },
+      "below_grade": { "levels": 2, "level_height": 5, "uses": [ "parking_deck", "loading_dock" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 20, 20 ], "core": { "footprint": [ 20, 15 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 10, "service_elevators": 2, "stairs": 3 },
+      "facade": {
+        "system": "bronze_curtain_wall",
+        "window_pattern": "regular_grid",
+        "spandrel": "dark_bronze",
+        "ground_treatment": "recessed_lobby_plaza",
+        "cornice": "none"
+      },
+      "program": [
+        { "floors": [ 1, 1 ], "use": "lobby" },
+        { "floors": [ 2, 50 ], "use": "office_open" },
+        { "floors": [ 51, 52 ], "use": "mechanical" }
+      ],
+      "fitout": { "lobby": "lobby_miesian_glass", "office_open": "office_corporate_open" }
+    },
+    {
+      "id": "loop_curved_bank_tower",
+      "name": "Curved-Profile Bank Tower",
+      "type": "office",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Chase Tower (Bank One Plaza), Chicago",
+        "city": "Chicago",
+        "completed": 1969,
+        "era": "late_modern",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 80, 40 ],
+        "floors": 60,
+        "floor_height": 4,
+        "ground_floor_height": 12,
+        "setbacks": [ { "at_floor": 20, "footprint": [ 66, 36 ] }, { "at_floor": 40, "footprint": [ 52, 32 ] } ],
+        "roof": { "type": "flat_mechanical", "height": 6 },
+        "note": "Sloped flanks — the footprint narrows continuously, approximated as three stepped bands."
+      },
+      "below_grade": {
+        "levels": 3,
+        "level_height": 5,
+        "uses": [ "parking_deck", "loading_dock", "transit_mezzanine" ],
+        "transit": "subway_direct"
+      },
+      "structure": { "bay": 5, "column_grid": [ 20, 20 ], "core": { "footprint": [ 24, 16 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 14, "service_elevators": 3, "stairs": 3, "sky_lobbies": [ 30 ] },
+      "facade": {
+        "system": "stone_clad_pier",
+        "window_pattern": "vertical_slot",
+        "spandrel": "granite",
+        "ground_treatment": "sunken_plaza",
+        "cornice": "none"
+      },
+      "program": [
+        { "floors": [ 1, 3 ], "use": "lobby" },
+        { "floors": [ 4, 29 ], "use": "office_open" },
+        { "floors": [ 30, 30 ], "use": "sky_lobby" },
+        { "floors": [ 31, 57 ], "use": "office_open" },
+        { "floors": [ 58, 60 ], "use": "mechanical" }
+      ],
+      "fitout": { "lobby": "lobby_travertine", "office_open": "office_corporate_open", "sky_lobby": "sky_lobby_modern" }
+    },
+    {
+      "id": "chevron_top_tower",
+      "name": "Chevron-Crowned Tower",
+      "type": "office",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Two Prudential Plaza, Chicago",
+        "city": "Chicago",
+        "completed": 1990,
+        "era": "postmodern",
+        "pre1990": false,
+        "named_landmark": true,
+        "distribution": "personal_only"
+      },
+      "massing": {
+        "footprint": [ 50, 50 ],
+        "floors": 64,
+        "floor_height": 4,
+        "ground_floor_height": 8,
+        "setbacks": [ { "at_floor": 45, "footprint": [ 42, 42 ] }, { "at_floor": 56, "footprint": [ 30, 30 ] } ],
+        "roof": {
+          "type": "spire",
+          "height": 20,
+          "antennas": [ { "height": 25, "count": 1 } ],
+          "features": [ "chevron_setbacks", "spotlit_crown" ]
+        }
+      },
+      "below_grade": {
+        "levels": 3,
+        "level_height": 5,
+        "uses": [ "parking_deck", "loading_dock" ],
+        "transit": "subway_mezzanine"
+      },
+      "structure": { "bay": 5, "column_grid": [ 20, 20 ], "core": { "footprint": [ 20, 20 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 12, "service_elevators": 2, "stairs": 3, "sky_lobbies": [ 33 ] },
+      "facade": {
+        "system": "granite_and_glass",
+        "window_pattern": "punched_with_chamfer",
+        "spandrel": "grey_granite",
+        "ground_treatment": "arcade",
+        "cornice": "stepped"
+      },
+      "program": [
+        { "floors": [ 1, 2 ], "use": "lobby" },
+        { "floors": [ 3, 32 ], "use": "office_open" },
+        { "floors": [ 33, 33 ], "use": "sky_lobby" },
+        { "floors": [ 34, 61 ], "use": "office_open" },
+        { "floors": [ 62, 64 ], "use": "mechanical" }
+      ],
+      "fitout": {
+        "lobby": "lobby_postmodern_marble",
+        "office_open": "office_corporate_open",
+        "sky_lobby": "sky_lobby_modern"
+      }
+    },
+    {
+      "id": "gothic_modern_shaft",
+      "name": "Neo-Gothic Modern Shaft",
+      "type": "office",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "AT&T Corporate Center, Chicago",
+        "city": "Chicago",
+        "completed": 1989,
+        "era": "postmodern",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 52, 52 ],
+        "floors": 60,
+        "floor_height": 4,
+        "ground_floor_height": 10,
+        "setbacks": [ { "at_floor": 40, "footprint": [ 44, 44 ] }, { "at_floor": 52, "footprint": [ 34, 34 ] } ],
+        "roof": { "type": "setback_crown", "height": 14, "features": [ "corner_pinnacles", "crown_uplighting" ] }
+      },
+      "below_grade": { "levels": 2, "level_height": 5, "uses": [ "parking_deck", "loading_dock" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 20, 20 ], "core": { "footprint": [ 20, 20 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 12, "service_elevators": 2, "stairs": 3, "sky_lobbies": [ 31 ] },
+      "facade": {
+        "system": "red_granite_pier",
+        "window_pattern": "vertical_slot",
+        "spandrel": "polished_granite",
+        "ground_treatment": "vaulted_arcade",
+        "cornice": "stepped"
+      },
+      "program": [
+        { "floors": [ 1, 3 ], "use": "lobby" },
+        { "floors": [ 4, 30 ], "use": "office_open" },
+        { "floors": [ 31, 31 ], "use": "sky_lobby" },
+        { "floors": [ 32, 57 ], "use": "office_open" },
+        { "floors": [ 58, 60 ], "use": "mechanical" }
+      ],
+      "fitout": {
+        "lobby": "lobby_postmodern_marble",
+        "office_open": "office_corporate_open",
+        "sky_lobby": "sky_lobby_modern"
+      }
+    },
+    {
+      "id": "postwar_apartment_slab",
+      "name": "Postwar Apartment Slab",
+      "type": "residential",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Lake Shore Drive apartment slabs, Chicago",
+        "city": "Chicago",
+        "completed": 1955,
+        "era": "miesian",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 45, 25 ],
+        "floors": 26,
+        "floor_height": 4,
+        "ground_floor_height": 6,
+        "roof": { "type": "flat_parapet", "height": 3 }
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "storage", "mechanical" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 15, 15 ], "core": { "footprint": [ 10, 10 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 3, "service_elevators": 1, "stairs": 2 },
+      "facade": {
+        "system": "black_steel_curtain_wall",
+        "window_pattern": "regular_grid",
+        "spandrel": "grey_glass",
+        "ground_treatment": "open_colonnade",
+        "cornice": "none"
+      },
+      "program": [
+        { "floors": [ 1, 1 ], "use": "lobby" },
+        { "floors": [ 2, 25 ], "use": "apartment" },
+        { "floors": [ 26, 26 ], "use": "mechanical" }
+      ],
+      "fitout": { "lobby": "lobby_midcentury", "apartment": "apartment_midcentury" }
+    },
+    {
+      "id": "river_north_glass_condo",
+      "name": "Contemporary Glass Condominium",
+      "type": "residential",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "River North condominium towers, Chicago",
+        "city": "Chicago",
+        "completed": 2008,
+        "era": "contemporary",
+        "pre1990": false,
+        "named_landmark": false,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 42, 34 ],
+        "floors": 44,
+        "floor_height": 4,
+        "ground_floor_height": 7,
+        "roof": { "type": "flat_parapet", "height": 4, "features": [ "roof_deck", "pool", "pergola" ] }
+      },
+      "below_grade": { "levels": 2, "level_height": 5, "uses": [ "parking_deck", "storage" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 16, 16 ], "core": { "footprint": [ 14, 12 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 4, "service_elevators": 1, "stairs": 2 },
+      "facade": {
+        "system": "blue_glass_curtain_wall",
+        "window_pattern": "floor_to_ceiling",
+        "spandrel": "spandrel_glass",
+        "ground_treatment": "retail_base",
+        "cornice": "none",
+        "features": [ "projecting_balconies" ]
+      },
+      "program": [
+        { "floors": [ 1, 2 ], "use": "retail_floor" },
+        { "floors": [ 3, 7 ], "use": "parking_deck" },
+        { "floors": [ 8, 8 ], "use": "lobby" },
+        { "floors": [ 9, 41 ], "use": "apartment" },
+        { "floors": [ 42, 43 ], "use": "penthouse" },
+        { "floors": [ 44, 44 ], "use": "mechanical" }
+      ],
+      "fitout": {
+        "retail_floor": "retail_street_modern",
+        "lobby": "lobby_contemporary",
+        "apartment": "apartment_contemporary",
+        "penthouse": "penthouse_luxury",
+        "parking_deck": "parking_deck_marked"
+      }
+    },
+    {
+      "id": "setback_supertall_residential",
+      "name": "Setback Supertall Residential",
+      "type": "residential",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Trump International Hotel and Tower, Chicago",
+        "city": "Chicago",
+        "completed": 2009,
+        "era": "contemporary",
+        "pre1990": false,
+        "named_landmark": true,
+        "distribution": "personal_only"
+      },
+      "massing": {
+        "footprint": [ 58, 44 ],
+        "floors": 92,
+        "floors_actual": 98,
+        "floor_height": 3,
+        "ground_floor_height": 8,
+        "setbacks": [
+          { "at_floor": 29, "footprint": [ 50, 40 ] },
+          { "at_floor": 51, "footprint": [ 42, 36 ] },
+          { "at_floor": 76, "footprint": [ 34, 30 ] }
+        ],
+        "roof": { "type": "spire", "height": 30, "features": [ "tapered_spire", "aviation_lights" ] }
+      },
+      "below_grade": {
+        "levels": 3,
+        "level_height": 5,
+        "uses": [ "parking_deck", "loading_dock", "mechanical" ],
+        "transit": "none"
+      },
+      "structure": { "bay": 5, "column_grid": [ 18, 18 ], "core": { "footprint": [ 20, 16 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 14, "service_elevators": 3, "stairs": 3, "sky_lobbies": [ 30, 52 ] },
+      "facade": {
+        "system": "silver_glass_curtain_wall",
+        "window_pattern": "floor_to_ceiling",
+        "spandrel": "stainless",
+        "ground_treatment": "riverwalk_podium",
+        "cornice": "none"
+      },
+      "program": [
+        { "floors": [ 1, 3 ], "use": "lobby" },
+        { "floors": [ 4, 12 ], "use": "parking_deck" },
+        { "floors": [ 13, 28 ], "use": "hotel_room" },
+        { "floors": [ 29, 29 ], "use": "restaurant_dining" },
+        { "floors": [ 30, 50 ], "use": "apartment" },
+        { "floors": [ 51, 51 ], "use": "sky_lobby" },
+        { "floors": [ 52, 88 ], "use": "apartment" },
+        { "floors": [ 89, 90 ], "use": "penthouse" },
+        { "floors": [ 91, 92 ], "use": "mechanical" }
+      ],
+      "fitout": {
+        "lobby": "lobby_contemporary",
+        "hotel_room": "hotel_room_luxury",
+        "apartment": "apartment_contemporary",
+        "penthouse": "penthouse_luxury",
+        "restaurant_dining": "restaurant_fine_dining",
+        "parking_deck": "parking_deck_marked",
+        "sky_lobby": "sky_lobby_modern"
+      }
+    },
+    {
+      "id": "loop_generic_office_tower",
+      "name": "Loop Generic Office Tower",
+      "type": "office",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Generic LaSalle Street commercial tower, Chicago",
+        "city": "Chicago",
+        "completed": 1985,
+        "era": "late_modern",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 40, 40 ],
+        "floors": 34,
+        "floor_height": 4,
+        "ground_floor_height": 8,
+        "roof": { "type": "flat_mechanical", "height": 6 }
+      },
+      "below_grade": {
+        "levels": 2,
+        "level_height": 5,
+        "uses": [ "parking_deck", "loading_dock" ],
+        "transit": "subway_mezzanine"
+      },
+      "structure": { "bay": 5, "column_grid": [ 15, 15 ], "core": { "footprint": [ 15, 15 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 8, "service_elevators": 2, "stairs": 2 },
+      "facade": {
+        "system": "grey_curtain_wall",
+        "window_pattern": "ribbon",
+        "spandrel": "grey_aluminium",
+        "ground_treatment": "retail_base",
+        "cornice": "none"
+      },
+      "program": [
+        { "floors": [ 1, 2 ], "use": "lobby" },
+        { "floors": [ 3, 32 ], "use": "office_open" },
+        { "floors": [ 33, 34 ], "use": "mechanical" }
+      ],
+      "fitout": { "lobby": "lobby_travertine", "office_open": "office_corporate_open" }
+    },
+    {
+      "id": "hotel_tower_convention",
+      "name": "Convention Hotel Tower",
+      "type": "hotel",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Loop convention hotels, Chicago",
+        "city": "Chicago",
+        "completed": 1980,
+        "era": "late_modern",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 48, 30 ],
+        "floors": 38,
+        "floor_height": 4,
+        "ground_floor_height": 12,
+        "setbacks": [ { "at_floor": 6, "footprint": [ 40, 26 ] } ],
+        "roof": { "type": "flat_mechanical", "height": 6 }
+      },
+      "below_grade": {
+        "levels": 2,
+        "level_height": 5,
+        "uses": [ "parking_deck", "loading_dock", "mechanical" ],
+        "transit": "subway_mezzanine"
+      },
+      "structure": { "bay": 5, "column_grid": [ 15, 15 ], "core": { "footprint": [ 14, 12 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 8, "service_elevators": 2, "stairs": 3 },
+      "facade": {
+        "system": "precast_concrete_panel",
+        "window_pattern": "punched_window",
+        "spandrel": "buff_precast",
+        "ground_treatment": "porte_cochere",
+        "cornice": "banded"
+      },
+      "program": [
+        { "floors": [ 1, 2 ], "use": "lobby" },
+        { "floors": [ 3, 4 ], "use": "auditorium" },
+        { "floors": [ 5, 5 ], "use": "restaurant_dining" },
+        { "floors": [ 6, 36 ], "use": "hotel_room" },
+        { "floors": [ 37, 38 ], "use": "mechanical" }
+      ],
+      "fitout": {
+        "lobby": "lobby_hotel_grand",
+        "auditorium": "ballroom_banquet",
+        "hotel_room": "hotel_room_standard",
+        "restaurant_dining": "restaurant_hotel"
+      }
+    }
+  ]
+}

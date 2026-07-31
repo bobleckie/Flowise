@@ -1,0 +1,505 @@
+{
+  "$comment": "Commercial, automotive and industrial low-rise. These are the buildings a city is mostly made of and the ones most often missing from Minecraft cities, which is why those cities read as film sets. All monolithic tier except the loft and garage — no repeating floors, so the module grid buys nothing.",
+  "buildings": [
+    {
+      "id": "gas_station_canopy",
+      "name": "Gas Station with Canopy",
+      "type": "automotive",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Postwar American filling station",
+        "city": "generic",
+        "completed": 1975,
+        "era": "roadside_commercial",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 46, 40 ],
+        "floors": 1,
+        "floor_height": 5,
+        "ground_floor_height": 5,
+        "roof": {
+          "type": "canopy",
+          "height": 3,
+          "features": [ "detached_pump_canopy", "illuminated_price_sign", "roof_hvac" ]
+        },
+        "note": "The canopy is a separate structure standing clear of the shop on four columns. Forcing it onto the building grid is exactly the wrong move."
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "storage" ], "transit": "none" },
+      "vertical": { "stairs": 1, "passenger_elevators": 0 },
+      "facade": {
+        "system": "metal_panel_and_glass",
+        "window_pattern": "full_glass_storefront",
+        "ground_treatment": "asphalt_forecourt",
+        "cornice": "banded_fascia",
+        "features": [ "fuel_pumps", "air_pump", "bollards", "waste_bins" ]
+      },
+      "program": [ { "floors": [ 1, 1 ], "use": "retail_floor" } ],
+      "fitout": { "retail_floor": "convenience_store_interior", "storage": "storage_back_room" }
+    },
+    {
+      "id": "convenience_store",
+      "name": "Corner Convenience Store",
+      "type": "retail",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Urban corner convenience store",
+        "city": "generic",
+        "completed": 1980,
+        "era": "roadside_commercial",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 30, 24 ],
+        "floors": 1,
+        "floor_height": 5,
+        "ground_floor_height": 5,
+        "roof": { "type": "flat_parapet", "height": 2, "features": [ "roof_hvac", "illuminated_sign_band" ] }
+      },
+      "below_grade": { "levels": 0, "level_height": 0, "uses": [], "transit": "none" },
+      "vertical": { "stairs": 1, "passenger_elevators": 0 },
+      "facade": {
+        "system": "split_face_block",
+        "window_pattern": "full_glass_storefront",
+        "ground_treatment": "concrete_apron",
+        "cornice": "banded_fascia",
+        "features": [ "security_grille", "ice_chest", "newspaper_box" ]
+      },
+      "program": [ { "floors": [ 1, 1 ], "use": "retail_floor" } ],
+      "fitout": { "retail_floor": "convenience_store_interior" }
+    },
+    {
+      "id": "fast_food_drive_through",
+      "name": "Fast Food with Drive-Through",
+      "type": "restaurant",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Suburban fast food restaurant",
+        "city": "generic",
+        "completed": 1985,
+        "era": "roadside_commercial",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 38, 30 ],
+        "floors": 1,
+        "floor_height": 5,
+        "ground_floor_height": 5,
+        "roof": { "type": "flat_parapet", "height": 3, "features": [ "mansard_fascia", "roof_hvac", "pylon_sign" ] },
+        "note": "Drive-through lane wraps one side with a menu board and pickup window — a site feature, not a building feature, and the assembler must place it as such."
+      },
+      "below_grade": { "levels": 0, "level_height": 0, "uses": [], "transit": "none" },
+      "vertical": { "stairs": 1, "passenger_elevators": 0 },
+      "facade": {
+        "system": "brick_and_emphasis_panel",
+        "window_pattern": "full_glass_storefront",
+        "ground_treatment": "drive_through_lane",
+        "cornice": "mansard_fascia",
+        "features": [ "menu_board", "pickup_window", "outdoor_seating" ]
+      },
+      "program": [ { "floors": [ 1, 1 ], "use": "restaurant_dining" } ],
+      "fitout": { "restaurant_dining": "fast_food_dining", "restaurant_kitchen": "fast_food_kitchen" }
+    },
+    {
+      "id": "roadside_diner",
+      "name": "Roadside Diner",
+      "type": "restaurant",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Stainless-steel American diner",
+        "city": "generic",
+        "completed": 1950,
+        "era": "streamline_moderne",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 34, 18 ],
+        "floors": 1,
+        "floor_height": 5,
+        "ground_floor_height": 5,
+        "roof": { "type": "barrel_vault", "height": 4, "features": [ "neon_sign", "rooftop_lettering" ] }
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "basement", "storage" ], "transit": "none" },
+      "vertical": { "stairs": 1, "passenger_elevators": 0 },
+      "facade": {
+        "system": "stainless_steel_and_enamel",
+        "window_pattern": "continuous_ribbon",
+        "ground_treatment": "concrete_apron",
+        "cornice": "streamlined_band",
+        "features": [ "neon_trim", "entry_vestibule" ]
+      },
+      "program": [ { "floors": [ 1, 1 ], "use": "restaurant_dining" } ],
+      "fitout": { "restaurant_dining": "diner_counter_booths", "restaurant_kitchen": "diner_kitchen" }
+    },
+    {
+      "id": "corner_tavern_mixed",
+      "name": "Corner Tavern with Flats Above",
+      "type": "mixed_use",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Chicago corner tavern building",
+        "city": "Chicago",
+        "completed": 1910,
+        "era": "vernacular",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 30, 40 ],
+        "floors": 3,
+        "floor_height": 4,
+        "ground_floor_height": 6,
+        "roof": { "type": "flat_parapet", "height": 3, "features": [ "ornate_cornice", "rear_porch_stack" ] },
+        "corner": "cut",
+        "note": "Angled corner entry at the intersection — the corner cut is what makes this building work on a street grid."
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "basement", "storage" ], "transit": "none" },
+      "vertical": { "stairs": 2, "passenger_elevators": 0 },
+      "facade": {
+        "system": "common_brick",
+        "window_pattern": "punched_window",
+        "ground_treatment": "corner_storefront",
+        "cornice": "pressed_metal",
+        "features": [ "corner_entry", "painted_wall_sign", "awning" ]
+      },
+      "program": [ { "floors": [ 1, 1 ], "use": "restaurant_dining" }, { "floors": [ 2, 3 ], "use": "apartment" } ],
+      "fitout": { "restaurant_dining": "tavern_bar", "apartment": "apartment_prewar_flat" }
+    },
+    {
+      "id": "strip_retail_row",
+      "name": "Strip Retail Row",
+      "type": "retail",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Suburban strip retail",
+        "city": "generic",
+        "completed": 1978,
+        "era": "roadside_commercial",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 80, 26 ],
+        "floors": 1,
+        "floor_height": 5,
+        "ground_floor_height": 5,
+        "roof": { "type": "flat_parapet", "height": 3, "features": [ "sign_band", "roof_hvac" ] },
+        "note": "Five tenant bays under one roof, each with its own storefront and sign — the bay rhythm is the building."
+      },
+      "below_grade": { "levels": 0, "level_height": 0, "uses": [], "transit": "none" },
+      "vertical": { "stairs": 1, "passenger_elevators": 0 },
+      "facade": {
+        "system": "brick_and_emphasis_panel",
+        "window_pattern": "full_glass_storefront",
+        "ground_treatment": "covered_walkway",
+        "cornice": "sign_band",
+        "features": [ "tenant_signage", "service_doors_rear" ]
+      },
+      "program": [ { "floors": [ 1, 1 ], "use": "retail_floor" } ],
+      "fitout": { "retail_floor": "retail_strip_tenant" }
+    },
+    {
+      "id": "big_box_store",
+      "name": "Big Box Store",
+      "type": "retail",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Suburban big-box retail",
+        "city": "generic",
+        "completed": 1995,
+        "era": "contemporary_commercial",
+        "pre1990": false,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 110, 90 ],
+        "floors": 1,
+        "floor_height": 8,
+        "ground_floor_height": 8,
+        "roof": { "type": "flat_parapet", "height": 3, "features": [ "roof_hvac_array", "skylights", "sign_band" ] },
+        "note": "8-block clear height. Single-storey but taller than a three-flat — height class must come from real height, not floor count."
+      },
+      "below_grade": { "levels": 0, "level_height": 0, "uses": [], "transit": "none" },
+      "vertical": { "stairs": 2, "passenger_elevators": 0, "service_elevators": 1 },
+      "facade": {
+        "system": "precast_concrete_panel",
+        "window_pattern": "entry_glazing_only",
+        "ground_treatment": "parking_apron",
+        "cornice": "parapet_band",
+        "features": [ "garden_centre", "loading_dock", "cart_corral" ]
+      },
+      "program": [ { "floors": [ 1, 1 ], "use": "retail_floor" } ],
+      "fitout": { "retail_floor": "big_box_aisles", "loading_dock": "loading_dock_standard" }
+    },
+    {
+      "id": "auto_repair_shop",
+      "name": "Auto Repair Shop",
+      "type": "automotive",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Neighbourhood auto repair garage",
+        "city": "generic",
+        "completed": 1970,
+        "era": "roadside_commercial",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 36, 28 ],
+        "floors": 1,
+        "floor_height": 6,
+        "ground_floor_height": 6,
+        "roof": { "type": "flat_parapet", "height": 2, "features": [ "roof_vents", "projecting_sign" ] }
+      },
+      "below_grade": { "levels": 0, "level_height": 0, "uses": [], "transit": "none" },
+      "vertical": { "stairs": 1, "passenger_elevators": 0 },
+      "facade": {
+        "system": "concrete_block",
+        "window_pattern": "overhead_door_bays",
+        "ground_treatment": "concrete_apron",
+        "cornice": "none",
+        "features": [ "roll_up_doors", "tyre_stacks", "vehicle_lift" ]
+      },
+      "program": [ { "floors": [ 1, 1 ], "use": "garage_bay" } ],
+      "fitout": { "garage_bay": "auto_repair_bay" }
+    },
+    {
+      "id": "car_wash_tunnel",
+      "name": "Tunnel Car Wash",
+      "type": "automotive",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Automatic tunnel car wash",
+        "city": "generic",
+        "completed": 1988,
+        "era": "roadside_commercial",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 44, 16 ],
+        "floors": 1,
+        "floor_height": 5,
+        "ground_floor_height": 5,
+        "roof": { "type": "flat_parapet", "height": 2, "features": [ "sign_band", "equipment_housing" ] }
+      },
+      "below_grade": { "levels": 0, "level_height": 0, "uses": [], "transit": "none" },
+      "vertical": { "stairs": 1, "passenger_elevators": 0 },
+      "facade": {
+        "system": "metal_panel_and_glass",
+        "window_pattern": "tunnel_openings",
+        "ground_treatment": "concrete_apron",
+        "cornice": "banded_fascia",
+        "features": [ "vacuum_bays", "pay_station", "brush_gantry" ]
+      },
+      "program": [ { "floors": [ 1, 1 ], "use": "garage_bay" } ],
+      "fitout": { "garage_bay": "car_wash_tunnel_interior" }
+    },
+    {
+      "id": "warehouse_loft",
+      "name": "Warehouse Loft Building",
+      "type": "industrial",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "West Loop timber-frame warehouse, Chicago",
+        "city": "Chicago",
+        "completed": 1905,
+        "era": "industrial_vernacular",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 60, 45 ],
+        "floors": 7,
+        "floor_height": 5,
+        "ground_floor_height": 6,
+        "roof": {
+          "type": "flat_parapet",
+          "height": 3,
+          "features": [ "water_tower", "freight_penthouse", "painted_wall_sign" ]
+        }
+      },
+      "below_grade": {
+        "levels": 1,
+        "level_height": 5,
+        "uses": [ "basement", "loading_dock", "mechanical" ],
+        "transit": "none"
+      },
+      "structure": { "bay": 5, "column_grid": [ 15, 15 ], "core": { "footprint": [ 10, 10 ], "position": "corner" } },
+      "vertical": { "passenger_elevators": 1, "service_elevators": 2, "stairs": 2 },
+      "facade": {
+        "system": "red_brick_heavy_timber",
+        "window_pattern": "large_industrial_sash",
+        "spandrel": "brick_pier",
+        "ground_treatment": "loading_dock_base",
+        "cornice": "corbelled_brick",
+        "features": [ "fire_escape", "loading_doors", "painted_ghost_sign" ]
+      },
+      "program": [
+        { "floors": [ 1, 1 ], "use": "loading_dock" },
+        { "floors": [ 2, 6 ], "use": "workshop" },
+        { "floors": [ 7, 7 ], "use": "storage" }
+      ],
+      "fitout": { "loading_dock": "loading_dock_standard", "workshop": "loft_workshop", "storage": "storage_racked" }
+    },
+    {
+      "id": "cold_storage_warehouse",
+      "name": "Cold Storage Warehouse",
+      "type": "industrial",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Urban cold storage warehouse",
+        "city": "Chicago",
+        "completed": 1925,
+        "era": "industrial_vernacular",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 50, 40 ],
+        "floors": 9,
+        "floor_height": 4,
+        "ground_floor_height": 6,
+        "roof": { "type": "flat_parapet", "height": 4, "features": [ "equipment_penthouse", "water_tower" ] },
+        "note": "Almost windowless — insulated mass. A good adversary for any facade rule that assumes windows on every bay."
+      },
+      "below_grade": { "levels": 1, "level_height": 5, "uses": [ "mechanical", "storage" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 15, 15 ], "core": { "footprint": [ 10, 10 ], "position": "corner" } },
+      "vertical": { "passenger_elevators": 1, "service_elevators": 3, "stairs": 2 },
+      "facade": {
+        "system": "buff_brick_blind_wall",
+        "window_pattern": "sparse_slot",
+        "spandrel": "brick_pier",
+        "ground_treatment": "loading_dock_base",
+        "cornice": "corbelled_brick"
+      },
+      "program": [
+        { "floors": [ 1, 1 ], "use": "loading_dock" },
+        { "floors": [ 2, 8 ], "use": "storage" },
+        { "floors": [ 9, 9 ], "use": "mechanical" }
+      ],
+      "fitout": { "loading_dock": "loading_dock_standard", "storage": "storage_cold_racked" }
+    },
+    {
+      "id": "parking_garage_precast",
+      "name": "Precast Parking Garage",
+      "type": "parking",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Downtown precast parking structure",
+        "city": "generic",
+        "completed": 1982,
+        "era": "late_modern",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 60, 50 ],
+        "floors": 8,
+        "floor_height": 4,
+        "ground_floor_height": 5,
+        "roof": {
+          "type": "flat_parapet",
+          "height": 2,
+          "features": [ "open_top_deck", "light_poles", "stair_bulkhead" ]
+        },
+        "note": "Open-sided: no glazing, spandrel panels only, and the top deck is open to the sky."
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "parking_deck" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 15, 15 ], "core": { "footprint": [ 10, 10 ], "position": "corner" } },
+      "vertical": { "passenger_elevators": 2, "service_elevators": 0, "stairs": 2 },
+      "facade": {
+        "system": "precast_spandrel_open",
+        "window_pattern": "open_spandrel_band",
+        "ground_treatment": "retail_liner_base",
+        "cornice": "none",
+        "features": [ "ramp_helix", "ticket_booth", "clearance_bar" ]
+      },
+      "program": [ { "floors": [ 1, 1 ], "use": "retail_floor" }, { "floors": [ 2, 8 ], "use": "parking_deck" } ],
+      "fitout": { "retail_floor": "retail_liner_small", "parking_deck": "parking_deck_marked" }
+    },
+    {
+      "id": "small_office_block",
+      "name": "Small Office Block",
+      "type": "office",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Neighbourhood commercial office block",
+        "city": "generic",
+        "completed": 1968,
+        "era": "late_modern",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 35, 25 ],
+        "floors": 4,
+        "floor_height": 4,
+        "ground_floor_height": 5,
+        "roof": { "type": "flat_parapet", "height": 2, "features": [ "roof_hvac" ] }
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "storage", "mechanical" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 10, 10 ], "core": { "footprint": [ 8, 8 ], "position": "rear" } },
+      "vertical": { "passenger_elevators": 1, "service_elevators": 0, "stairs": 2 },
+      "facade": {
+        "system": "brick_and_ribbon_glazing",
+        "window_pattern": "ribbon",
+        "ground_treatment": "storefront_base",
+        "cornice": "banded_fascia"
+      },
+      "program": [ { "floors": [ 1, 1 ], "use": "retail_floor" }, { "floors": [ 2, 4 ], "use": "office_open" } ],
+      "fitout": { "retail_floor": "retail_strip_tenant", "office_open": "office_small_suite" }
+    },
+    {
+      "id": "neoclassical_bank_branch",
+      "name": "Neoclassical Bank Branch",
+      "type": "office",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Neighbourhood savings bank",
+        "city": "Chicago",
+        "completed": 1922,
+        "era": "neoclassical",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 40, 34 ],
+        "floors": 2,
+        "floor_height": 8,
+        "ground_floor_height": 12,
+        "roof": { "type": "flat_parapet", "height": 4, "features": [ "balustrade", "carved_frieze" ] },
+        "note": "Double-height banking hall behind a temple front — two floors but as tall as a five-storey building."
+      },
+      "below_grade": { "levels": 1, "level_height": 5, "uses": [ "basement", "storage", "mechanical" ], "transit": "none" },
+      "vertical": { "stairs": 2, "passenger_elevators": 1 },
+      "facade": {
+        "system": "bedford_limestone",
+        "window_pattern": "monumental_arched",
+        "ground_treatment": "columned_portico",
+        "cornice": "dentil_entablature",
+        "features": [ "corinthian_columns", "bronze_doors", "carved_pediment" ]
+      },
+      "program": [ { "floors": [ 1, 1 ], "use": "lobby" }, { "floors": [ 2, 2 ], "use": "office_private" } ],
+      "fitout": { "lobby": "banking_hall", "office_private": "office_period_partitioned", "basement": "bank_vault" }
+    }
+  ]
+}

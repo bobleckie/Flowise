@@ -1,0 +1,460 @@
+{
+  "$comment": "Residential, from Chicago's vernacular housing stock up to mid-rise. The bungalow, two-flat and greystone are what actually fills a Chicago neighbourhood — a city built only from Loop towers reads as a downtown, not a city. Mostly monolithic tier: no repeating floors, so composing them from modules buys nothing.",
+  "buildings": [
+    {
+      "id": "chicago_bungalow",
+      "name": "Chicago Bungalow",
+      "type": "residential",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Chicago Bungalow, bungalow belt",
+        "city": "Chicago",
+        "completed": 1925,
+        "era": "craftsman_vernacular",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 24, 40 ],
+        "floors": 2,
+        "floor_height": 4,
+        "ground_floor_height": 4,
+        "roof": { "type": "hip", "height": 6, "features": [ "dormer", "chimney", "overhang" ] },
+        "note": "The single most common house in Chicago. Low-pitched hipped roof, full-width front, offset entry, brick. Second floor is a half-storey in the roof."
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "basement", "mechanical", "storage" ], "transit": "none" },
+      "vertical": { "stairs": 2, "passenger_elevators": 0 },
+      "facade": {
+        "system": "face_brick_with_limestone_trim",
+        "window_pattern": "art_glass_bay",
+        "ground_treatment": "raised_stoop",
+        "cornice": "boxed_eave",
+        "features": [ "projecting_bay", "art_glass_transom" ]
+      },
+      "program": [ { "floors": [ 1, 1 ], "use": "living" }, { "floors": [ 2, 2 ], "use": "bedroom" } ],
+      "fitout": {
+        "living": "house_living_1920s",
+        "bedroom": "house_bedroom_1920s",
+        "basement": "basement_finished_rec"
+      }
+    },
+    {
+      "id": "chicago_two_flat",
+      "name": "Chicago Two-Flat",
+      "type": "residential",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Chicago two-flat",
+        "city": "Chicago",
+        "completed": 1915,
+        "era": "vernacular",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 25, 55 ],
+        "floors": 3,
+        "floor_height": 4,
+        "ground_floor_height": 4,
+        "roof": { "type": "flat_parapet", "height": 2, "features": [ "rear_porch_stack" ] },
+        "note": "One flat per floor over a raised basement. Wooden rear porch stack is essential — it is the defining back-alley silhouette of Chicago."
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "basement", "storage", "mechanical" ], "transit": "none" },
+      "vertical": { "stairs": 2, "passenger_elevators": 0 },
+      "facade": {
+        "system": "common_brick_with_greystone_front",
+        "window_pattern": "punched_window",
+        "ground_treatment": "raised_stoop",
+        "cornice": "pressed_metal",
+        "features": [ "front_bay", "rear_wooden_porch" ]
+      },
+      "program": [ { "floors": [ 1, 2 ], "use": "apartment" }, { "floors": [ 3, 3 ], "use": "apartment" } ],
+      "fitout": { "apartment": "apartment_prewar_flat", "basement": "basement_unfinished" }
+    },
+    {
+      "id": "chicago_three_flat",
+      "name": "Chicago Three-Flat",
+      "type": "residential",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Chicago three-flat",
+        "city": "Chicago",
+        "completed": 1920,
+        "era": "vernacular",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 25, 58 ],
+        "floors": 4,
+        "floor_height": 4,
+        "ground_floor_height": 4,
+        "roof": { "type": "flat_parapet", "height": 2, "features": [ "rear_porch_stack" ] }
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "basement", "storage", "mechanical" ], "transit": "none" },
+      "vertical": { "stairs": 2, "passenger_elevators": 0 },
+      "facade": {
+        "system": "greystone_front_common_brick_sides",
+        "window_pattern": "punched_window",
+        "ground_treatment": "raised_stoop",
+        "cornice": "pressed_metal",
+        "features": [ "front_bay", "rear_wooden_porch" ]
+      },
+      "program": [ { "floors": [ 1, 3 ], "use": "apartment" }, { "floors": [ 4, 4 ], "use": "apartment" } ],
+      "fitout": { "apartment": "apartment_prewar_flat", "basement": "basement_unfinished" }
+    },
+    {
+      "id": "greystone_rowhouse",
+      "name": "Greystone Row House",
+      "type": "residential",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Chicago greystone row house",
+        "city": "Chicago",
+        "completed": 1900,
+        "era": "romanesque_revival",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 22, 50 ],
+        "floors": 3,
+        "floor_height": 4,
+        "ground_floor_height": 5,
+        "roof": { "type": "flat_parapet", "height": 3, "features": [ "ornate_cornice" ] },
+        "party_walls": [ "east", "west" ],
+        "note": "Party walls on both sides — designed to be placed in a continuous row, so the side elevations are blank."
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "basement", "mechanical" ], "transit": "none" },
+      "vertical": { "stairs": 2, "passenger_elevators": 0 },
+      "facade": {
+        "system": "bedford_limestone",
+        "window_pattern": "arched_romanesque",
+        "ground_treatment": "raised_stoop",
+        "cornice": "carved_stone",
+        "features": [ "carved_lintels", "projecting_bay" ]
+      },
+      "program": [ { "floors": [ 1, 2 ], "use": "living" }, { "floors": [ 3, 3 ], "use": "bedroom" } ],
+      "fitout": {
+        "living": "house_living_victorian",
+        "bedroom": "house_bedroom_victorian",
+        "basement": "basement_unfinished"
+      }
+    },
+    {
+      "id": "brownstone_rowhouse",
+      "name": "Brownstone Row House",
+      "type": "residential",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Eastern seaboard brownstone row",
+        "city": "generic",
+        "completed": 1890,
+        "era": "italianate",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 20, 45 ],
+        "floors": 4,
+        "floor_height": 4,
+        "ground_floor_height": 4,
+        "roof": { "type": "flat_parapet", "height": 3, "features": [ "ornate_cornice" ] },
+        "party_walls": [ "east", "west" ]
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "basement", "mechanical" ], "transit": "none" },
+      "vertical": { "stairs": 2, "passenger_elevators": 0 },
+      "facade": {
+        "system": "brownstone",
+        "window_pattern": "tall_double_hung",
+        "ground_treatment": "high_stoop",
+        "cornice": "bracketed_wood",
+        "features": [ "window_hoods", "iron_railings" ]
+      },
+      "program": [
+        { "floors": [ 1, 1 ], "use": "kitchen" },
+        { "floors": [ 2, 2 ], "use": "living" },
+        { "floors": [ 3, 4 ], "use": "bedroom" }
+      ],
+      "fitout": {
+        "kitchen": "house_kitchen_victorian",
+        "living": "house_living_victorian",
+        "bedroom": "house_bedroom_victorian"
+      }
+    },
+    {
+      "id": "courtyard_six_flat",
+      "name": "Courtyard Apartment Building",
+      "type": "residential",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Chicago U-shaped courtyard apartment building",
+        "city": "Chicago",
+        "completed": 1925,
+        "era": "revival_vernacular",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 70, 55 ],
+        "floors": 4,
+        "floor_height": 4,
+        "ground_floor_height": 4,
+        "roof": { "type": "flat_parapet", "height": 3 },
+        "courtyard": { "footprint": [ 30, 30 ], "from_floor": 1, "open_side": "south" },
+        "note": "U-plan open to the street with a landscaped court. Three separate stair cores, no elevator — very common and very Chicago."
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "basement", "storage", "mechanical" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 10, 10 ], "core": { "footprint": [ 8, 8 ], "position": "distributed" } },
+      "vertical": { "stairs": 3, "passenger_elevators": 0 },
+      "facade": {
+        "system": "tapestry_brick",
+        "window_pattern": "punched_window",
+        "ground_treatment": "courtyard_entries",
+        "cornice": "pressed_metal",
+        "features": [ "terracotta_entry_surrounds", "sunroom_bays" ]
+      },
+      "program": [ { "floors": [ 1, 3 ], "use": "apartment" }, { "floors": [ 4, 4 ], "use": "apartment" } ],
+      "fitout": { "apartment": "apartment_prewar_flat", "basement": "basement_unfinished" }
+    },
+    {
+      "id": "workers_cottage",
+      "name": "Workers Cottage",
+      "type": "residential",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Chicago workers cottage",
+        "city": "Chicago",
+        "completed": 1885,
+        "era": "vernacular",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 18, 34 ],
+        "floors": 2,
+        "floor_height": 4,
+        "ground_floor_height": 4,
+        "roof": { "type": "gable", "height": 5, "features": [ "front_gable", "chimney" ] },
+        "note": "Narrow front-gabled cottage on a raised basement. The oldest and smallest housing type in the catalog."
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "basement", "storage" ], "transit": "none" },
+      "vertical": { "stairs": 1, "passenger_elevators": 0 },
+      "facade": {
+        "system": "clapboard_or_common_brick",
+        "window_pattern": "double_hung",
+        "ground_treatment": "wooden_stoop",
+        "cornice": "simple_eave"
+      },
+      "program": [ { "floors": [ 1, 1 ], "use": "living" }, { "floors": [ 2, 2 ], "use": "bedroom" } ],
+      "fitout": {
+        "living": "house_living_modest",
+        "bedroom": "house_bedroom_modest",
+        "basement": "basement_unfinished"
+      }
+    },
+    {
+      "id": "gold_coast_mansion",
+      "name": "Gold Coast Mansion",
+      "type": "residential",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Gold Coast and Prairie Avenue mansions, Chicago",
+        "city": "Chicago",
+        "completed": 1895,
+        "era": "beaux_arts",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 40, 55 ],
+        "floors": 4,
+        "floor_height": 5,
+        "ground_floor_height": 6,
+        "roof": { "type": "mansard", "height": 8, "features": [ "dormers", "iron_cresting", "chimney_stacks" ] }
+      },
+      "below_grade": {
+        "levels": 1,
+        "level_height": 5,
+        "uses": [ "basement", "kitchen", "storage", "mechanical" ],
+        "transit": "none"
+      },
+      "vertical": { "stairs": 3, "passenger_elevators": 1 },
+      "facade": {
+        "system": "bedford_limestone",
+        "window_pattern": "tall_double_hung",
+        "ground_treatment": "carriage_entrance",
+        "cornice": "carved_stone",
+        "features": [ "balustrade", "carved_pediment", "iron_fence" ]
+      },
+      "program": [
+        { "floors": [ 1, 1 ], "use": "living" },
+        { "floors": [ 2, 2 ], "use": "living" },
+        { "floors": [ 3, 3 ], "use": "bedroom" },
+        { "floors": [ 4, 4 ], "use": "bedroom" }
+      ],
+      "fitout": { "living": "mansion_reception", "bedroom": "mansion_bedroom", "basement": "mansion_service_basement" }
+    },
+    {
+      "id": "suburban_ranch",
+      "name": "Suburban Ranch House",
+      "type": "residential",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Postwar Chicago suburban ranch",
+        "city": "generic",
+        "completed": 1958,
+        "era": "postwar_suburban",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 46, 26 ],
+        "floors": 1,
+        "floor_height": 4,
+        "ground_floor_height": 4,
+        "roof": { "type": "hip", "height": 4, "features": [ "wide_eaves", "chimney" ] },
+        "attached": { "garage_bays": 2 }
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "basement", "mechanical", "storage" ], "transit": "none" },
+      "vertical": { "stairs": 1, "passenger_elevators": 0 },
+      "facade": {
+        "system": "brick_and_siding",
+        "window_pattern": "picture_window",
+        "ground_treatment": "concrete_walk",
+        "cornice": "wide_eave",
+        "features": [ "attached_garage", "driveway" ]
+      },
+      "program": [ { "floors": [ 1, 1 ], "use": "living" } ],
+      "fitout": {
+        "living": "house_living_midcentury",
+        "basement": "basement_finished_rec",
+        "garage_bay": "garage_domestic"
+      }
+    },
+    {
+      "id": "townhouse_row_modern",
+      "name": "Modern Townhouse Row",
+      "type": "residential",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Infill townhouse rows, Chicago near north",
+        "city": "Chicago",
+        "completed": 1998,
+        "era": "contemporary",
+        "pre1990": false,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 22, 44 ],
+        "floors": 4,
+        "floor_height": 4,
+        "ground_floor_height": 5,
+        "roof": { "type": "flat_parapet", "height": 2, "features": [ "roof_deck", "stair_bulkhead" ] },
+        "party_walls": [ "east", "west" ],
+        "attached": { "garage_bays": 2 }
+      },
+      "below_grade": { "levels": 0, "level_height": 0, "uses": [], "transit": "none" },
+      "vertical": { "stairs": 1, "passenger_elevators": 0 },
+      "facade": {
+        "system": "red_brick_and_metal_panel",
+        "window_pattern": "large_fixed",
+        "ground_treatment": "garage_and_entry",
+        "cornice": "none",
+        "features": [ "roof_deck_railing" ]
+      },
+      "program": [
+        { "floors": [ 1, 1 ], "use": "garage_bay" },
+        { "floors": [ 2, 2 ], "use": "living" },
+        { "floors": [ 3, 4 ], "use": "bedroom" }
+      ],
+      "fitout": {
+        "garage_bay": "garage_domestic",
+        "living": "house_living_contemporary",
+        "bedroom": "house_bedroom_contemporary"
+      }
+    },
+    {
+      "id": "public_housing_midrise",
+      "name": "Mid-Century Public Housing Block",
+      "type": "residential",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Chicago Housing Authority mid-rise blocks",
+        "city": "Chicago",
+        "completed": 1962,
+        "era": "institutional_modern",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 70, 20 ],
+        "floors": 12,
+        "floor_height": 4,
+        "ground_floor_height": 4,
+        "roof": { "type": "flat_parapet", "height": 2, "features": [ "stair_bulkhead", "water_tank" ] },
+        "note": "Open exterior gallery access on one side — the corridor is outdoors, which the assembler must not enclose."
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "mechanical", "storage" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 10, 10 ], "core": { "footprint": [ 8, 12 ], "position": "end" } },
+      "vertical": { "passenger_elevators": 2, "service_elevators": 0, "stairs": 2 },
+      "facade": {
+        "system": "exposed_concrete_and_brick_infill",
+        "window_pattern": "regular_grid",
+        "ground_treatment": "open_undercroft",
+        "cornice": "none",
+        "features": [ "exterior_gallery", "wire_mesh_balustrade" ]
+      },
+      "program": [
+        { "floors": [ 1, 1 ], "use": "lobby" },
+        { "floors": [ 2, 11 ], "use": "apartment" },
+        { "floors": [ 12, 12 ], "use": "mechanical" }
+      ],
+      "fitout": { "lobby": "lobby_institutional", "apartment": "apartment_institutional" }
+    },
+    {
+      "id": "garden_apartment_walkup",
+      "name": "Garden Apartment Walk-Up",
+      "type": "residential",
+      "tier": "monolithic",
+      "provenance": {
+        "inspiration": "Postwar garden apartment walk-up",
+        "city": "generic",
+        "completed": 1965,
+        "era": "postwar_suburban",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 60, 26 ],
+        "floors": 3,
+        "floor_height": 4,
+        "ground_floor_height": 4,
+        "roof": { "type": "gable", "height": 4 }
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "storage", "mechanical" ], "transit": "none" },
+      "vertical": { "stairs": 2, "passenger_elevators": 0 },
+      "facade": {
+        "system": "brick_and_siding",
+        "window_pattern": "punched_window",
+        "ground_treatment": "landscaped_entry",
+        "cornice": "simple_eave",
+        "features": [ "balconies", "exterior_stair" ]
+      },
+      "program": [ { "floors": [ 1, 2 ], "use": "apartment" }, { "floors": [ 3, 3 ], "use": "apartment" } ],
+      "fitout": { "apartment": "apartment_midcentury" }
+    }
+  ]
+}

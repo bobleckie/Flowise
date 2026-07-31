@@ -1,0 +1,616 @@
+{
+  "$comment": "Chicago School, Art Deco and neo-Gothic. All pre-1990, so architectural copyright does not attach; named landmarks are still marked 'review' for trademark and trade-dress reasons. These carry the ornament budget — cornices, terra cotta, light courts — that makes a Loop street read as Chicago rather than as generic city.",
+  "buildings": [
+    {
+      "id": "monadnock_masonry_slab",
+      "name": "Load-Bearing Masonry Slab",
+      "type": "office",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Monadnock Building, Chicago",
+        "city": "Chicago",
+        "completed": 1891,
+        "era": "chicago_school",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 66, 22 ],
+        "floors": 17,
+        "floor_height": 4,
+        "ground_floor_height": 7,
+        "roof": { "type": "flat_parapet", "height": 3, "features": [ "flared_parapet" ] },
+        "note": "Walls taper from 6 blocks thick at grade to 2 at the top — the last tall load-bearing masonry building. The taper is the whole point."
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "mechanical", "storage" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 11, 11 ], "core": { "footprint": [ 10, 10 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 4, "service_elevators": 1, "stairs": 2 },
+      "facade": {
+        "system": "purple_brown_brick",
+        "window_pattern": "projecting_oriel_bay",
+        "spandrel": "brick",
+        "ground_treatment": "storefront_base",
+        "cornice": "flared_brick",
+        "features": [ "undulating_bay_windows" ]
+      },
+      "program": [
+        { "floors": [ 1, 1 ], "use": "retail_floor" },
+        { "floors": [ 2, 16 ], "use": "office_private" },
+        { "floors": [ 17, 17 ], "use": "mechanical" }
+      ],
+      "fitout": { "retail_floor": "retail_storefront_victorian", "office_private": "office_period_partitioned" }
+    },
+    {
+      "id": "rookery_light_court",
+      "name": "Light-Court Commercial Block",
+      "type": "office",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "The Rookery, Chicago",
+        "city": "Chicago",
+        "completed": 1888,
+        "era": "chicago_school",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 55, 55 ],
+        "floors": 12,
+        "floor_height": 4,
+        "ground_floor_height": 8,
+        "roof": { "type": "flat_parapet", "height": 4 },
+        "courtyard": { "footprint": [ 21, 21 ], "from_floor": 3 },
+        "note": "Hollow square around a glass-roofed light court — the interior court is the hero space, not the facade."
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "mechanical", "storage" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 15, 15 ], "core": { "footprint": [ 12, 10 ], "position": "corner" } },
+      "vertical": { "passenger_elevators": 4, "service_elevators": 1, "stairs": 3 },
+      "facade": {
+        "system": "red_brick_and_terracotta",
+        "window_pattern": "arched_romanesque",
+        "spandrel": "carved_terracotta",
+        "ground_treatment": "rusticated_arcade",
+        "cornice": "heavy_projecting"
+      },
+      "program": [
+        { "floors": [ 1, 2 ], "use": "lobby" },
+        { "floors": [ 3, 11 ], "use": "office_private" },
+        { "floors": [ 12, 12 ], "use": "mechanical" }
+      ],
+      "fitout": { "lobby": "lobby_light_court_ornate", "office_private": "office_period_partitioned" }
+    },
+    {
+      "id": "reliance_glass_pioneer",
+      "name": "Early Glass Curtain Tower",
+      "type": "mixed_use",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Reliance Building, Chicago",
+        "city": "Chicago",
+        "completed": 1895,
+        "era": "chicago_school",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 26, 20 ],
+        "floors": 15,
+        "floor_height": 4,
+        "ground_floor_height": 7,
+        "roof": { "type": "flat_parapet", "height": 3, "features": [ "ornate_cornice" ] }
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "mechanical" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 10, 10 ], "core": { "footprint": [ 8, 8 ], "position": "rear" } },
+      "vertical": { "passenger_elevators": 3, "service_elevators": 1, "stairs": 2 },
+      "facade": {
+        "system": "white_glazed_terracotta",
+        "window_pattern": "chicago_window",
+        "spandrel": "ornamented_terracotta",
+        "ground_treatment": "storefront_base",
+        "cornice": "projecting_terracotta",
+        "note": "Chicago window: a wide fixed pane flanked by two narrow operable sashes. Glass dominates the wall — this is the ancestor of the curtain wall."
+      },
+      "program": [
+        { "floors": [ 1, 2 ], "use": "retail_floor" },
+        { "floors": [ 3, 14 ], "use": "office_private" },
+        { "floors": [ 15, 15 ], "use": "mechanical" }
+      ],
+      "fitout": { "retail_floor": "retail_storefront_victorian", "office_private": "office_period_partitioned" }
+    },
+    {
+      "id": "marquette_chicago_school",
+      "name": "Chicago School Commercial Block",
+      "type": "office",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Marquette Building, Chicago",
+        "city": "Chicago",
+        "completed": 1895,
+        "era": "chicago_school",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 55, 50 ],
+        "floors": 17,
+        "floor_height": 4,
+        "ground_floor_height": 8,
+        "roof": { "type": "flat_parapet", "height": 4 },
+        "courtyard": { "footprint": [ 20, 16 ], "from_floor": 3 }
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "mechanical", "storage" ], "transit": "subway_mezzanine" },
+      "structure": { "bay": 5, "column_grid": [ 15, 15 ], "core": { "footprint": [ 12, 10 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 5, "service_elevators": 1, "stairs": 2 },
+      "facade": {
+        "system": "brown_terracotta_over_steel",
+        "window_pattern": "chicago_window",
+        "spandrel": "ornamented_terracotta",
+        "ground_treatment": "bronze_storefront",
+        "cornice": "projecting_terracotta"
+      },
+      "program": [
+        { "floors": [ 1, 1 ], "use": "lobby" },
+        { "floors": [ 2, 16 ], "use": "office_private" },
+        { "floors": [ 17, 17 ], "use": "mechanical" }
+      ],
+      "fitout": { "lobby": "lobby_mosaic_ornate", "office_private": "office_period_partitioned" }
+    },
+    {
+      "id": "fisher_gothic_terracotta",
+      "name": "Gothic Terracotta Tower",
+      "type": "office",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Fisher Building, Chicago",
+        "city": "Chicago",
+        "completed": 1896,
+        "era": "chicago_school_gothic",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 30, 25 ],
+        "floors": 20,
+        "floor_height": 4,
+        "ground_floor_height": 7,
+        "roof": { "type": "gothic_crown", "height": 8, "features": [ "pinnacles", "gargoyles" ] }
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "mechanical" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 10, 10 ], "core": { "footprint": [ 9, 8 ], "position": "rear" } },
+      "vertical": { "passenger_elevators": 4, "service_elevators": 1, "stairs": 2 },
+      "facade": {
+        "system": "yellow_glazed_terracotta",
+        "window_pattern": "chicago_window",
+        "spandrel": "gothic_tracery",
+        "ground_treatment": "storefront_base",
+        "cornice": "crenellated"
+      },
+      "program": [
+        { "floors": [ 1, 1 ], "use": "retail_floor" },
+        { "floors": [ 2, 19 ], "use": "office_private" },
+        { "floors": [ 20, 20 ], "use": "mechanical" }
+      ],
+      "fitout": { "retail_floor": "retail_storefront_victorian", "office_private": "office_period_partitioned" }
+    },
+    {
+      "id": "sullivan_ornamented_department_store",
+      "name": "Ornamented Department Store",
+      "type": "retail",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Sullivan Center (Carson Pirie Scott), Chicago",
+        "city": "Chicago",
+        "completed": 1899,
+        "era": "chicago_school",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 70, 55 ],
+        "floors": 12,
+        "floor_height": 4,
+        "ground_floor_height": 8,
+        "roof": { "type": "flat_parapet", "height": 4, "features": [ "projecting_cornice" ] },
+        "corner": "rounded",
+        "note": "Rounded corner entrance pavilion with dense cast-iron ornament over the first two floors."
+      },
+      "below_grade": { "levels": 1, "level_height": 5, "uses": [ "storage", "loading_dock" ], "transit": "subway_mezzanine" },
+      "structure": { "bay": 5, "column_grid": [ 15, 15 ], "core": { "footprint": [ 14, 10 ], "position": "rear" } },
+      "vertical": { "passenger_elevators": 6, "service_elevators": 2, "stairs": 3 },
+      "facade": {
+        "system": "white_terracotta_over_steel",
+        "window_pattern": "chicago_window",
+        "spandrel": "plain_terracotta",
+        "ground_treatment": "cast_iron_ornament",
+        "cornice": "projecting_terracotta"
+      },
+      "program": [
+        { "floors": [ 1, 8 ], "use": "retail_floor" },
+        { "floors": [ 9, 10 ], "use": "office_open" },
+        { "floors": [ 11, 11 ], "use": "storage" },
+        { "floors": [ 12, 12 ], "use": "mechanical" }
+      ],
+      "fitout": {
+        "retail_floor": "retail_department_store",
+        "office_open": "office_period_partitioned",
+        "storage": "storage_racked"
+      }
+    },
+    {
+      "id": "board_of_trade_deco",
+      "name": "Art Deco Exchange Tower",
+      "type": "office",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Chicago Board of Trade Building",
+        "city": "Chicago",
+        "completed": 1930,
+        "era": "art_deco",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 60, 45 ],
+        "floors": 44,
+        "floor_height": 4,
+        "ground_floor_height": 14,
+        "setbacks": [
+          { "at_floor": 15, "footprint": [ 50, 38 ] },
+          { "at_floor": 24, "footprint": [ 36, 30 ] },
+          { "at_floor": 35, "footprint": [ 24, 24 ] }
+        ],
+        "roof": { "type": "pyramid", "height": 16, "features": [ "rooftop_statue", "clock_face", "floodlighting" ] },
+        "note": "Terminates the LaSalle Street canyon. The pyramid roof and rooftop statue are the silhouette."
+      },
+      "below_grade": {
+        "levels": 2,
+        "level_height": 5,
+        "uses": [ "mechanical", "storage", "loading_dock" ],
+        "transit": "subway_mezzanine"
+      },
+      "structure": { "bay": 5, "column_grid": [ 15, 15 ], "core": { "footprint": [ 16, 14 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 10, "service_elevators": 2, "stairs": 3 },
+      "facade": {
+        "system": "limestone_deco",
+        "window_pattern": "vertical_slot",
+        "spandrel": "carved_limestone",
+        "ground_treatment": "monumental_entrance",
+        "cornice": "stepped_deco",
+        "features": [ "relief_sculpture", "fluted_piers" ]
+      },
+      "program": [
+        { "floors": [ 1, 2 ], "use": "lobby" },
+        { "floors": [ 3, 5 ], "use": "auditorium" },
+        { "floors": [ 6, 42 ], "use": "office_private" },
+        { "floors": [ 43, 44 ], "use": "mechanical" }
+      ],
+      "fitout": {
+        "lobby": "lobby_deco_marble",
+        "auditorium": "trading_floor",
+        "office_private": "office_period_partitioned"
+      }
+    },
+    {
+      "id": "carbide_carbon_deco",
+      "name": "Dark Green and Gold Deco Tower",
+      "type": "hotel",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Carbide and Carbon Building, Chicago",
+        "city": "Chicago",
+        "completed": 1929,
+        "era": "art_deco",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 34, 26 ],
+        "floors": 37,
+        "floor_height": 4,
+        "ground_floor_height": 10,
+        "setbacks": [ { "at_floor": 22, "footprint": [ 26, 22 ] }, { "at_floor": 32, "footprint": [ 18, 16 ] } ],
+        "roof": { "type": "setback_crown", "height": 12, "features": [ "gold_leaf_crown", "floodlighting" ] },
+        "note": "Dark green terra cotta shaft with a gold-leafed crown — the most colour-dependent building in the catalog."
+      },
+      "below_grade": { "levels": 1, "level_height": 5, "uses": [ "mechanical", "loading_dock" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 12, 12 ], "core": { "footprint": [ 11, 10 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 6, "service_elevators": 2, "stairs": 2 },
+      "facade": {
+        "system": "dark_green_terracotta",
+        "window_pattern": "vertical_slot",
+        "spandrel": "gold_trimmed",
+        "ground_treatment": "black_granite_base",
+        "cornice": "stepped_deco"
+      },
+      "program": [
+        { "floors": [ 1, 2 ], "use": "lobby" },
+        { "floors": [ 3, 3 ], "use": "restaurant_dining" },
+        { "floors": [ 4, 35 ], "use": "hotel_room" },
+        { "floors": [ 36, 37 ], "use": "mechanical" }
+      ],
+      "fitout": {
+        "lobby": "lobby_deco_marble",
+        "hotel_room": "hotel_room_boutique",
+        "restaurant_dining": "restaurant_hotel"
+      }
+    },
+    {
+      "id": "palmolive_deco_setback",
+      "name": "Setback Deco Tower with Beacon",
+      "type": "residential",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Palmolive Building, Chicago",
+        "city": "Chicago",
+        "completed": 1929,
+        "era": "art_deco",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 44, 40 ],
+        "floors": 37,
+        "floor_height": 4,
+        "ground_floor_height": 9,
+        "setbacks": [
+          { "at_floor": 12, "footprint": [ 38, 34 ] },
+          { "at_floor": 20, "footprint": [ 30, 28 ] },
+          { "at_floor": 28, "footprint": [ 22, 20 ] }
+        ],
+        "roof": { "type": "setback_crown", "height": 10, "features": [ "rotating_beacon", "floodlighting" ] }
+      },
+      "below_grade": { "levels": 2, "level_height": 5, "uses": [ "parking_deck", "mechanical" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 15, 15 ], "core": { "footprint": [ 13, 12 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 6, "service_elevators": 2, "stairs": 2 },
+      "facade": {
+        "system": "limestone_deco",
+        "window_pattern": "punched_window",
+        "spandrel": "carved_limestone",
+        "ground_treatment": "bronze_storefront",
+        "cornice": "stepped_deco"
+      },
+      "program": [
+        { "floors": [ 1, 2 ], "use": "lobby" },
+        { "floors": [ 3, 34 ], "use": "apartment" },
+        { "floors": [ 35, 36 ], "use": "penthouse" },
+        { "floors": [ 37, 37 ], "use": "mechanical" }
+      ],
+      "fitout": { "lobby": "lobby_deco_marble", "apartment": "apartment_prewar", "penthouse": "penthouse_deco" }
+    },
+    {
+      "id": "tribune_neo_gothic",
+      "name": "Neo-Gothic Newspaper Tower",
+      "type": "office",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Tribune Tower, Chicago",
+        "city": "Chicago",
+        "completed": 1925,
+        "era": "neo_gothic",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 38, 36 ],
+        "floors": 34,
+        "floor_height": 4,
+        "ground_floor_height": 10,
+        "setbacks": [ { "at_floor": 25, "footprint": [ 28, 26 ] } ],
+        "roof": {
+          "type": "gothic_crown",
+          "height": 18,
+          "features": [ "flying_buttresses", "open_crown", "floodlighting" ]
+        },
+        "note": "The flying-buttress crown is open tracery, not solid — a fill-solid roof kills this building."
+      },
+      "below_grade": {
+        "levels": 2,
+        "level_height": 5,
+        "uses": [ "mechanical", "loading_dock", "storage" ],
+        "transit": "none"
+      },
+      "structure": { "bay": 5, "column_grid": [ 13, 13 ], "core": { "footprint": [ 12, 12 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 8, "service_elevators": 2, "stairs": 3 },
+      "facade": {
+        "system": "indiana_limestone_gothic",
+        "window_pattern": "vertical_slot",
+        "spandrel": "gothic_tracery",
+        "ground_treatment": "carved_gothic_portal",
+        "cornice": "crenellated",
+        "features": [ "buttress_piers", "embedded_stone_fragments" ]
+      },
+      "program": [
+        { "floors": [ 1, 2 ], "use": "lobby" },
+        { "floors": [ 3, 4 ], "use": "workshop" },
+        { "floors": [ 5, 32 ], "use": "office_open" },
+        { "floors": [ 33, 34 ], "use": "mechanical" }
+      ],
+      "fitout": { "lobby": "lobby_gothic_stone", "workshop": "printing_press_hall", "office_open": "office_newsroom" }
+    },
+    {
+      "id": "wrigley_clock_tower",
+      "name": "White Terracotta Clock Tower",
+      "type": "office",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Wrigley Building, Chicago",
+        "city": "Chicago",
+        "completed": 1921,
+        "era": "beaux_arts",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 46, 30 ],
+        "floors": 30,
+        "floor_height": 4,
+        "ground_floor_height": 10,
+        "setbacks": [ { "at_floor": 15, "footprint": [ 30, 24 ] }, { "at_floor": 22, "footprint": [ 20, 18 ] } ],
+        "roof": { "type": "spire", "height": 14, "features": [ "four_clock_faces", "cupola", "floodlighting" ] },
+        "note": "Six shades of white glazed terra cotta, lightest at the top. Floodlit at night since it opened — the lighting is part of the building."
+      },
+      "below_grade": { "levels": 2, "level_height": 5, "uses": [ "mechanical", "loading_dock" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 15, 15 ], "core": { "footprint": [ 12, 11 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 7, "service_elevators": 2, "stairs": 2 },
+      "facade": {
+        "system": "white_glazed_terracotta",
+        "window_pattern": "punched_window",
+        "spandrel": "ornamented_terracotta",
+        "ground_treatment": "arcaded_base",
+        "cornice": "beaux_arts_projecting"
+      },
+      "program": [
+        { "floors": [ 1, 2 ], "use": "lobby" },
+        { "floors": [ 3, 28 ], "use": "office_private" },
+        { "floors": [ 29, 30 ], "use": "mechanical" }
+      ],
+      "fitout": { "lobby": "lobby_beaux_arts", "office_private": "office_period_partitioned" }
+    },
+    {
+      "id": "merchandise_mart_block",
+      "name": "Monumental Deco Wholesale Block",
+      "type": "mixed_use",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Merchandise Mart, Chicago",
+        "city": "Chicago",
+        "completed": 1930,
+        "era": "art_deco",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 110, 55 ],
+        "floors": 25,
+        "floor_height": 4,
+        "ground_floor_height": 10,
+        "setbacks": [ { "at_floor": 19, "footprint": [ 70, 40 ] }, { "at_floor": 22, "footprint": [ 30, 30 ] } ],
+        "roof": { "type": "setback_crown", "height": 10, "features": [ "corner_towers", "clock" ] },
+        "note": "Occupies two full city blocks. The largest single footprint in the catalog and a good stress test for the assembler."
+      },
+      "below_grade": {
+        "levels": 2,
+        "level_height": 5,
+        "uses": [ "loading_dock", "storage", "mechanical", "transit_mezzanine" ],
+        "transit": "subway_direct"
+      },
+      "structure": { "bay": 5, "column_grid": [ 20, 20 ], "core": { "footprint": [ 30, 20 ], "position": "center" } },
+      "vertical": { "passenger_elevators": 20, "service_elevators": 8, "stairs": 6 },
+      "facade": {
+        "system": "buff_terracotta_deco",
+        "window_pattern": "vertical_slot",
+        "spandrel": "carved_terracotta",
+        "ground_treatment": "monumental_entrance",
+        "cornice": "stepped_deco"
+      },
+      "program": [
+        { "floors": [ 1, 2 ], "use": "lobby" },
+        { "floors": [ 3, 12 ], "use": "retail_floor" },
+        { "floors": [ 13, 23 ], "use": "office_open" },
+        { "floors": [ 24, 25 ], "use": "mechanical" }
+      ],
+      "fitout": {
+        "lobby": "lobby_deco_marble",
+        "retail_floor": "showroom_wholesale",
+        "office_open": "office_corporate_open"
+      }
+    },
+    {
+      "id": "temple_church_office",
+      "name": "Church and Office Tower",
+      "type": "religious",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Chicago Temple Building",
+        "city": "Chicago",
+        "completed": 1924,
+        "era": "neo_gothic",
+        "pre1990": true,
+        "named_landmark": true,
+        "distribution": "review"
+      },
+      "massing": {
+        "footprint": [ 30, 26 ],
+        "floors": 21,
+        "floor_height": 4,
+        "ground_floor_height": 12,
+        "roof": {
+          "type": "spire",
+          "height": 26,
+          "features": [ "gothic_spire", "flying_buttresses", "illuminated_cross" ]
+        },
+        "note": "A working sanctuary at street level with an office shaft above and a spire on top. The most unusual program stack in the catalog."
+      },
+      "below_grade": { "levels": 1, "level_height": 5, "uses": [ "storage", "mechanical" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 12, 12 ], "core": { "footprint": [ 10, 9 ], "position": "rear" } },
+      "vertical": { "passenger_elevators": 4, "service_elevators": 1, "stairs": 2 },
+      "facade": {
+        "system": "indiana_limestone_gothic",
+        "window_pattern": "gothic_lancet",
+        "spandrel": "gothic_tracery",
+        "ground_treatment": "carved_gothic_portal",
+        "cornice": "crenellated"
+      },
+      "program": [
+        { "floors": [ 1, 3 ], "use": "sanctuary" },
+        { "floors": [ 4, 19 ], "use": "office_private" },
+        { "floors": [ 20, 21 ], "use": "mechanical" }
+      ],
+      "fitout": { "sanctuary": "sanctuary_gothic", "office_private": "office_period_partitioned" }
+    },
+    {
+      "id": "loop_greystone_commercial",
+      "name": "Greystone Commercial Block",
+      "type": "mixed_use",
+      "tier": "composed",
+      "provenance": {
+        "inspiration": "Generic State Street commercial block, Chicago",
+        "city": "Chicago",
+        "completed": 1905,
+        "era": "chicago_school",
+        "pre1990": true,
+        "named_landmark": false,
+        "distribution": "unrestricted"
+      },
+      "massing": {
+        "footprint": [ 40, 30 ],
+        "floors": 8,
+        "floor_height": 4,
+        "ground_floor_height": 7,
+        "roof": { "type": "flat_parapet", "height": 3, "features": [ "water_tower", "roof_hatch" ] }
+      },
+      "below_grade": { "levels": 1, "level_height": 4, "uses": [ "storage", "mechanical" ], "transit": "none" },
+      "structure": { "bay": 5, "column_grid": [ 10, 10 ], "core": { "footprint": [ 8, 8 ], "position": "rear" } },
+      "vertical": { "passenger_elevators": 2, "service_elevators": 1, "stairs": 2 },
+      "facade": {
+        "system": "grey_limestone",
+        "window_pattern": "chicago_window",
+        "spandrel": "plain_stone",
+        "ground_treatment": "storefront_base",
+        "cornice": "projecting_stone"
+      },
+      "program": [
+        { "floors": [ 1, 1 ], "use": "retail_floor" },
+        { "floors": [ 2, 7 ], "use": "office_private" },
+        { "floors": [ 8, 8 ], "use": "storage" }
+      ],
+      "fitout": {
+        "retail_floor": "retail_storefront_classic",
+        "office_private": "office_period_partitioned",
+        "storage": "storage_racked"
+      }
+    }
+  ]
+}
