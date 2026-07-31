@@ -169,6 +169,12 @@ export const BLOCK_COLORS = {
     'cb:screen': [22, 24, 30],
     'cb:bookcase': [86, 60, 40],
     'cb:planter': [72, 108, 56],
+    'cb:roof_fascia': [226, 224, 216],
+    'cb:dormer': [226, 224, 216],
+    'cb:bay_window': [226, 224, 216],
+    'cb:cornice': [206, 198, 178],
+    'cb:stoop': [130, 88, 62],
+    'cb:porch_post': [226, 224, 216],
 
     // misc
     'minecraft:prismarine': [99, 156, 151],
@@ -207,13 +213,34 @@ function deriveBase(blockId) {
  * Custom blocks whose colour comes from a block state rather than the id.
  * Without this the preview drew every roof slate-grey regardless of material.
  */
+/** Painted joinery and cut stone, shared by several custom blocks. */
+const TRIM_COLORS = {
+    white: [226, 224, 216],
+    cream: [214, 200, 172],
+    grey: [128, 132, 138],
+    wood: [118, 88, 58]
+}
+const STONE_COLORS = {
+    limestone: [206, 198, 178],
+    granite: [126, 126, 128],
+    brownstone: [130, 88, 62],
+    terracotta: [176, 118, 86],
+    concrete: [170, 168, 162]
+}
+
 const STATE_COLORS = {
     'cb:roof_slope': ['cb:material', { slate: [72, 78, 88], clay: [150, 78, 54], shake: [96, 72, 46], asphalt: [54, 54, 58], barrel: [172, 96, 58] }],
     'cb:roof_hip': ['cb:material', { slate: [72, 78, 88], clay: [150, 78, 54], shake: [96, 72, 46], asphalt: [54, 54, 58], barrel: [172, 96, 58] }],
-    'cb:roof_ridge': ['cb:material', { slate: [62, 68, 78], clay: [130, 66, 46], shake: [82, 62, 40], asphalt: [46, 46, 50], barrel: [156, 84, 50] }],
+    'cb:roof_ridge': ['cb:material', { slate: [84, 90, 100], clay: [166, 90, 64], shake: [110, 84, 56], asphalt: [66, 66, 70], barrel: [188, 110, 70] }],
     'cb:window': ['cb:style', { dark: [150, 190, 208], light: [190, 210, 220], bronze: [140, 152, 130], black: [96, 118, 134] }],
     'cb:sofa': ['cb:fabric', { charcoal: [64, 66, 72], olive: [96, 100, 66], rust: [140, 74, 52], cream: [196, 184, 158] }],
-    'cb:armchair': ['cb:fabric', { charcoal: [64, 66, 72], olive: [96, 100, 66], rust: [140, 74, 52], cream: [196, 184, 158] }]
+    'cb:armchair': ['cb:fabric', { charcoal: [64, 66, 72], olive: [96, 100, 66], rust: [140, 74, 52], cream: [196, 184, 158] }],
+    'cb:roof_fascia': ['cb:tone', TRIM_COLORS],
+    'cb:dormer': ['cb:tone', TRIM_COLORS],
+    'cb:bay_window': ['cb:tone', TRIM_COLORS],
+    'cb:porch_post': ['cb:tone', TRIM_COLORS],
+    'cb:cornice': ['cb:stone', STONE_COLORS],
+    'cb:stoop': ['cb:stone', STONE_COLORS]
 }
 
 /** Colour for a placed block, taking its state into account. */

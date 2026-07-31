@@ -17,6 +17,7 @@ import '../lib/materials.mjs'
 import { loadCatalog } from '../lib/catalog.mjs'
 import { generateBuilding, ROOF_KITS, roofKitFor } from '../lib/generate.mjs'
 import { isKnownBlock } from '../lib/blocks.mjs'
+import { voxelizeGeometry } from '../lib/geo-voxels.mjs'
 
 const ROOT = dirname(dirname(dirname(fileURLToPath(import.meta.url))))
 const BP = join(ROOT, 'packs', 'city_builder_bp')
@@ -201,6 +202,84 @@ test('furnished rooms get art and light fixtures on the walls', () => {
             // Art must name a variant, or every picture is the same one.
             const variants = new Set(art.map((a) => a.state?.['cb:art']))
             assert.ok(variants.size > 1, `${id}: every picture is variant ${[...variants][0]}`)
+        }
+    }
+})
+
+test('a block that names a material instance in its geometry declares it', () => {
+    // A face pointing at an instance the block never declares renders as the
+    // missing-texture checker in game, not as a load failure, so nothing else
+    // catches it.
+    for (const file of blockFiles()) {
+        const block = readJson(join(BP, 'blocks', file))['minecraft:block']
+        const geo = block.components['minecraft:geometry']
+        const model = join(RP, 'models', 'blocks', `${geo.replace('geometry.cb_', '')}.geo.json`)
+        const parsed = readJson(model)['minecraft:geometry'][0]
+
+        const named = new Set()
+        for (const cube of parsed.bones[0].cubes) {
+            for (const face of Object.values(cube.uv ?? {})) {
+                if (face.material_instance) named.add(face.material_instance)
+            }
+        }
+        if (!named.size) continue
+
+        const declared = new Set(Object.keys(block.components['minecraft:material_instances']))
+        for (const permutation of block.permutations ?? []) {
+            const instances = permutation.components?.['minecraft:material_instances']
+            if (!instances) continue
+            for (const instance of named) {
+                assert.ok(
+                    instances[instance],
+                    `${file}: a permutation drops the "${instance}" material instance`
+                )
+            }
+        }
+        for (const instance of named) {
+            assert.ok(declared.has(instance), `${file}: geometry names undeclared instance "${instance}"`)
+        }
+    }
+})
+
+test('roof blocks are solid under their slope, so no course shows a notch', () => {
+    // A bare rotated plate leaves the lower half of its block hollow and you can
+    // see straight through the roof at every course.
+    for (const id of ['geometry.cb_roof_slope', 'geometry.cb_roof_hip']) {
+        const cells = voxelizeGeometry(id, 8)
+        assert.ok(cells, `${id}: no geometry to voxelize`)
+        const solid = new Set(cells.map((c) => c.join(',')))
+
+        // Under every solid cell there must be more solid, all the way down.
+        for (const [x, y, z] of cells) {
+            for (let below = 0; below < y; below++) {
+                assert.ok(solid.has(`${x},${below},${z}`), `${id}: hollow under (${x},${y},${z})`)
+            }
+        }
+    }
+})
+
+test('a hip takes the lower of its two slopes, not the higher', () => {
+    // Unioning two whole plates gives max(), which bulges the hip above its
+    // neighbours and breaks the hip line into diamonds.
+    const R = 8
+    const height = (cells) => {
+        const top = new Map()
+        for (const [x, y, z] of cells) {
+            const key = `${x},${z}`
+            if (!top.has(key) || y > top.get(key)) top.set(key, y)
+        }
+        return top
+    }
+
+    const hip = height(voxelizeGeometry('geometry.cb_roof_hip', R))
+    for (let x = 0; x < R; x++) {
+        for (let z = 0; z < R; z++) {
+            const h = hip.get(`${x},${z}`)
+            assert.ok(h !== undefined, `hip is empty at (${x},${z})`)
+            // The surface must follow whichever direction is lower, within the
+            // one-cell tolerance of an 8x8x8 sample.
+            assert.ok(h <= Math.min(x, z) + 1, `hip bulges at (${x},${z}): ${h} > min(${x},${z})`)
+            assert.ok(h >= Math.min(x, z) - 1, `hip dips at (${x},${z}): ${h} < min(${x},${z})`)
         }
     }
 })

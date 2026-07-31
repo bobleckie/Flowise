@@ -13,8 +13,26 @@
     "cb:roof_hip": {
         "sound": "stone"
     },
-    "cb:window": {
+    "cb:roof_fascia": {
+        "sound": "stone"
+    },
+    "cb:dormer": {
         "sound": "wood"
+    },
+    "cb:bay_window": {
+        "sound": "glass"
+    },
+    "cb:cornice": {
+        "sound": "stone"
+    },
+    "cb:stoop": {
+        "sound": "stone"
+    },
+    "cb:porch_post": {
+        "sound": "wood"
+    },
+    "cb:window": {
+        "sound": "glass"
     },
     "cb:sconce": {
         "sound": "glass"

@@ -19,7 +19,10 @@ import { writeFileSync, mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { shingle, shake, barrelTile, window as windowTex, ridge, fabric, wood, metal, glowPanel, framedArt, panel } from './lib/textures.mjs'
+import {
+    shingle, shake, barrelTile, window as windowTex, ridge, fabric, wood, metal,
+    glowPanel, framedArt, panel, clapboard, ashlar
+} from './lib/textures.mjs'
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)))
 const BP = join(ROOT, 'packs', 'city_builder_bp')
@@ -30,14 +33,27 @@ const GEO_FORMAT = '1.12.0'
 
 // --- geometry helpers ------------------------------------------------------
 
-/** Per-face UV covering the whole 16x16 texture, so patterns tile cleanly. */
-function fullUv() {
-    const face = { uv: [0, 0], uv_size: [16, 16] }
-    return { north: face, south: face, east: face, west: face, up: face, down: face }
+const FACE_NAMES = ['north', 'south', 'east', 'west', 'up', 'down']
+
+/**
+ * Per-face UV covering the whole 16x16 texture, so patterns tile cleanly.
+ *
+ * `faces` optionally names a material instance per face — `{ north: 'glass' }`
+ * puts glazing on one side of a cube and siding on the rest, which is what lets
+ * a single-block dormer or bay window carry a real window.
+ */
+function fullUv(faces = {}) {
+    const uv = {}
+    for (const name of FACE_NAMES) {
+        const instance = faces[name] ?? faces['*']
+        uv[name] = instance ? { uv: [0, 0], uv_size: [16, 16], material_instance: instance } : { uv: [0, 0], uv_size: [16, 16] }
+    }
+    return uv
 }
 
 function cube(origin, size, extra = {}) {
-    return { origin, size, uv: fullUv(), ...extra }
+    const { faces, ...rest } = extra
+    return { origin, size, uv: fullUv(faces), ...rest }
 }
 
 function geometry(identifier, cubes, bounds = [2, 2, 2]) {
@@ -66,33 +82,161 @@ function geometry(identifier, cubes, bounds = [2, 2, 2]) {
 const SLOPE_ROTATION = -45
 const DIAGONAL = 22.63
 
+/**
+ * Facing convention: **a block's front is its -Z face.**
+ *
+ * `cb:roof_slope` rises toward +Z at rest, so its eave — the side you look at —
+ * is at -Z, and the generator places that course facing north (rotation 0).
+ * North is -Z in Minecraft, so front-at--Z is the only convention under which
+ * "facing north" and "unrotated" mean the same thing.
+ *
+ * Everything with a front must follow it. The window, the framed art and the
+ * screen were built the other way round, which put every window frame, sill and
+ * head on the *inside* of the building and hung every picture facing the wall.
+ */
+
+/**
+ * Half-plates for a hip corner.
+ *
+ * A hip is where two slopes meet, and its surface is the *lower* of the two
+ * planes — that is what makes it a ridge running out to the corner. Unioning
+ * two whole plates gives the *higher* one instead, so every hip block bulged
+ * above its neighbours and the hip line came out as a row of diamonds.
+ *
+ * Each plate is therefore sliced into strips and clipped at the diagonal, so it
+ * only covers the half of the block where its own plane is the lower one. The
+ * strips leave a one-unit jog on the diagonal itself — a sixteenth of a block,
+ * and both planes are the same height there anyway.
+ */
+const STRIP = 1
+
+function hipPlates() {
+    const cubes = []
+    for (let k = 0; k < 16 / STRIP; k++) {
+        const far = -8 + STRIP * k + STRIP // the diagonal at this strip's far edge
+        const length = Math.SQRT2 * far + 11.31
+
+        // Rising toward +x, covering the half where x is the lower plane.
+        cubes.push(cube([-11.31, 6.5, -8 + STRIP * k], [length, 3, STRIP], {
+            pivot: [0, 8, 0], rotation: [0, 0, -SLOPE_ROTATION]
+        }))
+        // Rising toward +z, covering the other half.
+        cubes.push(cube([-8 + STRIP * k, 6.5, -11.31], [STRIP, 3, length], {
+            pivot: [0, 8, 0], rotation: [SLOPE_ROTATION, 0, 0]
+        }))
+    }
+    return cubes
+}
+
+/**
+ * Solid structure beneath a roof plane.
+ *
+ * A bare rotated plate leaves the whole lower triangle of its block hollow, and
+ * on every perimeter course you could see straight through that hollow to the
+ * side of the block behind — a dark notch under each course, which is precisely
+ * the "still looks like stairs" artefact. The plane was right; the roof simply
+ * had no substance under it.
+ *
+ * Two-unit steps, always finishing below the plate's underside, so the stepping
+ * is buried inside the roof and never breaks the surface.
+ */
+function slopeFill({ corner = false } = {}) {
+    const cubes = []
+    for (let j = 1; j < 8; j++) {
+        const top = 2 * j
+        const from = -8 + 2 * j
+        cubes.push(corner ? cube([from, 0, from], [16 - 2 * j, top, 16 - 2 * j]) : cube([-8, 0, from], [16, top, 16 - 2 * j]))
+    }
+    return cubes
+}
+
 const GEOMETRIES = {
     'geometry.cb_roof_slope': geometry('geometry.cb_roof_slope', [
-        cube([-8, 6.5, -11.31], [16, 3, DIAGONAL], { pivot: [0, 8, 0], rotation: [SLOPE_ROTATION, 0, 0] })
+        cube([-8, 6.5, -11.31], [16, 3, DIAGONAL], { pivot: [0, 8, 0], rotation: [SLOPE_ROTATION, 0, 0] }),
+        ...slopeFill()
     ], [2, 2, 2]),
 
-    // Ridge cap: a low gabled prism sitting on the apex where two slopes meet.
-    // Deliberately unrotated — a rotated cap floated above the slopes it was
-    // meant to cover, leaving a shadow gap along the whole ridge line.
+    // Ridge cap: a rolled half-round tile bedded on a mortar course, which is
+    // what a real ridge is. The previous cap was three stacked slabs and read as
+    // a raised bar down the apex.
+    //
+    // The roll is an octagon — a box plus the same box turned 45 degrees — and
+    // the bedding course underneath is wide enough to close the gap where the
+    // two slopes stop short of the apex.
     'geometry.cb_roof_ridge': geometry('geometry.cb_roof_ridge', [
-        cube([-8, 0, -7], [16, 5, 14]),
-        cube([-8, 5, -5], [16, 4, 10]),
-        cube([-8, 9, -3], [16, 3, 6])
+        cube([-8, 0, -8], [16, 4, 16]), // bedding course, closing the apex
+        cube([-8, 4, -5], [16, 8, 10]),
+        cube([-8, 4, -5], [16, 8, 10], { pivot: [0, 8, 0], rotation: [45, 0, 0] })
+    ]),
+
+    // Eaves fascia and soffit, hung under the roof overhang. Without it the
+    // underside of the overhang is open and the roof edge reads as a row of
+    // tile ends — the sawtooth.
+    'geometry.cb_roof_fascia': geometry('geometry.cb_roof_fascia', [
+        cube([-8, 8, -8], [16, 8, 2]), // fascia board, on the outer face
+        cube([-8, 8, -6], [16, 2, 14]) // soffit, closing the overhang from below
+    ]),
+
+    // Gabled dormer. The front face carries real glazing through a named
+    // material instance, so one block reads as a window in a roof rather than a
+    // bump.
+    'geometry.cb_dormer': geometry('geometry.cb_dormer', [
+        cube([-7, 0, -8], [2, 11, 10]), // cheek, left
+        cube([5, 0, -8], [2, 11, 10]), // cheek, right
+        cube([-5, 0, -8], [10, 2, 2]), // apron under the sill
+        cube([-5, 2, -8], [10, 8, 2], { faces: { north: 'glass', south: 'glass' } }),
+        cube([-5, 10, -8], [10, 2, 2]), // head
+        cube([-4, 12, -8], [8, 2, 2]), // gable, stepped to the peak
+        cube([-2, 14, -8], [4, 2, 2]),
+        // Roof: two plates at 22.5 degrees meeting on a ridge at x = 0.
+        cube([-7.29, 11.45, -8], [7.57, 2, 10], { pivot: [-3.5, 12.45, 0], rotation: [0, 0, 22.5] }),
+        cube([-0.28, 11.45, -8], [7.57, 2, 10], { pivot: [3.5, 12.45, 0], rotation: [0, 0, -22.5] })
+    ], [3, 3, 3]),
+
+    // Canted bay window: a flat front pane with two angled cheeks, on an apron,
+    // under a lead cap. Sits in the cell outside the wall it belongs to.
+    'geometry.cb_bay_window': geometry('geometry.cb_bay_window', [
+        cube([-8, 0, -6], [16, 2, 14]), // apron
+        cube([-5, 2, -8], [10, 12, 2], { faces: { north: 'glass', south: 'glass' } }),
+        cube([-8.62, 2, -7.5], [4.24, 12, 2], {
+            pivot: [-6.5, 8, -6.5], rotation: [0, 45, 0], faces: { north: 'glass', south: 'glass' }
+        }),
+        cube([4.38, 2, -7.5], [4.24, 12, 2], {
+            pivot: [6.5, 8, -6.5], rotation: [0, -45, 0], faces: { north: 'glass', south: 'glass' }
+        }),
+        cube([-8, 14, -6], [16, 2, 14]) // cap
+    ], [3, 3, 3]),
+
+    // Cornice: a corbelled crown course. A cornice is stepped mouldings, so the
+    // steps are the point — what it replaces was a flat band of trim.
+    'geometry.cb_cornice': geometry('geometry.cb_cornice', [
+        cube([-8, 0, -4], [16, 5, 12]), // bed mould
+        cube([-8, 5, -6], [16, 4, 14]),
+        cube([-8, 9, -8], [16, 4, 16]), // corona, at full projection
+        cube([-8, 13, -6], [16, 3, 14]) // cyma, setting back above
+    ]),
+
+    // Front steps. Three treads falling toward the street.
+    'geometry.cb_stoop': geometry('geometry.cb_stoop', [
+        cube([-8, 0, -8], [16, 5, 16]),
+        cube([-8, 5, -3], [16, 5, 11]),
+        cube([-8, 10, 2], [16, 6, 6])
+    ]),
+
+    // Porch column: base, shaft, capital.
+    'geometry.cb_porch_post': geometry('geometry.cb_porch_post', [
+        cube([-4, 0, -4], [8, 2, 8]),
+        cube([-3, 2, -3], [6, 12, 6]),
+        cube([-4, 14, -4], [8, 2, 8])
     ]),
 
     // Hip: where two slopes meet on a diagonal. Built as the union of a
     // north-facing slope (rotated about X) and a west-facing one (about Z), so
     // each cube still rotates on a single axis as Bedrock requires.
     'geometry.cb_roof_hip': geometry('geometry.cb_roof_hip', [
-        cube([-8, 6.5, -11.31], [16, 3, DIAGONAL], { pivot: [0, 8, 0], rotation: [SLOPE_ROTATION, 0, 0] }),
-        cube([-11.31, 6.5, -8], [DIAGONAL, 3, 16], { pivot: [0, 8, 0], rotation: [0, 0, -SLOPE_ROTATION] }),
-        // Two planes crossing leave the outer corner open, which showed as a
-        // notch every block down the hip line. These close it with a stepped
-        // corner that follows the diagonal the two slopes imply.
-        cube([-8, 0, -8], [10, 3, 10]),
-        cube([-8, 3, -8], [8, 3, 8]),
-        cube([-8, 6, -8], [5, 3, 5]),
-        cube([-8, 9, -8], [3, 3, 3])
+        ...hipPlates(),
+        // Solid under the surface, stepping with whichever direction is lower.
+        ...slopeFill({ corner: true })
     ]),
 
     // Wall sconce: backplate, arm, shade.
@@ -121,8 +265,8 @@ const GEOMETRIES = {
         cube([-4, 7, -4], [8, 3, 8])
     ]),
 
-    // Framed art: a thin panel standing off the wall.
-    'geometry.cb_wall_art': geometry('geometry.cb_wall_art', [cube([-7, 4, 7], [14, 10, 1])]),
+    // Framed art: a thin panel standing off the wall, facing into the room.
+    'geometry.cb_wall_art': geometry('geometry.cb_wall_art', [cube([-7, 4, -8], [14, 10, 1])]),
 
     // Sofa: seat, back, two arms.
     'geometry.cb_sofa': geometry('geometry.cb_sofa', [
@@ -164,11 +308,11 @@ const GEOMETRIES = {
         cube([-8, 13, -8], [16, 3, 16])
     ]),
 
-    // Screen on a stand.
+    // Screen on a stand, facing into the room.
     'geometry.cb_screen': geometry('geometry.cb_screen', [
-        cube([-7, 4, 6], [14, 9, 1]),
-        cube([-2, 1, 5], [4, 3, 3]),
-        cube([-5, 0, 4], [10, 1, 4])
+        cube([-7, 4, -7], [14, 9, 1]),
+        cube([-2, 1, -8], [4, 3, 3]),
+        cube([-5, 0, -8], [10, 1, 4])
     ]),
 
     // Shelving with visible books.
@@ -181,11 +325,11 @@ const GEOMETRIES = {
     // Window: a recessed light in a frame, with a projecting sill and a reveal
     // to either side. Depth is what stops a window reading as a painted-on pane.
     'geometry.cb_window': geometry('geometry.cb_window', [
-        cube([-8, 0, 5], [16, 16, 2]), // the glazed panel, set back in the wall
-        cube([-8, 0, 7], [2, 16, 1]), // reveal, left
-        cube([6, 0, 7], [2, 16, 1]), // reveal, right
-        cube([-8, 14, 7], [16, 2, 1]), // head
-        cube([-8, 0, 7], [16, 3, 1]) // sill
+        cube([-8, 0, -7], [16, 16, 2]), // the glazed panel, set back in the wall
+        cube([-8, 0, -8], [2, 16, 1]), // reveal, left
+        cube([6, 0, -8], [2, 16, 1]), // reveal, right
+        cube([-8, 14, -8], [16, 2, 1]), // head
+        cube([-8, 0, -8], [16, 3, 1]) // sill
     ]),
 
     // Planter.
@@ -214,6 +358,32 @@ for (const [name, color] of Object.entries(SHINGLE_COLORS)) {
         : name === 'barrel' ? barrelTile(`shingle_${name}`, color)
         : shingle(`shingle_${name}`, color)
     TEXTURES[`cb_ridge_${name}`] = ridge(`ridge_${name}`, color)
+}
+
+/**
+ * Painted joinery — fascias, soffits, dormer cheeks, porch posts. Keyed to the
+ * roofing kit so a slate roof gets grey boards and a clay one gets cream.
+ */
+export const TRIM_TONES = {
+    white: [226, 224, 216],
+    cream: [214, 200, 172],
+    grey: [128, 132, 138],
+    wood: [118, 88, 58]
+}
+for (const [tone, color] of Object.entries(TRIM_TONES)) {
+    TEXTURES[`cb_trim_${tone}`] = clapboard(`trim_${tone}`, color)
+}
+
+/** Cut stone, for cornices and stoops. */
+export const STONE_TONES = {
+    limestone: [206, 198, 178],
+    granite: [126, 126, 128],
+    brownstone: [130, 88, 62],
+    terracotta: [176, 118, 86],
+    concrete: [170, 168, 162]
+}
+for (const [tone, color] of Object.entries(STONE_TONES)) {
+    TEXTURES[`cb_stone_${tone}`] = ashlar(`stone_${tone}`, color)
 }
 
 TEXTURES.cb_brass = metal('brass', [176, 138, 66])
@@ -276,6 +446,27 @@ function materialPermutations(prefix, materials, state = 'cb:material') {
     }))
 }
 
+/**
+ * A block whose body varies with a state but which also carries glazing on the
+ * faces the geometry marked `glass`. Every permutation has to restate the whole
+ * material_instances map — Bedrock replaces it wholesale rather than merging —
+ * so dropping `glass` here silently turns the window back into siding.
+ */
+function glazedPermutations(prefix, tones, state) {
+    return tones.map((tone) => ({
+        condition: `q.block_state('${state}') == '${tone}'`,
+        components: {
+            'minecraft:material_instances': {
+                '*': { texture: `${prefix}_${tone}`, render_method: 'opaque' },
+                glass: { texture: 'cb_window_dark', render_method: 'blend' }
+            }
+        }
+    }))
+}
+
+const TRIM_LIST = Object.keys(TRIM_TONES)
+const STONE_LIST = Object.keys(STONE_TONES)
+
 const SPEC = [
     {
         id: 'roof_slope',
@@ -309,6 +500,74 @@ const SPEC = [
         traits: CARDINAL_TRAIT,
         permutations: [...materialPermutations('cb_shingle', Object.keys(SHINGLE_COLORS)), ...facingPermutations()],
         collision: { origin: [-8, 0, -8], size: [16, 16, 16] },
+        category: 'construction'
+    },
+
+    {
+        id: 'roof_fascia',
+        name: 'Eaves Fascia',
+        geometry: 'geometry.cb_roof_fascia',
+        texture: 'cb_trim_white',
+        states: { 'cb:tone': TRIM_LIST },
+        traits: CARDINAL_TRAIT,
+        permutations: [...materialPermutations('cb_trim', TRIM_LIST, 'cb:tone'), ...facingPermutations()],
+        collision: 'none',
+        category: 'construction'
+    },
+    {
+        id: 'dormer',
+        name: 'Dormer Window',
+        geometry: 'geometry.cb_dormer',
+        texture: 'cb_trim_white',
+        glass: true,
+        states: { 'cb:tone': TRIM_LIST },
+        traits: CARDINAL_TRAIT,
+        permutations: [...glazedPermutations('cb_trim', TRIM_LIST, 'cb:tone'), ...facingPermutations()],
+        collision: { origin: [-8, 0, -8], size: [16, 16, 16] },
+        category: 'construction'
+    },
+    {
+        id: 'bay_window',
+        name: 'Bay Window',
+        geometry: 'geometry.cb_bay_window',
+        texture: 'cb_trim_white',
+        glass: true,
+        states: { 'cb:tone': TRIM_LIST },
+        traits: CARDINAL_TRAIT,
+        permutations: [...glazedPermutations('cb_trim', TRIM_LIST, 'cb:tone'), ...facingPermutations()],
+        collision: { origin: [-8, 0, -8], size: [16, 16, 16] },
+        category: 'construction'
+    },
+    {
+        id: 'cornice',
+        name: 'Cornice',
+        geometry: 'geometry.cb_cornice',
+        texture: 'cb_stone_limestone',
+        states: { 'cb:stone': STONE_LIST },
+        traits: CARDINAL_TRAIT,
+        permutations: [...materialPermutations('cb_stone', STONE_LIST, 'cb:stone'), ...facingPermutations()],
+        collision: { origin: [-8, 0, -8], size: [16, 16, 16] },
+        category: 'construction'
+    },
+    {
+        id: 'stoop',
+        name: 'Stoop',
+        geometry: 'geometry.cb_stoop',
+        texture: 'cb_stone_brownstone',
+        states: { 'cb:stone': STONE_LIST },
+        traits: CARDINAL_TRAIT,
+        permutations: [...materialPermutations('cb_stone', STONE_LIST, 'cb:stone'), ...facingPermutations()],
+        collision: { origin: [-8, 0, -8], size: [16, 16, 16] },
+        category: 'construction'
+    },
+    {
+        id: 'porch_post',
+        name: 'Porch Post',
+        geometry: 'geometry.cb_porch_post',
+        texture: 'cb_trim_white',
+        states: { 'cb:tone': TRIM_LIST },
+        permutations: materialPermutations('cb_trim', TRIM_LIST, 'cb:tone'),
+        collision: { origin: [-4, 0, -4], size: [8, 16, 8] },
         category: 'construction'
     },
 
@@ -476,7 +735,10 @@ for (const spec of SPEC) {
     const components = {
         'minecraft:geometry': spec.geometry,
         'minecraft:material_instances': {
-            '*': { texture: spec.texture, render_method: spec.render ?? 'opaque' }
+            '*': { texture: spec.texture, render_method: spec.render ?? 'opaque' },
+            // A geometry that names a `glass` instance must find one declared on
+            // the base components too, not only inside the permutations.
+            ...(spec.glass ? { glass: { texture: 'cb_window_dark', render_method: 'blend' } } : {})
         },
         'minecraft:destructible_by_mining': { seconds_to_destroy: 1.5 },
         'minecraft:destructible_by_explosion': { explosion_resistance: 3 }
@@ -536,7 +798,12 @@ writeFileSync(
         ...Object.fromEntries(
             SPEC.map((spec) => [
                 `cb:${spec.id}`,
-                { sound: /roof/.test(spec.id) ? 'stone' : /sconce|chandelier|light|screen/.test(spec.id) ? 'glass' : 'wood' }
+                {
+                    sound:
+                        /roof|cornice|stoop/.test(spec.id) ? 'stone'
+                        : /sconce|chandelier|light|screen|window/.test(spec.id) ? 'glass'
+                        : 'wood'
+                }
             ])
         )
     })

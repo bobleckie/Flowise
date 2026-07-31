@@ -249,7 +249,8 @@ function roofCap(entry) {
         // The topmost plate carries the roof, so its span sets the rise.
         const last = (m.setbacks ?? []).slice(-1)[0]?.footprint ?? m.footprint
         const span = m.roof.type === 'gable' ? last[0] : Math.min(last[0], last[1])
-        return Math.max(2, Math.floor((span - 1) / 2))
+        const full = Math.max(2, Math.ceil(span / 2))
+        return m.roof.height ? Math.max(2, Math.min(full, m.roof.height)) : full
     }
     return m.roof.height ?? (m.roof.type === 'flat_mechanical' ? 8 : 0)
 }

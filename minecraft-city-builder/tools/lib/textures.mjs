@@ -348,6 +348,65 @@ export function framedArt(name, variant, frameColor) {
     return tex
 }
 
+/**
+ * Clapboard siding: horizontal boards, each with a shadow line under its butt.
+ * Used on dormer cheeks, fascias and porch work — the places where a flat
+ * colour would give the whole detail away as a painted cube.
+ */
+export function clapboard(name, base) {
+    const random = rng(name)
+    const tex = new Tex()
+    const course = 4
+
+    for (let y = 0; y < 16; y++) {
+        const within = y % course
+        for (let x = 0; x < 16; x++) {
+            let tone = 0.97 + random() * 0.06
+            if (within === 0) tone *= 0.58 // the shadow the board above casts
+            else if (within === 1) tone *= 0.88
+            else if (within === course - 1) tone *= 1.08 // lit butt edge
+            // Occasional board joint.
+            if (x === (Math.floor(y / course) % 2 ? 4 : 11)) tone *= 0.8
+            tex.set(x, y, shade(base, tone))
+        }
+    }
+    return tex
+}
+
+/**
+ * Ashlar stone: coursed blocks with recessed mortar joints. For cornices,
+ * stoops and the parts of a facade that are meant to read as cut stone.
+ */
+export function ashlar(name, base, { course = 5, length = 8 } = {}) {
+    const random = rng(name)
+    const tex = new Tex()
+
+    const tone = new Map()
+    const toneFor = (row, col) => {
+        const key = `${row}:${col}`
+        if (!tone.has(key)) tone.set(key, 0.9 + random() * 0.2)
+        return tone.get(key)
+    }
+
+    for (let y = 0; y < 16; y++) {
+        const row = Math.floor(y / course)
+        const offset = (row % 2) * Math.floor(length / 2)
+        for (let x = 0; x < 16; x++) {
+            const col = Math.floor((x + offset) / length)
+            let factor = toneFor(row, col)
+
+            const onBedJoint = y % course === 0
+            const onHeadJoint = (x + offset) % length === 0
+            if (onBedJoint || onHeadJoint) factor *= 0.62
+            else if (y % course === 1) factor *= 1.06 // the lit top of each stone
+            factor *= 0.98 + random() * 0.04
+
+            tex.set(x, y, shade(base, factor))
+        }
+    }
+    return tex
+}
+
 /** A flat colour with a border — used for screens and panels. */
 export function panel(name, face, border) {
     const tex = new Tex()

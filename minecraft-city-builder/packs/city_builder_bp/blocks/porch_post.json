@@ -1,0 +1,104 @@
+{
+    "format_version": "1.21.10",
+    "minecraft:block": {
+        "description": {
+            "identifier": "cb:porch_post",
+            "menu_category": {
+                "category": "construction"
+            },
+            "states": {
+                "cb:tone": [
+                    "white",
+                    "cream",
+                    "grey",
+                    "wood"
+                ]
+            }
+        },
+        "components": {
+            "minecraft:geometry": "geometry.cb_porch_post",
+            "minecraft:material_instances": {
+                "*": {
+                    "texture": "cb_trim_white",
+                    "render_method": "opaque"
+                }
+            },
+            "minecraft:destructible_by_mining": {
+                "seconds_to_destroy": 1.5
+            },
+            "minecraft:destructible_by_explosion": {
+                "explosion_resistance": 3
+            },
+            "minecraft:collision_box": {
+                "origin": [
+                    -4,
+                    0,
+                    -4
+                ],
+                "size": [
+                    8,
+                    16,
+                    8
+                ]
+            },
+            "minecraft:selection_box": {
+                "origin": [
+                    -4,
+                    0,
+                    -4
+                ],
+                "size": [
+                    8,
+                    16,
+                    8
+                ]
+            }
+        },
+        "permutations": [
+            {
+                "condition": "q.block_state('cb:tone') == 'white'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_trim_white",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:tone') == 'cream'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_trim_cream",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:tone') == 'grey'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_trim_grey",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:tone') == 'wood'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_trim_wood",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            }
+        ]
+    }
+}

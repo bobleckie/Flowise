@@ -128,7 +128,16 @@ export function pitchedRise(entry) {
     const plates = floorPlates(entry)
     const [sx, sz] = plates[plates.length - 1].size
     const span = entry.massing.roof.type === 'gable' ? sx : Math.min(sx, sz)
-    return Math.max(2, Math.floor((span - 1) / 2))
+    // Courses, not rise: a 9-wide hip needs five of them to close on a single
+    // ridge line. Budgeting only four left the apex as a flat patch of tile.
+    const full = Math.max(2, Math.ceil(span / 2))
+
+    // A 45-degree hip over a 40-wide house rises twenty blocks, and no building
+    // in the catalog looks like that. Where a rise is declared, honour it and
+    // let the roof finish on a flat deck — a truncated hip, which is the real
+    // form for a wide building and the reason mansards exist at all.
+    const declared = entry.massing.roof.height
+    return declared ? Math.max(2, Math.min(full, declared)) : full
 }
 
 export function roofCapFor(entry) {
@@ -256,7 +265,46 @@ export const ROOF_KITS = {
     barrel_tile: { material: 'barrel', full: 'minecraft:terracotta', edge: 'minecraft:orange_terracotta' }
 }
 
-export const ROOF_BLOCKS = { slope: 'cb:roof_slope', ridge: 'cb:roof_ridge', hip: 'cb:roof_hip' }
+export const ROOF_BLOCKS = {
+    slope: 'cb:roof_slope',
+    ridge: 'cb:roof_ridge',
+    hip: 'cb:roof_hip',
+    fascia: 'cb:roof_fascia',
+    dormer: 'cb:dormer'
+}
+
+/**
+ * Every building carries a one-block margin on all four sides.
+ *
+ * Real buildings project past their structure — eaves overhang, cornices
+ * corbel out, bay windows bulge, stoops reach the pavement. Without the margin
+ * those blocks fall outside the module and are silently discarded, which is
+ * exactly what was happening: the eaves course was being generated and then
+ * thrown away on every building whose top floor was its full footprint.
+ *
+ * The module reports it as `margin`, so a city block can overlap neighbours by
+ * that much and still have party walls meet.
+ */
+export const MARGIN = 1
+
+/** Painted joinery tone, keyed to the roofing kit. */
+export function trimToneFor(entry) {
+    const material = roofKitFor(entry).material
+    if (material === 'slate') return 'grey'
+    if (material === 'shake') return 'wood'
+    if (material === 'clay' || material === 'barrel') return 'cream'
+    return 'white'
+}
+
+/** Cut-stone tone for cornices and stoops, taken from the facade's own wall. */
+export function stoneToneFor(palette) {
+    const wall = `${palette.wall ?? ''} ${palette.trim ?? ''}`
+    if (/brick|terracotta|copper/.test(wall)) return 'terracotta'
+    if (/brown|mud|dark_oak/.test(wall)) return 'brownstone'
+    if (/deepslate|blackstone|basalt|tuff|gray|grey/.test(wall)) return 'granite'
+    if (/concrete|smooth_stone|andesite/.test(wall)) return 'concrete'
+    return 'limestone'
+}
 
 /**
  * Window families that get a framed window unit rather than a plain pane.
@@ -274,6 +322,9 @@ export function windowStyleFor(palette) {
     if (/quartz|calcite|diorite|white|sandstone|birch/.test(frame)) return 'light'
     return 'dark'
 }
+
+/** The way out of a wall cell, given the direction that wall faces. */
+const OUTWARD = { north: [0, -1], south: [0, 1], west: [-1, 0], east: [1, 0] }
 
 /** Which kit a building roofs with, from its era. */
 export function roofKitFor(entry) {
@@ -304,13 +355,19 @@ export function generateBuilding(entry, { interior = true, shellOnly = false } =
     const [bx, bz] = m.footprint
     const height = totalHeight(entry)
 
+    // Module extents: the structure plus the margin every projecting detail
+    // needs. Building-local coordinates stay unshifted; `put` applies the offset
+    // once, at the single point every block goes through.
+    const width = bx + MARGIN * 2
+    const depth = bz + MARGIN * 2
+
     const cells = new Map()
     const put = (x, y, z, block, state) => {
         if (!block) return
-        x = Math.round(x)
+        x = Math.round(x) + MARGIN
         y = Math.round(y)
-        z = Math.round(z)
-        if (x < 0 || z < 0 || x >= bx || z >= bz || y < 0 || y >= height) return
+        z = Math.round(z) + MARGIN
+        if (x < 0 || z < 0 || x >= width || z >= depth || y < 0 || y >= height) return
         const cell = { pos: [x, y, z], block }
         if (state) cell.state = state
         cells.set(`${x},${y},${z}`, cell)
@@ -341,6 +398,7 @@ export function generateBuilding(entry, { interior = true, shellOnly = false } =
 
         const framed = FRAMED_WINDOW_FAMILIES.has(spec.family)
         const windowStyle = windowStyleFor(palette)
+        const trimTone = trimToneFor(entry)
 
         perimeter.forEach(([x, z], u) => {
             // Which way this cell faces, so a window unit is turned outward.
@@ -363,11 +421,44 @@ export function generateBuilding(entry, { interior = true, shellOnly = false } =
                 }
                 put(x, plate.base + v, z, material(role))
             }
+
+            // Oriel and art-glass bays project past the wall. That is the whole
+            // point of the pattern, and drawing them flat lost it.
+            if (spec.bay && !isGround && u % (bay * 2) === Math.floor(bay / 2)) {
+                const onCorner = (x === ox || x === ox + sx - 1) && (z === oz || z === oz + sz - 1)
+                const [dx, dz] = OUTWARD[facing]
+                if (!onCorner) {
+                    for (let v = 1; v < interiorHeight; v++) {
+                        if (facadeCell(u, v, spec, { interiorHeight, bay, isGround }) !== 'glass') continue
+                        put(x + dx, plate.base + v, z + dz, 'cb:bay_window', {
+                            'cb:tone': trimTone,
+                            'minecraft:cardinal_direction': facing
+                        })
+                    }
+                }
+            }
         })
 
-        // Cornice: a trim course at the top of the topmost floor.
+        // Cornice. A crown course in the wall plane, plus a corbelled moulding
+        // ring projecting past it — a cornice that does not project is just a
+        // stripe of a different colour.
         if (plate.floor === m.floors && entry.facade.cornice && entry.facade.cornice !== 'none') {
-            perimeter.forEach(([x, z]) => put(x, plate.base + interiorHeight, z, palette.trim))
+            const y = plate.base + interiorHeight
+            perimeter.forEach(([x, z]) => put(x, y, z, palette.trim))
+
+            if (!PITCHED.has(m.roof.type)) {
+                const stone = stoneToneFor(palette)
+                const crown = (x, z, dir) =>
+                    put(x, y, z, 'cb:cornice', { 'cb:stone': stone, 'minecraft:cardinal_direction': dir })
+                for (let x = ox - 1; x <= ox + sx; x++) {
+                    crown(x, oz - 1, 'north')
+                    crown(x, oz + sz, 'south')
+                }
+                for (let z = oz; z < oz + sz; z++) {
+                    crown(ox - 1, z, 'west')
+                    crown(ox + sx, z, 'east')
+                }
+            }
         }
 
     }
@@ -378,11 +469,13 @@ export function generateBuilding(entry, { interior = true, shellOnly = false } =
     // `free` reports cells the shell left empty, so the fitout can furnish a
     // room without overwriting a stair, a partition, a door or a lift shaft.
     const free = (x, y, z) => {
-        const cell = cells.get(`${Math.round(x)},${Math.round(y)},${Math.round(z)}`)
+        const cell = cells.get(`${Math.round(x) + MARGIN},${Math.round(y)},${Math.round(z) + MARGIN}`)
         return cell !== undefined && cell.block === 'minecraft:air'
     }
 
     if (interior && !shellOnly) buildInterior(entry, put, palette, plates, [bx, bz], free)
+
+    entrancePorch(entry, put, palette, plates)
 
     // --- roof
     const top = plates[plates.length - 1]
@@ -410,13 +503,56 @@ export function generateBuilding(entry, { interior = true, shellOnly = false } =
 
     return {
         id: entry.id,
-        footprint: [bx, height, bz],
+        footprint: [width, height, depth],
+        margin: MARGIN,
         category: 'building',
         connections: {},
         palette: {},
         blocks,
         block_entities: [],
         entities: []
+    }
+}
+
+/**
+ * Steps up to the door, and a porch over them on a house.
+ *
+ * The entrances the interior cuts are at the middle of both short faces; this
+ * lines the stoop up with them, so the way in reads as a way in from outside
+ * rather than as a hole in a wall of glass.
+ */
+function entrancePorch(entry, put, palette, plates) {
+    const ground = plates[0]
+    const [sx, sz] = ground.size
+    const [ox, oz] = ground.origin
+    const cx = ox + Math.floor(sx / 2)
+    const stone = stoneToneFor(palette)
+    const tone = trimToneFor(entry)
+    const half = Math.floor(Math.max(2, Math.min(6, Math.floor(sx / 8))) / 2)
+
+    // A porch belongs on a house, not on the front of a forty-storey tower.
+    const porch = PITCHED.has(entry.massing.roof.type) && entry.massing.floors <= 4
+    const kit = roofKitFor(entry)
+
+    for (const [z, dir] of [[oz - 1, 'north'], [oz + sz, 'south']]) {
+        for (let dx = -half; dx <= half; dx++) {
+            put(cx + dx, ground.base, z, 'cb:stoop', {
+                'cb:stone': stone,
+                'minecraft:cardinal_direction': dir
+            })
+        }
+        if (!porch) continue
+
+        for (const dx of [-half - 1, half + 1]) {
+            for (let v = 1; v <= 3; v++) {
+                put(cx + dx, ground.base + v, z, 'cb:porch_post', { 'cb:tone': tone })
+            }
+            put(cx + dx, ground.base, z, 'cb:stoop', { 'cb:stone': stone, 'minecraft:cardinal_direction': dir })
+        }
+        // Porch roof, tucked under the eaves line — one course higher and it
+        // stands proud of the roof it is supposed to shelter under.
+        const head = ground.base + ground.height - 1
+        for (let dx = -half - 1; dx <= half + 1; dx++) put(cx + dx, head, z, kit.edge)
     }
 }
 
@@ -658,7 +794,16 @@ export function verticalRegistry(entry) {
 
     return {
         hasLift: shaftD > 0,
-        shaft: shaftD > 0 ? { x: core.x + 1, z: core.z + stairD, w: Math.max(1, core.w - 2), d: Math.max(1, shaftD - 1) } : null,
+        // Module coordinates, so the runtime can use these directly: the
+        // generator offsets every block by MARGIN and the shaft moves with it.
+        shaft: shaftD > 0
+            ? {
+                x: core.x + 1 + MARGIN,
+                z: core.z + stairD + MARGIN,
+                w: Math.max(1, core.w - 2),
+                d: Math.max(1, shaftD - 1)
+            }
+            : null,
         stops: plates.map((plate) => ({
             floor: plate.floor,
             y: plate.base + 1,
@@ -681,18 +826,38 @@ function pitchedRoof(entry, put, top, roofBase, type, cap) {
     const [sx, sz] = top.size
     const [ox, oz] = top.origin
     const facing = (dir) => ({ 'cb:material': kit.material, 'minecraft:cardinal_direction': dir })
+    const tone = trimToneFor(entry)
 
     const gable = type === 'gable'
-    const limit = gable ? Math.floor(sx / 2) : Math.floor(Math.min(sx, sz) / 2)
+    const limit = Math.ceil((gable ? sx : Math.min(sx, sz)) / 2)
     const steps = Math.max(1, Math.min(cap, limit))
 
-    // Eaves: a solid course overhanging the wall, so the roof reads as a roof
-    // rather than as the wall changing colour at the top.
-    for (let x = -1; x <= sx; x++) {
-        for (const z of [-1, sz]) put(ox + x, roofBase, oz + z, kit.edge)
+    // Eaves. The roof plane continues one course *below* the first course and
+    // one cell out, so the overhang is the same slope carried past the wall —
+    // not a square lip stuck on the side, which is what a solid ring at roof
+    // level looked like. A fascia and soffit close the underside.
+    const eaveY = roofBase - 1
+    const eave = (x, z, dir) => {
+        put(ox + x, eaveY, oz + z, ROOF_BLOCKS.slope, facing(dir))
+        put(ox + x, eaveY - 1, oz + z, ROOF_BLOCKS.fascia, {
+            'cb:tone': tone,
+            'minecraft:cardinal_direction': dir
+        })
     }
-    for (let z = 0; z < sz; z++) {
-        for (const x of [-1, sx]) put(ox + x, roofBase, oz + z, kit.edge)
+
+    for (let z = gable ? -1 : 0; z < (gable ? sz + 1 : sz); z++) {
+        eave(-1, z, 'west')
+        eave(sx, z, 'east')
+    }
+    if (!gable) {
+        for (let x = 0; x < sx; x++) {
+            eave(x, -1, 'north')
+            eave(x, sz, 'south')
+        }
+        put(ox - 1, eaveY, oz - 1, ROOF_BLOCKS.hip, facing('north'))
+        put(ox + sx, eaveY, oz - 1, ROOF_BLOCKS.hip, facing('east'))
+        put(ox - 1, eaveY, oz + sz, ROOF_BLOCKS.hip, facing('west'))
+        put(ox + sx, eaveY, oz + sz, ROOF_BLOCKS.hip, facing('south'))
     }
 
     for (let step = 0; step < steps; step++) {
@@ -723,15 +888,89 @@ function pitchedRoof(entry, put, top, roofBase, type, cap) {
         }
     }
 
+    dormers(put, ox, oz, sx, sz, roofBase, steps, gable, tone)
+
     const ridgeY = roofBase + steps - 1
     const rxLo = steps - 1
     const rxHi = sx - steps
     const rzLo = gable ? 0 : steps - 1
     const rzHi = gable ? sz - 1 : sz - steps
+    if (rxLo > rxHi || rzLo > rzHi) return
+
+    const wideX = rxHi - rxLo >= 1
+    const wideZ = rzHi - rzLo >= 1
+
+    if (wideX && wideZ && !gable) {
+        // A truncated hip: the roof stops short of a ridge and finishes on a
+        // flat deck, ringed with ridge tiles. Filling the whole apex with ridge
+        // caps instead gave a raised slab of tile several cells across.
+        for (let x = rxLo; x <= rxHi; x++) {
+            for (let z = rzLo; z <= rzHi; z++) put(ox + x, ridgeY, oz + z, kit.edge)
+        }
+        for (let x = rxLo; x <= rxHi; x++) {
+            put(ox + x, ridgeY, oz + rzLo, ROOF_BLOCKS.ridge, facing('north'))
+            put(ox + x, ridgeY, oz + rzHi, ROOF_BLOCKS.ridge, facing('north'))
+        }
+        for (let z = rzLo; z <= rzHi; z++) {
+            put(ox + rxLo, ridgeY, oz + z, ROOF_BLOCKS.ridge, facing('east'))
+            put(ox + rxHi, ridgeY, oz + z, ROOF_BLOCKS.ridge, facing('east'))
+        }
+        return
+    }
+
     const alongX = rxHi - rxLo >= rzHi - rzLo
     for (let x = rxLo; x <= rxHi; x++) {
         for (let z = rzLo; z <= rzHi; z++) {
             put(ox + x, ridgeY, oz + z, ROOF_BLOCKS.ridge, facing(alongX ? 'north' : 'east'))
+        }
+    }
+}
+
+/**
+ * Dormers, set into the roof plane a course up from the eaves.
+ *
+ * A big hip or gable roof with nothing on it is an unbroken field of tile, and
+ * that flatness is what makes a generated roof look generated. Real roofs of
+ * this size are punctuated — so these go in on any slope with room for them.
+ */
+function dormers(put, ox, oz, sx, sz, roofBase, steps, gable, tone) {
+    if (steps < 3) return
+
+    const step = steps >= 4 ? 1 : 0
+    const y = roofBase + step
+    const xLo = step
+    const xHi = sx - 1 - step
+    const zLo = gable ? 0 : step
+    const zHi = gable ? sz - 1 : sz - 1 - step
+
+    const set = (x, z, dir) =>
+        put(ox + x, y, oz + z, ROOF_BLOCKS.dormer, { 'cb:tone': tone, 'minecraft:cardinal_direction': dir })
+
+    // Only the long elevation gets dormers — a house with them on all four
+    // sides reads as a doll's house, not a roof.
+    const runZ = zHi - zLo + 1
+    const runX = xHi - xLo + 1
+
+    // Three clear cells at each end, so a dormer never lands on a hip, and no
+    // more than four to a side — a row of them every few blocks reads as a
+    // dotted line, not as windows.
+    const along = (run) => {
+        const usable = run - 6
+        if (usable < 1) return []
+        const count = Math.min(4, 1 + Math.floor(usable / 8))
+        const gap = usable / count
+        return Array.from({ length: count }, (_, i) => Math.round(3 + gap * (i + 0.5) - gap / 2))
+    }
+
+    if (gable || runZ >= runX) {
+        for (const offset of along(runZ)) {
+            set(xLo, zLo + offset, 'west')
+            set(xHi, zLo + offset, 'east')
+        }
+    } else {
+        for (const offset of along(runX)) {
+            set(xLo + offset, zLo, 'north')
+            set(xLo + offset, zHi, 'south')
         }
     }
 }

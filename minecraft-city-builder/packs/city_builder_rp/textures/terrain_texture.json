@@ -34,6 +34,33 @@
         "cb_ridge_barrel": {
             "textures": "textures/blocks/cb_ridge_barrel"
         },
+        "cb_trim_white": {
+            "textures": "textures/blocks/cb_trim_white"
+        },
+        "cb_trim_cream": {
+            "textures": "textures/blocks/cb_trim_cream"
+        },
+        "cb_trim_grey": {
+            "textures": "textures/blocks/cb_trim_grey"
+        },
+        "cb_trim_wood": {
+            "textures": "textures/blocks/cb_trim_wood"
+        },
+        "cb_stone_limestone": {
+            "textures": "textures/blocks/cb_stone_limestone"
+        },
+        "cb_stone_granite": {
+            "textures": "textures/blocks/cb_stone_granite"
+        },
+        "cb_stone_brownstone": {
+            "textures": "textures/blocks/cb_stone_brownstone"
+        },
+        "cb_stone_terracotta": {
+            "textures": "textures/blocks/cb_stone_terracotta"
+        },
+        "cb_stone_concrete": {
+            "textures": "textures/blocks/cb_stone_concrete"
+        },
         "cb_brass": {
             "textures": "textures/blocks/cb_brass"
         },

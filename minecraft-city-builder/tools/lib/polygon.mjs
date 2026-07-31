@@ -127,8 +127,9 @@ function rotateVector([x, y, z], facing) {
  *
  * @returns [{ points: [[x,y,z] x4], normal: [x,y,z], depth }]
  */
-export function blockFaces(cubes, origin, facing) {
+export function blockFaces(cubes, origin, facing, view = [1, 1, 1]) {
     const out = []
+    const viewLen = Math.hypot(...view) || 1
 
     for (const cube of cubes) {
         const [cx, cy, cz] = cube.origin
@@ -148,11 +149,16 @@ export function blockFaces(cubes, origin, facing) {
             // the cube's own rotation, then by the block's facing.
             const n = rotateVector(rotatePoint(face.normal, [0, 0, 0], cube.rotation), facing)
 
-            // The camera looks from (+x, +y, +z); back faces are skipped.
-            if (n[0] + n[1] + n[2] <= 0.001) continue
+            // Back faces are skipped. The test has to use the *real* camera
+            // direction: under a true isometric camera a 45-degree roof plane
+            // has a normal exactly perpendicular to the view, so it was being
+            // culled — which is why a correct slope kept coming out as a row of
+            // notches no matter what the geometry did.
+            if ((n[0] * view[0] + n[1] * view[1] + n[2] * view[2]) / viewLen <= 0.001) continue
 
             const points = face.idx.map((i) => corners[i])
-            const depth = points.reduce((sum, p) => sum + p[0] + p[1] + p[2], 0) / 4
+            const depth =
+                points.reduce((sum, p) => sum + p[0] * view[0] + p[1] * view[1] + p[2] * view[2], 0) / 4
             out.push({ points, normal: n, depth })
         }
     }
@@ -165,9 +171,12 @@ export const UNIT_CUBE = [{ origin: [-8, 0, -8], size: [16, 16, 16] }]
 /**
  * Flat shading. A pure top face is brightest, a south face darkest; a 45-degree
  * slope lands between the two, which is what makes it read as a slope.
+ *
+ * The key light is deliberately off the camera axis, so two roof planes meeting
+ * on a hip get visibly different tones instead of merging into one field.
  */
 const LIGHT = (() => {
-    const v = [0.35, 0.88, 0.32]
+    const v = [-0.42, 0.86, 0.29]
     const len = Math.hypot(...v)
     return v.map((c) => c / len)
 })()
@@ -176,5 +185,5 @@ export function shadeFor(normal) {
     const len = Math.hypot(...normal) || 1
     const n = normal.map((c) => c / len)
     const lambert = Math.max(0, n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2])
-    return 0.4 + 0.62 * lambert
+    return 0.42 + 0.6 * lambert
 }

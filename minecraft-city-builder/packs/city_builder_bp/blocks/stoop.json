@@ -1,0 +1,172 @@
+{
+    "format_version": "1.21.10",
+    "minecraft:block": {
+        "description": {
+            "identifier": "cb:stoop",
+            "menu_category": {
+                "category": "construction"
+            },
+            "states": {
+                "cb:stone": [
+                    "limestone",
+                    "granite",
+                    "brownstone",
+                    "terracotta",
+                    "concrete"
+                ]
+            },
+            "traits": {
+                "minecraft:placement_direction": {
+                    "enabled_states": [
+                        "minecraft:cardinal_direction"
+                    ],
+                    "y_rotation_offset": 180
+                }
+            }
+        },
+        "components": {
+            "minecraft:geometry": "geometry.cb_stoop",
+            "minecraft:material_instances": {
+                "*": {
+                    "texture": "cb_stone_brownstone",
+                    "render_method": "opaque"
+                }
+            },
+            "minecraft:destructible_by_mining": {
+                "seconds_to_destroy": 1.5
+            },
+            "minecraft:destructible_by_explosion": {
+                "explosion_resistance": 3
+            },
+            "minecraft:collision_box": {
+                "origin": [
+                    -8,
+                    0,
+                    -8
+                ],
+                "size": [
+                    16,
+                    16,
+                    16
+                ]
+            },
+            "minecraft:selection_box": {
+                "origin": [
+                    -8,
+                    0,
+                    -8
+                ],
+                "size": [
+                    16,
+                    16,
+                    16
+                ]
+            }
+        },
+        "permutations": [
+            {
+                "condition": "q.block_state('cb:stone') == 'limestone'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_stone_limestone",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:stone') == 'granite'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_stone_granite",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:stone') == 'brownstone'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_stone_brownstone",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:stone') == 'terracotta'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_stone_terracotta",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:stone') == 'concrete'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_stone_concrete",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'north'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            0,
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'east'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            90,
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'south'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            180,
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'west'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            270,
+                            0
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+}

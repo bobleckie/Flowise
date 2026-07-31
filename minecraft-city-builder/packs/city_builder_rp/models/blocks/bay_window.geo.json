@@ -3,14 +3,14 @@
     "minecraft:geometry": [
         {
             "description": {
-                "identifier": "geometry.cb_window",
+                "identifier": "geometry.cb_bay_window",
                 "texture_width": 16,
                 "texture_height": 16,
-                "visible_bounds_width": 2,
-                "visible_bounds_height": 2,
+                "visible_bounds_width": 3,
+                "visible_bounds_height": 3,
                 "visible_bounds_offset": [
                     0,
-                    1,
+                    1.5,
                     0
                 ]
             },
@@ -27,11 +27,85 @@
                             "origin": [
                                 -8,
                                 0,
-                                -7
+                                -6
                             ],
                             "size": [
                                 16,
-                                16,
+                                2,
+                                14
+                            ],
+                            "uv": {
+                                "north": {
+                                    "uv": [
+                                        0,
+                                        0
+                                    ],
+                                    "uv_size": [
+                                        16,
+                                        16
+                                    ]
+                                },
+                                "south": {
+                                    "uv": [
+                                        0,
+                                        0
+                                    ],
+                                    "uv_size": [
+                                        16,
+                                        16
+                                    ]
+                                },
+                                "east": {
+                                    "uv": [
+                                        0,
+                                        0
+                                    ],
+                                    "uv_size": [
+                                        16,
+                                        16
+                                    ]
+                                },
+                                "west": {
+                                    "uv": [
+                                        0,
+                                        0
+                                    ],
+                                    "uv_size": [
+                                        16,
+                                        16
+                                    ]
+                                },
+                                "up": {
+                                    "uv": [
+                                        0,
+                                        0
+                                    ],
+                                    "uv_size": [
+                                        16,
+                                        16
+                                    ]
+                                },
+                                "down": {
+                                    "uv": [
+                                        0,
+                                        0
+                                    ],
+                                    "uv_size": [
+                                        16,
+                                        16
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "origin": [
+                                -5,
+                                2,
+                                -8
+                            ],
+                            "size": [
+                                10,
+                                12,
                                 2
                             ],
                             "uv": {
@@ -43,7 +117,8 @@
                                     "uv_size": [
                                         16,
                                         16
-                                    ]
+                                    ],
+                                    "material_instance": "glass"
                                 },
                                 "south": {
                                     "uv": [
@@ -53,7 +128,8 @@
                                     "uv_size": [
                                         16,
                                         16
-                                    ]
+                                    ],
+                                    "material_instance": "glass"
                                 },
                                 "east": {
                                     "uv": [
@@ -99,14 +175,14 @@
                         },
                         {
                             "origin": [
-                                -8,
-                                0,
-                                -8
+                                -8.62,
+                                2,
+                                -7.5
                             ],
                             "size": [
-                                2,
-                                16,
-                                1
+                                4.24,
+                                12,
+                                2
                             ],
                             "uv": {
                                 "north": {
@@ -117,7 +193,8 @@
                                     "uv_size": [
                                         16,
                                         16
-                                    ]
+                                    ],
+                                    "material_instance": "glass"
                                 },
                                 "south": {
                                     "uv": [
@@ -127,7 +204,8 @@
                                     "uv_size": [
                                         16,
                                         16
-                                    ]
+                                    ],
+                                    "material_instance": "glass"
                                 },
                                 "east": {
                                     "uv": [
@@ -169,18 +247,28 @@
                                         16
                                     ]
                                 }
-                            }
+                            },
+                            "pivot": [
+                                -6.5,
+                                8,
+                                -6.5
+                            ],
+                            "rotation": [
+                                0,
+                                45,
+                                0
+                            ]
                         },
                         {
                             "origin": [
-                                6,
-                                0,
-                                -8
+                                4.38,
+                                2,
+                                -7.5
                             ],
                             "size": [
-                                2,
-                                16,
-                                1
+                                4.24,
+                                12,
+                                2
                             ],
                             "uv": {
                                 "north": {
@@ -191,7 +279,8 @@
                                     "uv_size": [
                                         16,
                                         16
-                                    ]
+                                    ],
+                                    "material_instance": "glass"
                                 },
                                 "south": {
                                     "uv": [
@@ -201,7 +290,8 @@
                                     "uv_size": [
                                         16,
                                         16
-                                    ]
+                                    ],
+                                    "material_instance": "glass"
                                 },
                                 "east": {
                                     "uv": [
@@ -243,92 +333,28 @@
                                         16
                                     ]
                                 }
-                            }
+                            },
+                            "pivot": [
+                                6.5,
+                                8,
+                                -6.5
+                            ],
+                            "rotation": [
+                                0,
+                                -45,
+                                0
+                            ]
                         },
                         {
                             "origin": [
                                 -8,
                                 14,
-                                -8
+                                -6
                             ],
                             "size": [
                                 16,
                                 2,
-                                1
-                            ],
-                            "uv": {
-                                "north": {
-                                    "uv": [
-                                        0,
-                                        0
-                                    ],
-                                    "uv_size": [
-                                        16,
-                                        16
-                                    ]
-                                },
-                                "south": {
-                                    "uv": [
-                                        0,
-                                        0
-                                    ],
-                                    "uv_size": [
-                                        16,
-                                        16
-                                    ]
-                                },
-                                "east": {
-                                    "uv": [
-                                        0,
-                                        0
-                                    ],
-                                    "uv_size": [
-                                        16,
-                                        16
-                                    ]
-                                },
-                                "west": {
-                                    "uv": [
-                                        0,
-                                        0
-                                    ],
-                                    "uv_size": [
-                                        16,
-                                        16
-                                    ]
-                                },
-                                "up": {
-                                    "uv": [
-                                        0,
-                                        0
-                                    ],
-                                    "uv_size": [
-                                        16,
-                                        16
-                                    ]
-                                },
-                                "down": {
-                                    "uv": [
-                                        0,
-                                        0
-                                    ],
-                                    "uv_size": [
-                                        16,
-                                        16
-                                    ]
-                                }
-                            }
-                        },
-                        {
-                            "origin": [
-                                -8,
-                                0,
-                                -8
-                            ],
-                            "size": [
-                                16,
-                                3,
-                                1
+                                14
                             ],
                             "uv": {
                                 "north": {

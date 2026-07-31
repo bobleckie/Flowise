@@ -104,42 +104,34 @@ export class Canvas {
     }
 }
 
-// --- cube sprite ------------------------------------------------------------
+// --- camera ------------------------------------------------------------------
 
 /**
- * Face mask for one isometric cube at a given size.
- * 1 = top, 2 = right (+x), 3 = left (+z), 0 = transparent.
+ * A general axonometric camera, not a true isometric one.
+ *
+ * True isometric looks down the (1,1,1) axis, and the normal of a 45-degree
+ * roof plane is exactly perpendicular to that: `n · (1,1,1) == 0`. Every
+ * pitched roof in the library was therefore edge-on to the camera and culled
+ * as a back face, leaving only the notches between courses. The roofs were
+ * right; the view of them could not have been more wrong.
+ *
+ * Turning the camera off the diagonal — 35 degrees round, 50 degrees down —
+ * puts every one of the four slopes of a hip roof at a positive angle to the
+ * view, so they all draw, and no principal plane of the model is degenerate.
  */
-function cubeSprite(size) {
-    size = Math.max(1, Math.round(size))
-    const w = size
-    const h = Math.max(1, Math.round(size / 2))
-    const v = size
-    const width = 2 * w
-    const height = 2 * h + v
-    const mask = new Uint8Array(width * height)
+const AZIMUTH = (35 * Math.PI) / 180
+const ELEVATION = (50 * Math.PI) / 180
 
-    for (let py = 0; py < height; py++) {
-        for (let px = 0; px < width; px++) {
-            const u = px - w + 0.5
-            const t = py + 0.5
-            let face = 0
-            if (Math.abs(u) / w + Math.abs(t - h) / h <= 1) {
-                face = 1
-            } else if (u >= 0) {
-                const edge = 2 * h - (h * u) / w
-                if (t > edge && t <= edge + v) face = 2
-            } else {
-                const edge = 2 * h + (h * u) / w
-                if (t > edge && t <= edge + v) face = 3
-            }
-            mask[py * width + px] = face
-        }
-    }
-    return { mask, width, height, w, h, v }
-}
+const CA = Math.cos(AZIMUTH)
+const SA = Math.sin(AZIMUTH)
+const CE = Math.cos(ELEVATION)
+const SE = Math.sin(ELEVATION)
 
-const SHADE = { 1: 1.0, 2: 0.76, 3: 0.55 }
+/** The direction the camera sits in. A face is visible when `n · VIEW > 0`. */
+export const VIEW = [SA, Math.tan(ELEVATION), CA]
+
+/** Screen offset per unit of world, before scaling. Y grows downward. */
+const screenUnits = (x, y, z) => [x * CA - z * SA, (x * SA + z * CA) * SE - y * CE]
 
 // --- renderer ---------------------------------------------------------------
 
@@ -175,33 +167,43 @@ export function renderIso(blocks, { size, maxPixels = 1200, background, cutaway 
     const dy = maxY + 1
     const dz = maxZ + 1
 
-    // Fit the model to maxPixels if no explicit cube size was given.
-    if (!size) {
-        const wUnits = dx + dz
-        const hUnits = (dx + dz) / 2 + dy
-        size = Math.max(1, Math.floor(Math.min((maxPixels * 0.98) / wUnits, (maxPixels * 0.98) / hUnits)))
+    // Project the bounding box and let its screen extent size the canvas —
+    // the camera is no longer axis-aligned, so the old closed form is gone.
+    let minU = Infinity
+    let maxU = -Infinity
+    let minV = Infinity
+    let maxV = -Infinity
+    for (const cx of [0, dx]) {
+        for (const cy of [0, dy]) {
+            for (const cz of [0, dz]) {
+                const [u, t] = screenUnits(cx, cy, cz)
+                if (u < minU) minU = u
+                if (u > maxU) maxU = u
+                if (t < minV) minV = t
+                if (t > maxV) maxV = t
+            }
+        }
     }
 
-    const sprite = cubeSprite(size)
-    const { w, h, v } = sprite
+    if (!size) {
+        size = Math.max(1, Math.floor(Math.min((maxPixels * 0.98) / (maxU - minU), (maxPixels * 0.98) / (maxV - minV))))
+    }
 
-    const width = (dx + dz) * w + 2 * w
-    const height = (dx + dz) * h + dy * v + 2 * h + v
+    const pad = Math.max(2, Math.round(size / 2))
+    const width = Math.ceil((maxU - minU) * size) + pad * 2
+    const height = Math.ceil((maxV - minV) * size) + pad * 2
     const canvas = new Canvas(width, height, background)
 
-    const originX = dz * w
-    const originY = dy * v
-
-    // Painter's algorithm: the camera looks from (+x, +y, +z), so larger
-    // x + y + z is nearer and must be drawn later.
-    const order = blocks.slice().sort((a, b) => {
-        const da = a.pos[0] + a.pos[1] + a.pos[2]
-        const db = b.pos[0] + b.pos[1] + b.pos[2]
-        return da - db
-    })
+    // Painter's algorithm: further along the view direction is nearer the
+    // camera, so it is drawn later.
+    const depthOf = (p) => p[0] * VIEW[0] + p[1] * VIEW[1] + p[2] * VIEW[2]
+    const order = blocks.slice().sort((a, b) => depthOf(a.pos) - depthOf(b.pos))
 
     // Project a point in continuous block space to the screen.
-    const project = (fx, fy, fz) => [originX + (fx - fz) * w, originY + (fx + fz) * h - fy * v]
+    const project = (fx, fy, fz) => {
+        const [u, t] = screenUnits(fx, fy, fz)
+        return [pad + (u - minU) * size, pad + (t - minV) * size]
+    }
 
     for (const block of order) {
         const [x, y, z] = block.pos
@@ -210,7 +212,7 @@ export function renderIso(blocks, { size, maxPixels = 1200, background, cutaway 
 
         const cubes = cubesForBlock(block.block) ?? UNIT_CUBE
         const facing = block.state?.['minecraft:cardinal_direction']
-        const faces = blockFaces(cubes, [x, y, z], facing).sort((a, b) => a.depth - b.depth)
+        const faces = blockFaces(cubes, [x, y, z], facing, VIEW).sort((a, b) => a.depth - b.depth)
 
         for (const face of faces) {
             const shade = shadeFor(face.normal)
