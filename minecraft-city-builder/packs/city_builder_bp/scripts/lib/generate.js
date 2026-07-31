@@ -222,6 +222,32 @@ export const ROOFING = 'minecraft:deepslate_tiles'
 export const ROOF_EQUIPMENT = 'minecraft:light_gray_concrete'
 
 /**
+ * Roofing kits. A pitched roof is built from the custom shingled roof blocks
+ * (see tools/gen-blocks.mjs), which are genuine 45-degree wedges with a shingle
+ * texture — not stacked cubes and not stairs.
+ *
+ * `full` fills the hidden core beneath the slope; `edge` forms the eaves course.
+ */
+export const ROOF_KITS = {
+    slate: { material: 'slate', full: 'minecraft:deepslate_tiles', edge: 'minecraft:polished_deepslate' },
+    clay_tile: { material: 'clay', full: 'minecraft:red_terracotta', edge: 'minecraft:terracotta' },
+    wood_shake: { material: 'shake', full: 'minecraft:stripped_dark_oak_log', edge: 'minecraft:dark_oak_planks' },
+    asphalt_shingle: { material: 'asphalt', full: 'minecraft:blackstone', edge: 'minecraft:polished_blackstone' }
+}
+
+export const ROOF_BLOCKS = { slope: 'cb:roof_slope', ridge: 'cb:roof_ridge', hip: 'cb:roof_hip' }
+
+/** Which kit a building roofs with, from its era. */
+export function roofKitFor(entry) {
+    const era = entry.provenance?.era ?? ''
+    if (/gothic|romanesque|beaux_arts|neoclassical|civic|chicago_school/.test(era)) return ROOF_KITS.slate
+    if (/craftsman|vernacular|italianate|revival/.test(era)) return ROOF_KITS.clay_tile
+    if (/postwar_suburban|roadside/.test(era)) return ROOF_KITS.asphalt_shingle
+    if (/streamline|expressionist/.test(era)) return ROOF_KITS.wood_shake
+    return ROOF_KITS.slate
+}
+
+/**
  * Generate a complete building module from a catalog entry.
  *
  * @param entry catalog entry
@@ -538,23 +564,9 @@ function buildRoof(entry, put, palette, top, roofBase) {
             break
         case 'gable':
         case 'hip':
-        case 'mansard': {
-            const steps = Math.max(1, cap)
-            for (let y = 1; y <= steps; y++) {
-                const inset = type === 'gable' ? 0 : y
-                if (inset * 2 >= Math.min(sx, sz)) break
-                // Pitched roofs are roofing material, not facade trim — a
-                // limestone-coloured shingle roof reads as unfinished.
-                if (type === 'gable') {
-                    for (let x = y; x < sx - y; x++) {
-                        for (let z = 0; z < sz; z++) put(ox + x, roofBase + y, oz + z, ROOFING)
-                    }
-                } else {
-                    deck(roofBase + y, inset, ROOFING)
-                }
-            }
+        case 'mansard':
+            pitchedRoof(entry, put, top, roofBase, type, cap)
             break
-        }
         case 'barrel_vault':
             for (let y = 1; y <= cap; y++) {
                 const inset = Math.round((Math.min(sx, sz) / 2) * (1 - Math.cos((y / cap) * (Math.PI / 2))))
@@ -595,5 +607,74 @@ export function verticalRegistry(entry) {
             y: plate.base + 1,
             use: (entry.program ?? []).find((b) => plate.floor >= b.floors[0] && plate.floor <= b.floors[1])?.use ?? ''
         }))
+    }
+}
+
+
+/**
+ * A pitched roof made of the custom shingled roof blocks.
+ *
+ * Each course steps inward and up. The perimeter of the course is slope blocks
+ * turned to face outward, the corners are hips where two slopes meet, the
+ * interior is filled solid so no daylight shows through, and the apex is capped
+ * with ridge tiles.
+ */
+function pitchedRoof(entry, put, top, roofBase, type, cap) {
+    const kit = roofKitFor(entry)
+    const [sx, sz] = top.size
+    const [ox, oz] = top.origin
+    const facing = (dir) => ({ 'cb:material': kit.material, 'minecraft:cardinal_direction': dir })
+
+    const gable = type === 'gable'
+    const limit = gable ? Math.floor(sx / 2) : Math.floor(Math.min(sx, sz) / 2)
+    const steps = Math.max(1, Math.min(cap, limit))
+
+    // Eaves: a solid course overhanging the wall, so the roof reads as a roof
+    // rather than as the wall changing colour at the top.
+    for (let x = -1; x <= sx; x++) {
+        for (const z of [-1, sz]) put(ox + x, roofBase, oz + z, kit.edge)
+    }
+    for (let z = 0; z < sz; z++) {
+        for (const x of [-1, sx]) put(ox + x, roofBase, oz + z, kit.edge)
+    }
+
+    for (let step = 0; step < steps; step++) {
+        const y = roofBase + step
+        const xLo = step
+        const xHi = sx - 1 - step
+        const zLo = gable ? 0 : step
+        const zHi = gable ? sz - 1 : sz - 1 - step
+        if (xLo > xHi || zLo > zHi) break
+
+        for (let x = xLo; x <= xHi; x++) {
+            for (let z = zLo; z <= zHi; z++) put(ox + x, y, oz + z, kit.full)
+        }
+
+        for (let z = zLo; z <= zHi; z++) {
+            put(ox + xLo, y, oz + z, ROOF_BLOCKS.slope, facing('west'))
+            put(ox + xHi, y, oz + z, ROOF_BLOCKS.slope, facing('east'))
+        }
+        if (!gable) {
+            for (let x = xLo; x <= xHi; x++) {
+                put(ox + x, y, oz + zLo, ROOF_BLOCKS.slope, facing('north'))
+                put(ox + x, y, oz + zHi, ROOF_BLOCKS.slope, facing('south'))
+            }
+            put(ox + xLo, y, oz + zLo, ROOF_BLOCKS.hip, facing('north'))
+            put(ox + xHi, y, oz + zLo, ROOF_BLOCKS.hip, facing('east'))
+            put(ox + xLo, y, oz + zHi, ROOF_BLOCKS.hip, facing('west'))
+            put(ox + xHi, y, oz + zHi, ROOF_BLOCKS.hip, facing('south'))
+        }
+    }
+
+    const ridgeY = roofBase + steps - 1
+    const rxLo = steps - 1
+    const rxHi = sx - steps
+    const rzLo = gable ? 0 : steps - 1
+    const rzHi = gable ? sz - 1 : sz - steps
+    const alongX = rxHi - rxLo >= rzHi - rzLo
+    for (let x = rxLo; x <= rxHi; x++) {
+        for (let z = rzLo; z <= rzHi; z++) {
+            put(ox + x, ridgeY, oz + z, ROOF_BLOCKS.ridge, facing(alongX ? 'north' : 'east'))
+        }
     }
 }

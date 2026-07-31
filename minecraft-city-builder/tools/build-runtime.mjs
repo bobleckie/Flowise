@@ -44,6 +44,9 @@ function slim(entry) {
         name: entry.name,
         type: entry.type,
         tier: entry.tier,
+        // Needed at runtime: the roofing kit is chosen from the era, and the
+        // placement dialog shows the inspiration.
+        provenance: entry.provenance,
         massing: entry.massing,
         below_grade: entry.below_grade,
         structure: entry.structure,

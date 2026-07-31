@@ -12,7 +12,55 @@
  */
 
 import { deflateSync, crc32 as zlibCrc32 } from 'node:zlib'
-import { colorOf, TRANSLUCENT } from './blocks.mjs'
+import { colorOf, colorOfPlaced, TRANSLUCENT } from './blocks.mjs'
+
+/**
+ * Sub-block shapes, in half-block units on a 2x2x2 grid.
+ *
+ * The renderer otherwise draws every block as a full cube, which made the
+ * custom 45-degree roof blocks look exactly like the stacked cubes they
+ * replaced — the preview could not tell the difference, which is the one thing
+ * it exists to do. Listing the occupied half-cells is enough resolution to show
+ * a slope as a slope.
+ *
+ * Cells are [x, y, z] with each axis in {0, 1}.
+ */
+export const SHAPES = {
+    // Slope rising toward +z: the far half is full, the near half is empty.
+    'cb:roof_slope': [[0, 0, 1], [1, 0, 1], [0, 1, 1], [1, 1, 1], [0, 0, 0], [1, 0, 0]],
+    // Hip: a slope cut back on one side too.
+    'cb:roof_hip': [[0, 0, 1], [1, 0, 1], [0, 1, 1], [0, 0, 0]],
+    // Ridge: only the upper half, spanning the apex.
+    'cb:roof_ridge': [[0, 1, 0], [1, 1, 0], [0, 1, 1], [1, 1, 1]],
+
+    'cb:sofa': [[0, 0, 0], [1, 0, 0], [0, 0, 1], [1, 0, 1], [0, 1, 1], [1, 1, 1]],
+    'cb:armchair': [[0, 0, 0], [0, 0, 1], [0, 1, 1]],
+    'cb:desk': [[0, 1, 0], [1, 1, 0], [0, 1, 1], [1, 1, 1], [0, 0, 0], [1, 0, 1]],
+    'cb:table': [[0, 1, 0], [1, 1, 0], [0, 1, 1], [1, 1, 1]],
+    'cb:counter': [[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0], [0, 0, 1], [1, 0, 1]],
+    'cb:bookcase': [[0, 0, 1], [1, 0, 1], [0, 1, 1], [1, 1, 1]],
+    'cb:screen': [[0, 1, 1], [1, 1, 1]],
+    'cb:planter': [[0, 0, 0], [1, 0, 0], [0, 0, 1], [1, 0, 1]],
+    'cb:wall_art': [[0, 1, 1], [1, 1, 1]],
+    'cb:sconce': [[0, 1, 1]],
+    'cb:chandelier': [[0, 1, 0], [1, 1, 0], [0, 1, 1], [1, 1, 1]],
+    'cb:ceiling_light': [[0, 1, 0], [1, 1, 0], [0, 1, 1], [1, 1, 1]],
+    'cb:pendant_light': [[0, 1, 0], [1, 1, 0], [0, 1, 1], [1, 1, 1]]
+}
+
+/** Half-block rotation about Y, so a shape follows its facing. */
+function rotateCell([x, y, z], facing) {
+    switch (facing) {
+        case 'east':
+            return [1 - z, y, x]
+        case 'south':
+            return [1 - x, y, 1 - z]
+        case 'west':
+            return [z, y, 1 - x]
+        default:
+            return [x, y, z]
+    }
+}
 
 // --- PNG --------------------------------------------------------------------
 
@@ -197,23 +245,50 @@ export function renderIso(blocks, { size, maxPixels = 1200, background, cutaway 
         return da - db
     })
 
-    for (const block of order) {
-        const [x, y, z] = block.pos
-        const color = colorOf(block.block)
-        const alpha = TRANSLUCENT.has(block.block) ? 0.55 : 1
+    // Half-scale sprite, for blocks whose shape is not a full cube.
+    const halfSprite = size >= 2 ? cubeSprite(Math.max(1, Math.floor(size / 2))) : null
 
-        const sx = originX + (x - z) * w - w
-        const sy = originY + (x + z) * h - y * v
-
-        for (let py = 0; py < sprite.height; py++) {
+    const draw = (spriteToUse, sx, sy, color, alpha) => {
+        for (let py = 0; py < spriteToUse.height; py++) {
             const cy = sy + py
             if (cy < 0 || cy >= height) continue
-            for (let px = 0; px < sprite.width; px++) {
-                const face = sprite.mask[py * sprite.width + px]
+            for (let px = 0; px < spriteToUse.width; px++) {
+                const face = spriteToUse.mask[py * spriteToUse.width + px]
                 if (!face) continue
                 const shade = SHADE[face]
                 canvas.set(sx + px, cy, [color[0] * shade, color[1] * shade, color[2] * shade], alpha)
             }
+        }
+    }
+
+    for (const block of order) {
+        const [x, y, z] = block.pos
+        const color = colorOfPlaced(block)
+        const alpha = TRANSLUCENT.has(block.block) ? 0.55 : 1
+        const shape = SHAPES[block.block]
+
+        if (!shape || !halfSprite) {
+            draw(sprite, originX + (x - z) * w - w, originY + (x + z) * h - y * v, color, alpha)
+            continue
+        }
+
+        // Sub-block cells, drawn back to front within the block.
+        const facing = block.state?.['minecraft:cardinal_direction']
+        const cells = shape
+            .map((cell) => rotateCell(cell, facing))
+            .sort((a, b) => a[0] + a[1] + a[2] - (b[0] + b[1] + b[2]))
+
+        for (const [cx, cy2, cz] of cells) {
+            const fx = x + cx / 2
+            const fy = y + cy2 / 2
+            const fz = z + cz / 2
+            draw(
+                halfSprite,
+                Math.round(originX + (fx - fz) * w - halfSprite.w),
+                Math.round(originY + (fx + fz) * h - fy * v),
+                color,
+                alpha
+            )
         }
     }
 

@@ -1,0 +1,160 @@
+{
+    "format_version": "1.21.10",
+    "minecraft:block": {
+        "description": {
+            "identifier": "cb:roof_ridge",
+            "menu_category": {
+                "category": "construction"
+            },
+            "states": {
+                "cb:material": [
+                    "slate",
+                    "clay",
+                    "shake",
+                    "asphalt"
+                ]
+            },
+            "traits": {
+                "minecraft:placement_direction": {
+                    "enabled_states": [
+                        "minecraft:cardinal_direction"
+                    ],
+                    "y_rotation_offset": 180
+                }
+            }
+        },
+        "components": {
+            "minecraft:geometry": "geometry.cb_roof_ridge",
+            "minecraft:material_instances": {
+                "*": {
+                    "texture": "cb_ridge_slate",
+                    "render_method": "opaque"
+                }
+            },
+            "minecraft:destructible_by_mining": {
+                "seconds_to_destroy": 1.5
+            },
+            "minecraft:destructible_by_explosion": {
+                "explosion_resistance": 3
+            },
+            "minecraft:collision_box": {
+                "origin": [
+                    -8,
+                    8,
+                    -8
+                ],
+                "size": [
+                    16,
+                    8,
+                    16
+                ]
+            },
+            "minecraft:selection_box": {
+                "origin": [
+                    -8,
+                    8,
+                    -8
+                ],
+                "size": [
+                    16,
+                    8,
+                    16
+                ]
+            }
+        },
+        "permutations": [
+            {
+                "condition": "q.block_state('cb:material') == 'slate'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_ridge_slate",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:material') == 'clay'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_ridge_clay",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:material') == 'shake'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_ridge_shake",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:material') == 'asphalt'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_ridge_asphalt",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'north'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            0,
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'east'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            90,
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'south'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            180,
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'west'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            270,
+                            0
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+}

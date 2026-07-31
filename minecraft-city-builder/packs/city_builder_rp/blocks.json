@@ -1,0 +1,55 @@
+{
+    "format_version": [
+        1,
+        1,
+        0
+    ],
+    "cb:roof_slope": {
+        "sound": "stone"
+    },
+    "cb:roof_ridge": {
+        "sound": "stone"
+    },
+    "cb:roof_hip": {
+        "sound": "stone"
+    },
+    "cb:sconce": {
+        "sound": "glass"
+    },
+    "cb:chandelier": {
+        "sound": "glass"
+    },
+    "cb:ceiling_light": {
+        "sound": "glass"
+    },
+    "cb:pendant_light": {
+        "sound": "glass"
+    },
+    "cb:wall_art": {
+        "sound": "wood"
+    },
+    "cb:sofa": {
+        "sound": "wood"
+    },
+    "cb:armchair": {
+        "sound": "wood"
+    },
+    "cb:desk": {
+        "sound": "wood"
+    },
+    "cb:table": {
+        "sound": "wood"
+    },
+    "cb:counter": {
+        "sound": "wood"
+    },
+    "cb:screen": {
+        "sound": "glass"
+    },
+    "cb:bookcase": {
+        "sound": "wood"
+    },
+    "cb:planter": {
+        "sound": "wood"
+    }
+}

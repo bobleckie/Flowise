@@ -151,6 +151,24 @@ export const BLOCK_COLORS = {
     'minecraft:red_carpet': [160, 39, 34],
     'minecraft:white_wool': [233, 236, 236],
 
+    // custom blocks — see tools/gen-blocks.mjs
+    'cb:roof_slope': [72, 78, 88],
+    'cb:roof_ridge': [64, 70, 80],
+    'cb:roof_hip': [72, 78, 88],
+    'cb:sconce': [176, 138, 66],
+    'cb:chandelier': [176, 138, 66],
+    'cb:ceiling_light': [232, 244, 255],
+    'cb:pendant_light': [255, 236, 190],
+    'cb:wall_art': [92, 68, 44],
+    'cb:sofa': [64, 66, 72],
+    'cb:armchair': [96, 100, 66],
+    'cb:desk': [86, 60, 40],
+    'cb:table': [162, 130, 84],
+    'cb:counter': [186, 186, 182],
+    'cb:screen': [22, 24, 30],
+    'cb:bookcase': [86, 60, 40],
+    'cb:planter': [72, 108, 56],
+
     // misc
     'minecraft:prismarine': [99, 156, 151],
     'minecraft:dark_prismarine': [51, 91, 75],
@@ -182,6 +200,29 @@ function deriveBase(blockId) {
         stem.replace(/^minecraft:/, 'minecraft:') + '_bricks'
     ]
     return candidates.find((c) => c in BLOCK_COLORS) ?? null
+}
+
+/**
+ * Custom blocks whose colour comes from a block state rather than the id.
+ * Without this the preview drew every roof slate-grey regardless of material.
+ */
+const STATE_COLORS = {
+    'cb:roof_slope': ['cb:material', { slate: [72, 78, 88], clay: [150, 78, 54], shake: [96, 72, 46], asphalt: [54, 54, 58] }],
+    'cb:roof_hip': ['cb:material', { slate: [72, 78, 88], clay: [150, 78, 54], shake: [96, 72, 46], asphalt: [54, 54, 58] }],
+    'cb:roof_ridge': ['cb:material', { slate: [62, 68, 78], clay: [130, 66, 46], shake: [82, 62, 40], asphalt: [46, 46, 50] }],
+    'cb:sofa': ['cb:fabric', { charcoal: [64, 66, 72], olive: [96, 100, 66], rust: [140, 74, 52], cream: [196, 184, 158] }],
+    'cb:armchair': ['cb:fabric', { charcoal: [64, 66, 72], olive: [96, 100, 66], rust: [140, 74, 52], cream: [196, 184, 158] }]
+}
+
+/** Colour for a placed block, taking its state into account. */
+export function colorOfPlaced(block) {
+    const rule = STATE_COLORS[block.block]
+    if (rule) {
+        const [state, table] = rule
+        const value = block.state?.[state]
+        if (value !== undefined && table[value]) return table[value]
+    }
+    return colorOf(block.block)
 }
 
 export function colorOf(blockId) {

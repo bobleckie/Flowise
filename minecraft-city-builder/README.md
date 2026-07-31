@@ -198,6 +198,32 @@ Placement times at the default 400 blocks/tick: most buildings land in under 10
 seconds; the largest supertall takes about a minute. Raise the budget in
 Settings to trade smoothness for speed.
 
+## Custom blocks
+
+Vanilla Minecraft has no angled roof block — stairs are the closest it gets, and
+stairs read as steps. Bedrock does support custom blocks with arbitrary
+geometry, so the pack ships its own: a genuine 45-degree shingled slope, ridge
+caps, hips, wall sconces, chandeliers, pendant and ceiling lights, framed
+artwork in five variants, and furniture with real arms, backs, legs and
+pedestals rather than a coloured cube.
+
+```sh
+node tools/gen-blocks.mjs      # 16 blocks, 16 geometries, 26 textures
+```
+
+Everything is generated from one spec table in `tools/gen-blocks.mjs`, including
+the textures — `tools/lib/textures.mjs` produces shingle courses, upholstery,
+wood grain, brushed metal, glow panels and framed art procedurally, so a new
+material is a line of data rather than a hand-painted PNG.
+
+Roofing picks its kit from the building's era: slate for gothic and
+neoclassical, clay tile for vernacular and revival, wood shake for expressionist,
+asphalt for postwar. Shingle colour, ridge and hip all follow.
+
+**Not verified in-game:** the slope geometry is a plate rotated 45 degrees. If
+it ever renders sloping the wrong way, flip `SLOPE_ROTATION` in
+`tools/gen-blocks.mjs` — that single constant controls it.
+
 ## Interiors and fitout
 
 Buildings are not shells. Every floor gets a walkable surface, the stair core
@@ -208,7 +234,9 @@ interior is not a black box.
 Furniture is rule-driven, keyed to **room type** rather than to building
 (`tools/lib/fitout.mjs`). 26 rules cover offices, apartments, hotel rooms,
 classrooms, wards, lobbies, restaurants, retail, workshops, platforms and
-sanctuaries. That is the answer to the premortem's finding that 108 named
+sanctuaries. Rooms also get framed art and wall sconces on the inside face of
+the exterior wall — a room with furniture but blank walls still reads as a
+warehouse. That is the answer to the premortem's finding that 108 named
 fitouts across 68 buildings was hand-authoring with extra steps: a 1920s office
 and a 1970s office are the same rule with different materials.
 

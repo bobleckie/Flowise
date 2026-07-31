@@ -11,11 +11,12 @@
     "scripts": {
         "test": "node --test \"tools/test/*.test.mjs\"",
         "check": "node tools/build.mjs --check",
-        "build": "node tools/build-runtime.mjs && node tools/build.mjs",
+        "build": "node tools/gen-blocks.mjs && node tools/build-runtime.mjs && node tools/build.mjs",
         "gen:fixture": "node tools/gen-test-room.mjs",
         "gen:art": "python3 tools/gen_placeholder_art.py",
         "build:runtime": "node tools/build-runtime.mjs",
         "presets": "node tools/build-preset.mjs --all --sheet --shell-only --no-structure",
-        "palette": "node tools/palette-check.mjs"
+        "palette": "node tools/palette-check.mjs",
+        "gen:blocks": "node tools/gen-blocks.mjs"
     }
 }

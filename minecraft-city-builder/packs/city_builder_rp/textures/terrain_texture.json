@@ -1,0 +1,86 @@
+{
+    "resource_pack_name": "city_builder",
+    "texture_name": "atlas.terrain",
+    "padding": 8,
+    "num_mip_levels": 4,
+    "texture_data": {
+        "cb_shingle_slate": {
+            "textures": "textures/blocks/cb_shingle_slate"
+        },
+        "cb_ridge_slate": {
+            "textures": "textures/blocks/cb_ridge_slate"
+        },
+        "cb_shingle_clay": {
+            "textures": "textures/blocks/cb_shingle_clay"
+        },
+        "cb_ridge_clay": {
+            "textures": "textures/blocks/cb_ridge_clay"
+        },
+        "cb_shingle_shake": {
+            "textures": "textures/blocks/cb_shingle_shake"
+        },
+        "cb_ridge_shake": {
+            "textures": "textures/blocks/cb_ridge_shake"
+        },
+        "cb_shingle_asphalt": {
+            "textures": "textures/blocks/cb_shingle_asphalt"
+        },
+        "cb_ridge_asphalt": {
+            "textures": "textures/blocks/cb_ridge_asphalt"
+        },
+        "cb_brass": {
+            "textures": "textures/blocks/cb_brass"
+        },
+        "cb_glow_warm": {
+            "textures": "textures/blocks/cb_glow_warm"
+        },
+        "cb_glow_cool": {
+            "textures": "textures/blocks/cb_glow_cool"
+        },
+        "cb_fabric_charcoal": {
+            "textures": "textures/blocks/cb_fabric_charcoal"
+        },
+        "cb_fabric_olive": {
+            "textures": "textures/blocks/cb_fabric_olive"
+        },
+        "cb_fabric_rust": {
+            "textures": "textures/blocks/cb_fabric_rust"
+        },
+        "cb_fabric_cream": {
+            "textures": "textures/blocks/cb_fabric_cream"
+        },
+        "cb_wood_walnut": {
+            "textures": "textures/blocks/cb_wood_walnut"
+        },
+        "cb_wood_oak": {
+            "textures": "textures/blocks/cb_wood_oak"
+        },
+        "cb_stone_worktop": {
+            "textures": "textures/blocks/cb_stone_worktop"
+        },
+        "cb_screen_dark": {
+            "textures": "textures/blocks/cb_screen_dark"
+        },
+        "cb_planter": {
+            "textures": "textures/blocks/cb_planter"
+        },
+        "cb_foliage": {
+            "textures": "textures/blocks/cb_foliage"
+        },
+        "cb_art_0": {
+            "textures": "textures/blocks/cb_art_0"
+        },
+        "cb_art_1": {
+            "textures": "textures/blocks/cb_art_1"
+        },
+        "cb_art_2": {
+            "textures": "textures/blocks/cb_art_2"
+        },
+        "cb_art_3": {
+            "textures": "textures/blocks/cb_art_3"
+        },
+        "cb_art_4": {
+            "textures": "textures/blocks/cb_art_4"
+        }
+    }
+}

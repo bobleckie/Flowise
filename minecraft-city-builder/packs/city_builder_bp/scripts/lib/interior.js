@@ -28,7 +28,7 @@ export const FITTINGS = {
     stair_block: 'minecraft:stone_bricks',
     door: 'minecraft:oak_door',
     light: 'minecraft:lantern',
-    ceiling_light: 'minecraft:glowstone',
+    ceiling_light: 'cb:ceiling_light',
     shaft: 'minecraft:polished_deepslate',
     shaft_door: 'minecraft:iron_door',
     air: 'minecraft:air'

@@ -3,3 +3,21 @@ pack.description=Textures and models for the Minecraft City Builder add-on. Mile
 
 item.cb:build_wand=Build Wand
 item.cb:build_wand.name=Build Wand
+
+# --- custom blocks ---
+tile.cb:roof_slope.name=Roof Shingles (Slope)
+tile.cb:roof_ridge.name=Roof Ridge Cap
+tile.cb:roof_hip.name=Roof Hip
+tile.cb:sconce.name=Wall Sconce
+tile.cb:chandelier.name=Chandelier
+tile.cb:ceiling_light.name=Ceiling Light
+tile.cb:pendant_light.name=Pendant Light
+tile.cb:wall_art.name=Framed Artwork
+tile.cb:sofa.name=Sofa
+tile.cb:armchair.name=Armchair
+tile.cb:desk.name=Desk
+tile.cb:table.name=Table
+tile.cb:counter.name=Counter
+tile.cb:screen.name=Screen
+tile.cb:bookcase.name=Bookcase
+tile.cb:planter.name=Planter

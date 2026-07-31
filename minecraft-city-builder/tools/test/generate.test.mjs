@@ -289,7 +289,9 @@ test('interiors make every building enterable and climbable', () => {
             assert.ok(stairs.length > 0, `${entry.id} is ${entry.massing.floors} floors with no stairs`)
         }
 
-        const lights = blocks.filter((b) => b.block === 'minecraft:glowstone' || b.block === 'minecraft:lantern')
+        // Lighting is custom fixtures now, not glowstone cubes.
+        const LIGHTS = ['cb:ceiling_light', 'cb:chandelier', 'cb:pendant_light', 'cb:sconce', 'minecraft:lantern', 'minecraft:glowstone']
+        const lights = blocks.filter((b) => LIGHTS.includes(b.block))
         assert.ok(lights.length > 0, `${entry.id} has no interior lighting`)
 
         // Hollowed volume: a solid building would have almost no air.

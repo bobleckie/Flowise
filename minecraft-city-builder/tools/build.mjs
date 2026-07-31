@@ -179,6 +179,43 @@ function validate(files) {
         if (!files.includes(entry)) errors.push(`city_builder_bp: script entry "${script.entry}" not found`)
     }
 
+    // Every custom block must have its geometry and textures present, or the
+    // pack loads with invisible blocks and an error only in the Content Log.
+    const blockDir = join(PACKS_DIR, 'city_builder_bp', 'blocks')
+    const blockFiles = files.filter((f) => f.startsWith(blockDir))
+    const terrainPath = join(PACKS_DIR, 'city_builder_rp', 'textures', 'terrain_texture.json')
+    const terrain = files.includes(terrainPath) ? readJson(terrainPath).texture_data ?? {} : {}
+
+    for (const file of blockFiles) {
+        const block = readJson(file)['minecraft:block']
+        if (!block) {
+            errors.push(`${relative(ROOT, file)}: not a block definition`)
+            continue
+        }
+        const geo = block.components?.['minecraft:geometry']
+        const identifier = typeof geo === 'string' ? geo : geo?.identifier
+        if (identifier) {
+            const geoFile = join(PACKS_DIR, 'city_builder_rp', 'models', 'blocks', `${identifier.replace('geometry.cb_', '')}.geo.json`)
+            if (!files.includes(geoFile)) errors.push(`${relative(ROOT, file)}: geometry "${identifier}" has no model`)
+        }
+        // Every texture named, in components and in permutations.
+        const named = new Set()
+        const collect = (components) => {
+            for (const instance of Object.values(components?.['minecraft:material_instances'] ?? {})) {
+                if (instance.texture) named.add(instance.texture)
+            }
+        }
+        collect(block.components)
+        for (const permutation of block.permutations ?? []) collect(permutation.components)
+        for (const texture of named) {
+            if (!terrain[texture]) errors.push(`${relative(ROOT, file)}: texture "${texture}" is not in terrain_texture.json`)
+            else {
+                const png = join(PACKS_DIR, 'city_builder_rp', `${terrain[texture].textures}.png`)
+                if (!files.includes(png)) errors.push(`${relative(ROOT, file)}: ${terrain[texture].textures}.png is missing`)
+            }
+        }
+    }
+
     // Every texture referenced by item_texture.json must exist.
     const texturesPath = join(PACKS_DIR, 'city_builder_rp', 'textures', 'item_texture.json')
     if (files.includes(texturesPath)) {

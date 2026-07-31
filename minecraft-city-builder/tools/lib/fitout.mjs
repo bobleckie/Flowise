@@ -11,31 +11,49 @@
  * overwrites a stair, a partition, a door or a lift shaft.
  */
 
-/** Vanilla blocks that read as furniture. */
+/**
+ * Furniture blocks.
+ *
+ * The `cb:` entries are custom blocks with real geometry — a sofa with arms and
+ * a back, a desk with pedestals, a chandelier with candles (see
+ * tools/gen-blocks.mjs). Vanilla blocks are kept only where vanilla already has
+ * the right object, like a bed or a chest.
+ */
 const F = {
-    desk: 'minecraft:smooth_stone_slab',
-    desk_leg: 'minecraft:stone_bricks',
-    chair: 'minecraft:oak_stairs',
-    table: 'minecraft:oak_slab',
-    table_leg: 'minecraft:oak_fence',
+    // custom models
+    sofa: 'cb:sofa',
+    armchair: 'cb:armchair',
+    desk: 'cb:desk',
+    table: 'cb:table',
+    counter: 'cb:counter',
+    bookcase: 'cb:bookcase',
+    screen: 'cb:screen',
+    planter: 'cb:planter',
+    art: 'cb:wall_art',
+    sconce: 'cb:sconce',
+    chandelier: 'cb:chandelier',
+    ceiling_light: 'cb:ceiling_light',
+    pendant: 'cb:pendant_light',
+
+    // vanilla, where vanilla is already right
     bed: 'minecraft:bed',
+    chair: 'minecraft:oak_stairs',
     nightstand: 'minecraft:barrel',
     storage: 'minecraft:chest',
     shelf: 'minecraft:bookshelf',
-    rack: 'minecraft:barrel',
-    counter: 'minecraft:smooth_quartz_slab',
-    counter_base: 'minecraft:quartz_block',
-    plant: 'minecraft:flower_pot',
-    lamp: 'minecraft:lantern',
-    lamp_post: 'minecraft:oak_fence',
-    bench: 'minecraft:oak_stairs',
-    sofa: 'minecraft:red_wool',
     rug: 'minecraft:red_carpet',
     machine: 'minecraft:blast_furnace',
     sink: 'minecraft:cauldron',
     lectern: 'minecraft:lectern',
-    crate: 'minecraft:barrel'
+    crate: 'minecraft:barrel',
+    bench: 'minecraft:oak_stairs'
 }
+
+/** Upholstery colourways, so a lobby is not forty identical sofas. */
+const FABRICS = ['charcoal', 'olive', 'rust', 'cream']
+
+/** Custom blocks take a cardinal direction naming the way they face. */
+const dir = (facing) => ({ 'minecraft:cardinal_direction': facing })
 
 /** Bedrock facings. */
 const DIR4 = { east: 0, south: 1, west: 2, north: 3 }
@@ -131,7 +149,54 @@ export function fitoutFloor(put, free, plate, core, band, interiorHeight) {
             placed += put_count
         }
     }
+
+    placed += wallDressing(put, free, plate, core, band, y, headroom)
     return placed
+}
+
+/** Room types that get pictures on the wall. */
+const ART_ROOMS = new Set([
+    'lobby', 'sky_lobby', 'office_open', 'office_private', 'apartment', 'living',
+    'penthouse', 'hotel_room', 'restaurant_dining', 'gallery', 'library_stack', 'ward'
+])
+
+/**
+ * Dress the inside face of the exterior wall with framed art and sconces.
+ *
+ * A room with furniture but blank walls still reads as a warehouse. The
+ * fixture's cardinal direction names the way it faces, which is into the room.
+ */
+function wallDressing(put, free, plate, core, band, y, headroom) {
+    if (!ART_ROOMS.has(band)) return 0
+    const [sx, sz] = plate.size
+    const [ox, oz] = plate.origin
+    if (sx < 8 || sz < 8) return 0
+
+    let n = 0
+    let piece = 0
+    const artY = y + Math.min(1, headroom - 2)
+    const sconceY = y + Math.min(2, headroom - 1)
+
+    // Walk the four interior wall faces, alternating art and sconces.
+    const walls = [
+        { fixed: 'z', at: oz + 1, from: ox + 3, to: ox + sx - 4, facing: 'south' },
+        { fixed: 'z', at: oz + sz - 2, from: ox + 3, to: ox + sx - 4, facing: 'north' },
+        { fixed: 'x', at: ox + 1, from: oz + 3, to: oz + sz - 4, facing: 'east' },
+        { fixed: 'x', at: ox + sx - 2, from: oz + 3, to: oz + sz - 4, facing: 'west' }
+    ]
+
+    for (const wall of walls) {
+        for (let along = wall.from; along <= wall.to; along += 5) {
+            const x = wall.fixed === 'z' ? along : wall.at
+            const z = wall.fixed === 'z' ? wall.at : along
+            if (x >= core.x - 1 && x <= core.x + core.w && z >= core.z - 1 && z <= core.z + core.d) continue
+
+            if (piece % 2 === 0) n += set(put, free, x, artY, z, F.art, { 'cb:art': piece % 5, ...dir(wall.facing) })
+            else if (headroom >= 3) n += set(put, free, x, sconceY, z, F.sconce, dir(wall.facing))
+            piece++
+        }
+    }
+    return n
 }
 
 // --- individual rules ------------------------------------------------------
@@ -166,14 +231,13 @@ function bed(put, free, x, y, z, facing = DIR4.south) {
     ])
 }
 
-function deskCluster(put, free, x, y, z, headroom) {
+function deskCluster(put, free, x, y, z, headroom, index = 0) {
     let n = 0
-    // Two desks facing each other across a shared spine.
-    n += set(put, free, x, y, z, F.desk)
-    n += set(put, free, x + 1, y, z, F.desk)
+    n += set(put, free, x, y, z, F.desk, dir('north'))
     n += set(put, free, x, y, z + 1, F.chair, { weirdo_direction: STAIR4.north, upside_down_bit: false })
-    n += set(put, free, x + 1, y, z - 1, F.chair, { weirdo_direction: STAIR4.south, upside_down_bit: false })
-    if (headroom >= 3) n += set(put, free, x, y + 1, z, F.lamp, { hanging: false })
+    if (index % 3 === 0) n += set(put, free, x + 1, y, z, F.screen, dir('north'))
+    if (index % 4 === 1) n += set(put, free, x + 1, y, z, F.planter)
+    if (headroom >= 3) n += set(put, free, x, y + headroom - 1, z, F.ceiling_light)
     return n
 }
 
@@ -184,13 +248,11 @@ function schoolDesk(put, free, x, y, z) {
     return n
 }
 
-function shelfRun(put, free, x, y, z, headroom) {
+function shelfRun(put, free, x, y, z, headroom, index = 0) {
     let n = 0
-    const height = Math.max(1, Math.min(2, headroom - 1))
-    for (let dy = 0; dy < height; dy++) {
-        n += set(put, free, x, y + dy, z, F.shelf)
-        n += set(put, free, x, y + dy, z + 1, F.shelf)
-    }
+    n += set(put, free, x, y, z, F.bookcase, dir('north'))
+    n += set(put, free, x, y, z + 1, F.bookcase, dir('south'))
+    if (headroom >= 3 && index % 2 === 0) n += set(put, free, x, y + headroom - 1, z, F.ceiling_light)
     return n
 }
 
@@ -217,48 +279,45 @@ function dwelling(put, free, x, y, z, headroom, index = 0) {
             n += set(put, free, x + 2, y, z + 1, F.storage, { 'minecraft:cardinal_direction': 'south' })
             break
         case 1: // eating
-            n += set(put, free, x, y, z, F.table_leg)
-            n += set(put, free, x, y + 1, z, F.table)
+            n += set(put, free, x, y, z, F.table)
             n += set(put, free, x - 1, y, z, F.chair, { weirdo_direction: STAIR4.east, upside_down_bit: false })
             n += set(put, free, x + 1, y, z, F.chair, { weirdo_direction: STAIR4.west, upside_down_bit: false })
-            n += set(put, free, x, y, z + 2, F.counter_base)
-            n += set(put, free, x, y + 1, z + 2, F.counter)
+            n += set(put, free, x, y, z + 2, F.counter, dir('south'))
             break
-        default: // living
-            n += set(put, free, x, y, z, F.sofa)
-            n += set(put, free, x + 1, y, z, F.sofa)
+        default: { // living
+            const fabric = { 'cb:fabric': FABRICS[(index / 3) % FABRICS.length | 0] }
+            n += set(put, free, x, y, z, F.sofa, { ...fabric, ...dir('south') })
+            n += set(put, free, x + 1, y, z, F.sofa, { ...fabric, ...dir('south') })
             n += set(put, free, x, y, z + 2, F.rug)
             n += set(put, free, x + 1, y, z + 2, F.rug)
-            n += set(put, free, x + 2, y, z, F.shelf)
-            if (headroom >= 3) {
-                n += set(put, free, x + 2, y, z + 2, F.lamp_post)
-                n += set(put, free, x + 2, y + 1, z + 2, F.lamp, { hanging: false })
-            }
+            n += set(put, free, x + 2, y, z + 1, F.screen, dir('west'))
+            n += set(put, free, x + 2, y, z, F.bookcase, dir('west'))
+            if (headroom >= 3) n += set(put, free, x, y + headroom - 1, z + 1, F.pendant)
             break
+        }
     }
     return n
 }
 
-function lobbySeating(put, free, x, y, z, headroom) {
+function lobbySeating(put, free, x, y, z, headroom, index = 0) {
+    const fabric = { 'cb:fabric': FABRICS[index % FABRICS.length] }
     let n = 0
-    n += set(put, free, x, y, z, F.sofa)
-    n += set(put, free, x + 1, y, z, F.sofa)
-    n += set(put, free, x, y, z + 2, F.sofa)
-    n += set(put, free, x + 1, y, z + 2, F.sofa)
-    n += set(put, free, x + 3, y, z + 1, F.plant)
-    if (headroom >= 3) {
-        n += set(put, free, x + 3, y, z, F.lamp_post)
-        n += set(put, free, x + 3, y + 1, z, F.lamp, { hanging: false })
-    }
+    n += set(put, free, x, y, z, F.sofa, { ...fabric, ...dir('south') })
+    n += set(put, free, x + 1, y, z, F.sofa, { ...fabric, ...dir('south') })
+    n += set(put, free, x, y, z + 3, F.armchair, { ...fabric, ...dir('north') })
+    n += set(put, free, x + 2, y, z + 2, F.table)
+    n += set(put, free, x + 3, y, z, F.planter)
+    if (headroom >= 4) n += set(put, free, x + 1, y + headroom - 1, z + 2, F.chandelier)
+    else if (headroom >= 3) n += set(put, free, x + 1, y + headroom - 1, z + 2, F.pendant)
     return n
 }
 
-function diningTable(put, free, x, y, z) {
+function diningTable(put, free, x, y, z, headroom) {
     let n = 0
-    n += set(put, free, x, y, z, F.table_leg)
-    n += set(put, free, x, y + 1, z, F.table)
+    n += set(put, free, x, y, z, F.table)
     n += set(put, free, x - 1, y, z, F.chair, { weirdo_direction: STAIR4.east, upside_down_bit: false })
     n += set(put, free, x + 1, y, z, F.chair, { weirdo_direction: STAIR4.west, upside_down_bit: false })
+    if (headroom >= 3) n += set(put, free, x, y + headroom - 1, z, F.pendant)
     return n
 }
 
@@ -294,11 +353,11 @@ function pewRun(put, free, x, y, z) {
     return n
 }
 
-function kitchenRun(put, free, x, y, z) {
+function kitchenRun(put, free, x, y, z, headroom) {
     let n = 0
-    n += set(put, free, x, y, z, F.counter_base)
-    n += set(put, free, x, y + 1, z, F.counter)
+    n += set(put, free, x, y, z, F.counter, dir('south'))
     n += set(put, free, x + 1, y, z, F.sink)
     n += set(put, free, x + 2, y, z, F.machine, { 'minecraft:cardinal_direction': 'south', lit: false })
+    if (headroom >= 3) n += set(put, free, x + 1, y + headroom - 1, z, F.ceiling_light)
     return n
 }
