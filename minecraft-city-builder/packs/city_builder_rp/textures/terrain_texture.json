@@ -28,6 +28,12 @@
         "cb_ridge_asphalt": {
             "textures": "textures/blocks/cb_ridge_asphalt"
         },
+        "cb_shingle_barrel": {
+            "textures": "textures/blocks/cb_shingle_barrel"
+        },
+        "cb_ridge_barrel": {
+            "textures": "textures/blocks/cb_ridge_barrel"
+        },
         "cb_brass": {
             "textures": "textures/blocks/cb_brass"
         },
@@ -66,6 +72,18 @@
         },
         "cb_foliage": {
             "textures": "textures/blocks/cb_foliage"
+        },
+        "cb_window_dark": {
+            "textures": "textures/blocks/cb_window_dark"
+        },
+        "cb_window_light": {
+            "textures": "textures/blocks/cb_window_light"
+        },
+        "cb_window_bronze": {
+            "textures": "textures/blocks/cb_window_bronze"
+        },
+        "cb_window_black": {
+            "textures": "textures/blocks/cb_window_black"
         },
         "cb_art_0": {
             "textures": "textures/blocks/cb_art_0"

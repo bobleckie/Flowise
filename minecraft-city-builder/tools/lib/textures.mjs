@@ -169,6 +169,72 @@ export function shake(name, base) {
     return shingle(name, base, { courses: 4, width: 7, round: false })
 }
 
+/**
+ * Barrel (mission) tile: half-round pantiles running down the slope, in
+ * alternating cover and pan courses. Reads completely differently from a flat
+ * shingle, which is the point of having it.
+ */
+export function barrelTile(name, base) {
+    const random = rng(name)
+    const tex = new Tex()
+    const pitch = 4 // one cover tile every four pixels across
+
+    for (let x = 0; x < 16; x++) {
+        const across = x % pitch
+        // Half-round profile: bright along the crown, dark in the pan.
+        const curve = Math.cos(((across / pitch) * 2 - 0.5) * Math.PI)
+        let profile = 0.72 + Math.max(0, curve) * 0.5
+        if (across === 0) profile *= 0.6 // the shadowed joint between tiles
+
+        for (let y = 0; y < 16; y++) {
+            // Courses overlap down the slope, so each has a shadow at its head.
+            const course = y % 8
+            let tone = profile
+            if (course === 0) tone *= 0.55
+            else if (course === 1) tone *= 0.82
+            else if (course === 7) tone *= 1.1
+            tone *= 0.95 + random() * 0.1
+            tex.set(x, y, shade(base, tone))
+        }
+    }
+    return tex
+}
+
+/**
+ * A window: painted frame, sill, mullions and glazing, with the glass left
+ * translucent so it reads as glass rather than as a blue block.
+ */
+export function window(name, frameColor, glassColor, { mullions = 1, transom = true } = {}) {
+    const random = rng(name)
+    const tex = new Tex()
+
+    for (let y = 0; y < 16; y++) {
+        for (let x = 0; x < 16; x++) {
+            const edge = Math.min(x, y, 15 - x, 15 - y)
+
+            // Outer frame, with the head lighter and the sill heavier.
+            if (edge < 2) {
+                const lit = y < 2 ? 1.12 : y > 13 ? 0.8 : 1
+                tex.set(x, y, [...shade(frameColor, lit * (edge === 0 ? 0.78 : 1)), 255])
+                continue
+            }
+            // Mullions and transom divide the opening into lights.
+            const onMullion = mullions > 0 && Math.abs(x - 8) < 1
+            const onTransom = transom && Math.abs(y - 6) < 1
+            if (onMullion || onTransom) {
+                tex.set(x, y, [...shade(frameColor, 0.92), 255])
+                continue
+            }
+
+            // Glazing: a diagonal sheen so it does not read as flat colour.
+            const sheen = 1 + Math.max(0, 1 - Math.abs(x - y) / 6) * 0.35
+            const grime = 0.96 + random() * 0.08
+            tex.set(x, y, [...shade(glassColor, sheen * grime), 190])
+        }
+    }
+    return tex
+}
+
 /** Ridge tiles: a run of half-round caps. */
 export function ridge(name, base) {
     const random = rng(name)

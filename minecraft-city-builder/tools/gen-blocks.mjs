@@ -19,7 +19,7 @@ import { writeFileSync, mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { shingle, shake, ridge, fabric, wood, metal, glowPanel, framedArt, panel } from './lib/textures.mjs'
+import { shingle, shake, barrelTile, window as windowTex, ridge, fabric, wood, metal, glowPanel, framedArt, panel } from './lib/textures.mjs'
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)))
 const BP = join(ROOT, 'packs', 'city_builder_bp')
@@ -71,16 +71,21 @@ const GEOMETRIES = {
         cube([-8, 6.5, -11.31], [16, 3, DIAGONAL], { pivot: [0, 8, 0], rotation: [SLOPE_ROTATION, 0, 0] })
     ], [2, 2, 2]),
 
-    // A ridge cap: two short plates meeting at the apex.
+    // Ridge cap: a low gabled prism sitting on the apex where two slopes meet.
+    // Deliberately unrotated — a rotated cap floated above the slopes it was
+    // meant to cover, leaving a shadow gap along the whole ridge line.
     'geometry.cb_roof_ridge': geometry('geometry.cb_roof_ridge', [
-        cube([-8, 9, -5.5], [16, 3, 7.8], { pivot: [0, 11, -2], rotation: [-45, 0, 0] }),
-        cube([-8, 9, -2.3], [16, 3, 7.8], { pivot: [0, 11, 2], rotation: [45, 0, 0] })
+        cube([-8, 0, -7], [16, 5, 14]),
+        cube([-8, 5, -5], [16, 4, 10]),
+        cube([-8, 9, -3], [16, 3, 6])
     ]),
 
-    // A hip/valley end: a slope narrowing to a point.
+    // Hip: where two slopes meet on a diagonal. Built as the union of a
+    // north-facing slope (rotated about X) and a west-facing one (about Z), so
+    // each cube still rotates on a single axis as Bedrock requires.
     'geometry.cb_roof_hip': geometry('geometry.cb_roof_hip', [
         cube([-8, 6.5, -11.31], [16, 3, DIAGONAL], { pivot: [0, 8, 0], rotation: [SLOPE_ROTATION, 0, 0] }),
-        cube([-8, 6.5, -11.31], [3, 16, DIAGONAL], { pivot: [-6.5, 8, 0], rotation: [SLOPE_ROTATION, 0, 0] })
+        cube([-11.31, 6.5, -8], [DIAGONAL, 3, 16], { pivot: [0, 8, 0], rotation: [0, 0, -SLOPE_ROTATION] })
     ]),
 
     // Wall sconce: backplate, arm, shade.
@@ -166,6 +171,16 @@ const GEOMETRIES = {
         cube([-7, 8, 1], [14, 4, 2])
     ]),
 
+    // Window: a recessed light in a frame, with a projecting sill and a reveal
+    // to either side. Depth is what stops a window reading as a painted-on pane.
+    'geometry.cb_window': geometry('geometry.cb_window', [
+        cube([-8, 0, 5], [16, 16, 2]), // the glazed panel, set back in the wall
+        cube([-8, 0, 7], [2, 16, 1]), // reveal, left
+        cube([6, 0, 7], [2, 16, 1]), // reveal, right
+        cube([-8, 14, 7], [16, 2, 1]), // head
+        cube([-8, 0, 7], [16, 3, 1]) // sill
+    ]),
+
     // Planter.
     'geometry.cb_planter': geometry('geometry.cb_planter', [
         cube([-5, 0, -5], [10, 6, 10]),
@@ -179,14 +194,18 @@ const SHINGLE_COLORS = {
     slate: [72, 78, 88],
     clay: [150, 78, 54],
     shake: [96, 72, 46],
-    asphalt: [54, 54, 58]
+    asphalt: [54, 54, 58],
+    barrel: [172, 96, 58]
 }
 
 const TEXTURES = {}
 
 for (const [name, color] of Object.entries(SHINGLE_COLORS)) {
     // Wooden shakes are longer and more irregular than slate or clay tiles.
-    TEXTURES[`cb_shingle_${name}`] = name === 'shake' ? shake(`shingle_${name}`, color) : shingle(`shingle_${name}`, color)
+    TEXTURES[`cb_shingle_${name}`] =
+        name === 'shake' ? shake(`shingle_${name}`, color)
+        : name === 'barrel' ? barrelTile(`shingle_${name}`, color)
+        : shingle(`shingle_${name}`, color)
     TEXTURES[`cb_ridge_${name}`] = ridge(`ridge_${name}`, color)
 }
 
@@ -203,6 +222,16 @@ TEXTURES.cb_stone_worktop = metal('worktop', [186, 186, 182])
 TEXTURES.cb_screen_dark = panel('screen', [22, 24, 30], [44, 46, 52])
 TEXTURES.cb_planter = wood('planter', [110, 84, 60])
 TEXTURES.cb_foliage = fabric('foliage', [72, 108, 56], { seam: false })
+
+const WINDOW_STYLES = {
+    dark: [[46, 48, 54], [150, 190, 208]],
+    light: [[224, 222, 214], [168, 200, 214]],
+    bronze: [[122, 88, 52], [140, 152, 130]],
+    black: [[24, 25, 30], [96, 118, 134]]
+}
+for (const [style, [frameColor, glassColor]] of Object.entries(WINDOW_STYLES)) {
+    TEXTURES[`cb_window_${style}`] = windowTex(`window_${style}`, frameColor, glassColor)
+}
 
 for (let variant = 0; variant < 5; variant++) {
     TEXTURES[`cb_art_${variant}`] = framedArt('art', variant, [92, 68, 44])
@@ -231,7 +260,10 @@ function materialPermutations(prefix, materials, state = 'cb:material') {
         condition: `q.block_state('${state}') == '${material}'`,
         components: {
             'minecraft:material_instances': {
-                '*': { texture: `${prefix}_${material}`, render_method: 'opaque' }
+                '*': {
+                    texture: `${prefix}_${material}`,
+                    render_method: prefix === 'cb_window' ? 'blend' : 'opaque'
+                }
             }
         }
     }))
@@ -273,6 +305,18 @@ const SPEC = [
         category: 'construction'
     },
 
+    {
+        id: 'window',
+        name: 'Window',
+        geometry: 'geometry.cb_window',
+        texture: 'cb_window_dark',
+        render: 'blend',
+        states: { 'cb:style': Object.keys(WINDOW_STYLES) },
+        traits: CARDINAL_TRAIT,
+        permutations: [...materialPermutations('cb_window', Object.keys(WINDOW_STYLES), 'cb:style'), ...facingPermutations()],
+        collision: { origin: [-8, 0, -8], size: [16, 16, 16] },
+        category: 'construction'
+    },
     {
         id: 'sconce',
         name: 'Wall Sconce',

@@ -8,6 +8,7 @@ item.cb:build_wand.name=Build Wand
 tile.cb:roof_slope.name=Roof Shingles (Slope)
 tile.cb:roof_ridge.name=Roof Ridge Cap
 tile.cb:roof_hip.name=Roof Hip
+tile.cb:window.name=Window
 tile.cb:sconce.name=Wall Sconce
 tile.cb:chandelier.name=Chandelier
 tile.cb:ceiling_light.name=Ceiling Light

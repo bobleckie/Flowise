@@ -240,12 +240,26 @@ function summarizeRuns(numbers) {
 
 // --- derived metrics -------------------------------------------------------
 
+/** Pitched roofs rise half their span; see `pitchedRise` in generate.mjs. */
+const PITCHED = new Set(['gable', 'hip', 'mansard'])
+
+function roofCap(entry) {
+    const m = entry.massing
+    if (PITCHED.has(m.roof.type)) {
+        // The topmost plate carries the roof, so its span sets the rise.
+        const last = (m.setbacks ?? []).slice(-1)[0]?.footprint ?? m.footprint
+        const span = m.roof.type === 'gable' ? last[0] : Math.min(last[0], last[1])
+        return Math.max(2, Math.floor((span - 1) / 2))
+    }
+    return m.roof.height ?? (m.roof.type === 'flat_mechanical' ? 8 : 0)
+}
+
 /** Total block height above the street datum, including roof and antennas. */
 export function heightAboveGrade(entry) {
     const m = entry.massing
     const ground = m.ground_floor_height ?? m.floor_height
     const shaft = ground + (m.floors - 1) * m.floor_height
-    const roofcap = m.roof.height ?? (m.roof.type === 'flat_mechanical' ? 8 : 0)
+    const roofcap = roofCap(entry)
     const antenna = Math.max(0, ...(m.roof.antennas ?? []).map((a) => a.height))
     return { shaft, roofcap, antenna, total: shaft + roofcap + antenna }
 }

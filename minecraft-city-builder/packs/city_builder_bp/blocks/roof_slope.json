@@ -11,7 +11,8 @@
                     "slate",
                     "clay",
                     "shake",
-                    "asphalt"
+                    "asphalt",
+                    "barrel"
                 ]
             },
             "traits": {
@@ -102,6 +103,17 @@
                     "minecraft:material_instances": {
                         "*": {
                             "texture": "cb_shingle_asphalt",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:material') == 'barrel'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_shingle_barrel",
                             "render_method": "opaque"
                         }
                     }

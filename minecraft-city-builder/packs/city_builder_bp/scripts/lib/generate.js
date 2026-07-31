@@ -117,11 +117,31 @@ export function floorPlates(entry) {
     return plates
 }
 
+/** Types whose height is set by their span rather than by the catalog. */
+const PITCHED = new Set(['gable', 'hip', 'mansard'])
+
+/**
+ * Rise of a pitched roof, in blocks. A 45-degree slope rises half its span, so
+ * the roof comes to a proper ridge instead of a flat-topped stub.
+ */
+export function pitchedRise(entry) {
+    const plates = floorPlates(entry)
+    const [sx, sz] = plates[plates.length - 1].size
+    const span = entry.massing.roof.type === 'gable' ? sx : Math.min(sx, sz)
+    return Math.max(2, Math.floor((span - 1) / 2))
+}
+
+export function roofCapFor(entry) {
+    const roof = entry.massing.roof
+    if (PITCHED.has(roof.type)) return pitchedRise(entry)
+    return roof.height ?? (roof.type === 'flat_mechanical' ? 8 : 0)
+}
+
 export function totalHeight(entry) {
     const plates = floorPlates(entry)
     const last = plates[plates.length - 1]
     const m = entry.massing
-    const roofcap = m.roof.height ?? (m.roof.type === 'flat_mechanical' ? 8 : 0)
+    const roofcap = roofCapFor(entry)
     const antenna = Math.max(0, ...(m.roof.antennas ?? []).map((a) => a.height))
     return last.base + last.height + roofcap + antenna
 }
@@ -232,15 +252,34 @@ export const ROOF_KITS = {
     slate: { material: 'slate', full: 'minecraft:deepslate_tiles', edge: 'minecraft:polished_deepslate' },
     clay_tile: { material: 'clay', full: 'minecraft:red_terracotta', edge: 'minecraft:terracotta' },
     wood_shake: { material: 'shake', full: 'minecraft:stripped_dark_oak_log', edge: 'minecraft:dark_oak_planks' },
-    asphalt_shingle: { material: 'asphalt', full: 'minecraft:blackstone', edge: 'minecraft:polished_blackstone' }
+    asphalt_shingle: { material: 'asphalt', full: 'minecraft:blackstone', edge: 'minecraft:polished_blackstone' },
+    barrel_tile: { material: 'barrel', full: 'minecraft:terracotta', edge: 'minecraft:orange_terracotta' }
 }
 
 export const ROOF_BLOCKS = { slope: 'cb:roof_slope', ridge: 'cb:roof_ridge', hip: 'cb:roof_hip' }
+
+/**
+ * Window families that get a framed window unit rather than a plain pane.
+ *
+ * A curtain wall really is a continuous sheet of glass, so it keeps the pane —
+ * putting a sash frame on a Miesian tower would be wrong, not better.
+ */
+const FRAMED_WINDOW_FAMILIES = new Set(['grid', 'arched', 'blank', 'ribbon'])
+
+/** Window frame colourway, inferred from the facade's own frame material. */
+export function windowStyleFor(palette) {
+    const frame = palette.frame ?? ''
+    if (/black|deepslate|blackstone/.test(frame)) return 'black'
+    if (/copper|brown|dark_oak|terracotta/.test(frame)) return 'bronze'
+    if (/quartz|calcite|diorite|white|sandstone|birch/.test(frame)) return 'light'
+    return 'dark'
+}
 
 /** Which kit a building roofs with, from its era. */
 export function roofKitFor(entry) {
     const era = entry.provenance?.era ?? ''
     if (/gothic|romanesque|beaux_arts|neoclassical|civic|chicago_school/.test(era)) return ROOF_KITS.slate
+    if (/beaux_arts|neoclassical|mediterranean|mission/.test(era)) return ROOF_KITS.barrel_tile
     if (/craftsman|vernacular|italianate|revival/.test(era)) return ROOF_KITS.clay_tile
     if (/postwar_suburban|roadside/.test(era)) return ROOF_KITS.asphalt_shingle
     if (/streamline|expressionist/.test(era)) return ROOF_KITS.wood_shake
@@ -300,10 +339,28 @@ export function generateBuilding(entry, { interior = true, shellOnly = false } =
         for (let x = sx - 2; x >= 0; x--) perimeter.push([ox + x, oz + sz - 1])
         for (let z = sz - 2; z >= 1; z--) perimeter.push([ox, oz + z])
 
+        const framed = FRAMED_WINDOW_FAMILIES.has(spec.family)
+        const windowStyle = windowStyleFor(palette)
+
         perimeter.forEach(([x, z], u) => {
+            // Which way this cell faces, so a window unit is turned outward.
+            const facing =
+                z === oz ? 'north'
+                : z === oz + sz - 1 ? 'south'
+                : x === ox ? 'west'
+                : 'east'
+
             for (let v = 0; v <= interiorHeight; v++) {
                 const role = facadeCell(u, v, spec, { interiorHeight, bay, isGround })
                 if (role === 'open') continue
+
+                if (role === 'glass' && framed && !isGround) {
+                    put(x, plate.base + v, z, 'cb:window', {
+                        'cb:style': windowStyle,
+                        'minecraft:cardinal_direction': facing
+                    })
+                    continue
+                }
                 put(x, plate.base + v, z, material(role))
             }
         })
@@ -334,7 +391,7 @@ export function generateBuilding(entry, { interior = true, shellOnly = false } =
     roofFeatures(entry, put, palette, top, roofBase)
 
     // --- antennas
-    const roofcap = m.roof.height ?? (m.roof.type === 'flat_mechanical' ? 8 : 0)
+    const roofcap = roofCapFor(entry)
     for (const [i, antenna] of (m.roof.antennas ?? []).entries()) {
         const count = antenna.count ?? 1
         const [sx, sz] = top.size
@@ -376,7 +433,7 @@ function roofFeatures(entry, put, palette, top, roofBase) {
 
     const [sx, sz] = top.size
     const [ox, oz] = top.origin
-    const cap = entry.massing.roof.height ?? 0
+    const cap = roofCapFor(entry)
     const deckY = roofBase + (entry.massing.roof.type === 'flat_mechanical' ? cap : 1)
 
     const box = (x, z, w, d, h, block) => {
@@ -507,7 +564,7 @@ function roofFeatures(entry, put, palette, top, roofBase) {
 
 function buildRoof(entry, put, palette, top, roofBase) {
     const type = entry.massing.roof.type
-    const cap = entry.massing.roof.height ?? (type === 'flat_mechanical' ? 8 : 0)
+    const cap = roofCapFor(entry)
     const [sx, sz] = top.size
     const [ox, oz] = top.origin
 

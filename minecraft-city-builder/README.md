@@ -208,8 +208,17 @@ artwork in five variants, and furniture with real arms, backs, legs and
 pedestals rather than a coloured cube.
 
 ```sh
-node tools/gen-blocks.mjs      # 16 blocks, 16 geometries, 26 textures
+node tools/gen-blocks.mjs      # 17 blocks, 17 geometries, 32 textures
 ```
+
+Roof materials: slate, clay tile, wood shake, asphalt shingle and barrel
+(mission) tile — each with its own procedural pattern, so a barrel-tile roof of
+half-round pantiles reads nothing like a flat slate one.
+
+Windows are framed units with a recessed light, mullions, a transom, a head and
+a sill, in four frame colourways. They are used for punched windows only — a
+curtain wall genuinely is a continuous sheet of glass, so putting a sash frame
+on a Miesian tower would be wrong rather than better.
 
 Everything is generated from one spec table in `tools/gen-blocks.mjs`, including
 the textures — `tools/lib/textures.mjs` produces shingle courses, upholstery,
@@ -220,9 +229,17 @@ Roofing picks its kit from the building's era: slate for gothic and
 neoclassical, clay tile for vernacular and revival, wood shake for expressionist,
 asphalt for postwar. Shingle colour, ridge and hip all follow.
 
-**Not verified in-game:** the slope geometry is a plate rotated 45 degrees. If
-it ever renders sloping the wrong way, flip `SLOPE_ROTATION` in
-`tools/gen-blocks.mjs` — that single constant controls it.
+The preview renderer reads the real `.geo.json` and rasterises it, rotation and
+all (`tools/lib/geo-voxels.mjs`), so what you see in a preview is the geometry
+Minecraft will build — not an approximation. Before that existed, a 45-degree
+wedge and a stack of cubes rendered identically, which made the roof impossible
+to judge.
+
+**Not verified in-game:** the slope geometry is a plate rotated 45 degrees. The
+voxeliser confirms the profile is a clean diagonal, but the *sign* of the
+rotation cannot be checked without the game. If roofs render sloping inward,
+flip `SLOPE_ROTATION` in `tools/gen-blocks.mjs` — that one constant controls
+every roof in the library.
 
 ## Interiors and fitout
 

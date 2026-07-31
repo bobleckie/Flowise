@@ -160,6 +160,7 @@ export const BLOCK_COLORS = {
     'cb:ceiling_light': [232, 244, 255],
     'cb:pendant_light': [255, 236, 190],
     'cb:wall_art': [92, 68, 44],
+    'cb:window': [150, 190, 208],
     'cb:sofa': [64, 66, 72],
     'cb:armchair': [96, 100, 66],
     'cb:desk': [86, 60, 40],
@@ -207,9 +208,10 @@ function deriveBase(blockId) {
  * Without this the preview drew every roof slate-grey regardless of material.
  */
 const STATE_COLORS = {
-    'cb:roof_slope': ['cb:material', { slate: [72, 78, 88], clay: [150, 78, 54], shake: [96, 72, 46], asphalt: [54, 54, 58] }],
-    'cb:roof_hip': ['cb:material', { slate: [72, 78, 88], clay: [150, 78, 54], shake: [96, 72, 46], asphalt: [54, 54, 58] }],
-    'cb:roof_ridge': ['cb:material', { slate: [62, 68, 78], clay: [130, 66, 46], shake: [82, 62, 40], asphalt: [46, 46, 50] }],
+    'cb:roof_slope': ['cb:material', { slate: [72, 78, 88], clay: [150, 78, 54], shake: [96, 72, 46], asphalt: [54, 54, 58], barrel: [172, 96, 58] }],
+    'cb:roof_hip': ['cb:material', { slate: [72, 78, 88], clay: [150, 78, 54], shake: [96, 72, 46], asphalt: [54, 54, 58], barrel: [172, 96, 58] }],
+    'cb:roof_ridge': ['cb:material', { slate: [62, 68, 78], clay: [130, 66, 46], shake: [82, 62, 40], asphalt: [46, 46, 50], barrel: [156, 84, 50] }],
+    'cb:window': ['cb:style', { dark: [150, 190, 208], light: [190, 210, 220], bronze: [140, 152, 130], black: [96, 118, 134] }],
     'cb:sofa': ['cb:fabric', { charcoal: [64, 66, 72], olive: [96, 100, 66], rust: [140, 74, 52], cream: [196, 184, 158] }],
     'cb:armchair': ['cb:fabric', { charcoal: [64, 66, 72], olive: [96, 100, 66], rust: [140, 74, 52], cream: [196, 184, 158] }]
 }

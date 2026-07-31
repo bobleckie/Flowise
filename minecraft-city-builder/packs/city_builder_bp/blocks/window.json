@@ -2,17 +2,16 @@
     "format_version": "1.21.10",
     "minecraft:block": {
         "description": {
-            "identifier": "cb:roof_hip",
+            "identifier": "cb:window",
             "menu_category": {
                 "category": "construction"
             },
             "states": {
-                "cb:material": [
-                    "slate",
-                    "clay",
-                    "shake",
-                    "asphalt",
-                    "barrel"
+                "cb:style": [
+                    "dark",
+                    "light",
+                    "bronze",
+                    "black"
                 ]
             },
             "traits": {
@@ -25,11 +24,11 @@
             }
         },
         "components": {
-            "minecraft:geometry": "geometry.cb_roof_hip",
+            "minecraft:geometry": "geometry.cb_window",
             "minecraft:material_instances": {
                 "*": {
-                    "texture": "cb_shingle_slate",
-                    "render_method": "opaque"
+                    "texture": "cb_window_dark",
+                    "render_method": "blend"
                 }
             },
             "minecraft:destructible_by_mining": {
@@ -65,56 +64,45 @@
         },
         "permutations": [
             {
-                "condition": "q.block_state('cb:material') == 'slate'",
+                "condition": "q.block_state('cb:style') == 'dark'",
                 "components": {
                     "minecraft:material_instances": {
                         "*": {
-                            "texture": "cb_shingle_slate",
-                            "render_method": "opaque"
+                            "texture": "cb_window_dark",
+                            "render_method": "blend"
                         }
                     }
                 }
             },
             {
-                "condition": "q.block_state('cb:material') == 'clay'",
+                "condition": "q.block_state('cb:style') == 'light'",
                 "components": {
                     "minecraft:material_instances": {
                         "*": {
-                            "texture": "cb_shingle_clay",
-                            "render_method": "opaque"
+                            "texture": "cb_window_light",
+                            "render_method": "blend"
                         }
                     }
                 }
             },
             {
-                "condition": "q.block_state('cb:material') == 'shake'",
+                "condition": "q.block_state('cb:style') == 'bronze'",
                 "components": {
                     "minecraft:material_instances": {
                         "*": {
-                            "texture": "cb_shingle_shake",
-                            "render_method": "opaque"
+                            "texture": "cb_window_bronze",
+                            "render_method": "blend"
                         }
                     }
                 }
             },
             {
-                "condition": "q.block_state('cb:material') == 'asphalt'",
+                "condition": "q.block_state('cb:style') == 'black'",
                 "components": {
                     "minecraft:material_instances": {
                         "*": {
-                            "texture": "cb_shingle_asphalt",
-                            "render_method": "opaque"
-                        }
-                    }
-                }
-            },
-            {
-                "condition": "q.block_state('cb:material') == 'barrel'",
-                "components": {
-                    "minecraft:material_instances": {
-                        "*": {
-                            "texture": "cb_shingle_barrel",
-                            "render_method": "opaque"
+                            "texture": "cb_window_black",
+                            "render_method": "blend"
                         }
                     }
                 }

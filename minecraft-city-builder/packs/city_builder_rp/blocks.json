@@ -13,6 +13,9 @@
     "cb:roof_hip": {
         "sound": "stone"
     },
+    "cb:window": {
+        "sound": "wood"
+    },
     "cb:sconce": {
         "sound": "glass"
     },
