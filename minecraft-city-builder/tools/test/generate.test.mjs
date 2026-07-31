@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url'
 
 import '../lib/materials.mjs' // binds the material palette into the generator
 import { loadCatalog } from '../lib/catalog.mjs'
-import { generateBuilding, floorPlates, totalHeight, facadeCell, windowSpec, WINDOW_FAMILIES, MATERIALS } from '../lib/generate.mjs'
+import { generateBuilding, floorPlates, totalHeight, facadeCell, windowSpec, verticalRegistry, WINDOW_FAMILIES, MATERIALS } from '../lib/generate.mjs'
 import { validateModule, moduleToModel } from '../lib/module-format.mjs'
 import { writeMcStructure } from '../lib/mcstructure.mjs'
 import '../lib/rotation-table.mjs' // binds the rotation table
@@ -358,6 +358,67 @@ test('rotating a finished building keeps it enterable and climbable', () => {
                     `${id} r${turns * 90}: stair facing ${stair.state.weirdo_direction}`
                 )
             }
+        }
+    }
+})
+
+
+// --- elevators -------------------------------------------------------------
+
+test('every building with a declared elevator gets a real shaft', () => {
+    for (const entry of catalog) {
+        const lifts = (entry.vertical.passenger_elevators ?? 0) + (entry.vertical.service_elevators ?? 0)
+        const registry = verticalRegistry(entry)
+        if (lifts === 0) continue
+
+        assert.ok(registry.hasLift, `${entry.id} declares ${lifts} lifts but has no shaft`)
+        assert.ok(registry.shaft.w >= 1 && registry.shaft.d >= 1, `${entry.id}: degenerate shaft`)
+    }
+})
+
+test('the shaft sits inside the building and stops line up with floors', () => {
+    for (const entry of catalog) {
+        const registry = verticalRegistry(entry)
+        const [bx, , bz] = [entry.massing.footprint[0], 0, entry.massing.footprint[1]]
+        const plates = floorPlates(entry)
+
+        assert.equal(registry.stops.length, entry.massing.floors, `${entry.id}: stop count`)
+        registry.stops.forEach((stop, i) => {
+            assert.equal(stop.floor, plates[i].floor, `${entry.id}: stop ${i} floor`)
+            // A stop must be standing height above the slab, not inside it.
+            assert.equal(stop.y, plates[i].base + 1, `${entry.id}: stop ${i} is not on the floor surface`)
+        })
+
+        // Stops must ascend, or the floor panel lists them out of order.
+        for (let i = 1; i < registry.stops.length; i++) {
+            assert.ok(registry.stops[i].y > registry.stops[i - 1].y, `${entry.id}: stops out of order`)
+        }
+
+        if (!registry.hasLift) continue
+        const { x, z, w, d } = registry.shaft
+        assert.ok(x >= 0 && x + w <= bx, `${entry.id}: shaft escapes the footprint in x`)
+        assert.ok(z >= 0 && z + d <= bz, `${entry.id}: shaft escapes the footprint in z`)
+    }
+})
+
+test('the shaft is actually hollow where the lift runs', () => {
+    // A shaft full of blocks is a wall with a door on it.
+    for (const id of ['loop_greystone_commercial', 'hotel_tower_convention', 'aon_white_shaft']) {
+        const entry = catalog.find((e) => e.id === id)
+        const registry = verticalRegistry(entry)
+        assert.ok(registry.hasLift, `${id} should have a lift`)
+
+        const solid = new Set(
+            generateBuilding(entry)
+                .blocks.filter((b) => b.block !== 'minecraft:air')
+                .map((b) => b.pos.join(','))
+        )
+
+        // Check a mid-height stop: the cell a rider occupies must be clear.
+        const stop = registry.stops[Math.floor(registry.stops.length / 2)]
+        const { x, z } = registry.shaft
+        for (const dy of [0, 1]) {
+            assert.ok(!solid.has(`${x},${stop.y + dy},${z}`), `${id}: shaft blocked at floor ${stop.floor}`)
         }
     }
 })

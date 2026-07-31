@@ -180,6 +180,10 @@ Full procedure in [MILESTONES.md](MILESTONES.md#m2-acceptance-test--current).
 2. Activate *City Builder (Behavior)* on a creative world.
 3. `/give @s cb:build_wand`, then right-click.
 
+**Stand in a lift shaft and the wand becomes a call button** — pick a floor and
+ride. On a 100-storey tower the panel lists the floors around you plus every
+programme change, rather than a hundred buttons.
+
 **Place Building** browses 68 presets grouped by type. Pick one, choose a
 rotation, and it builds from your feet outward with its north-west corner at
 your position. **Undo Last Build** clears it again. **Settings** tunes the

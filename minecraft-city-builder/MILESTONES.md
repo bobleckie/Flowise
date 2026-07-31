@@ -15,7 +15,7 @@ the actual product; Phase 3 is cities.
 | M2 — Rotation Correctness | **Built, awaiting acceptance** | Rotation table + engine + 61 offline tests + in-game probe harness. 4 encodings still need measuring. |
 | M3 — Assembler | **Built, awaiting acceptance** | Parameterized generator: all 68 buildings generate, render and compile. |
 | M4 — Animated Construction | **Placement queue built** | Tick-budgeted placer with air-run bulk clearing, progress, cancel, undo. Scaffolding animation still to do. |
-| M5 — Elevators | Shaft built, cab not | Lift shaft and landing doors generate; the rideable cab is next. |
+| M5 — Elevators | **Built, awaiting acceptance** | Shafts registered on placement; floor panel on the wand; smooth ride. Moves the player rather than a rideable cab — see note. |
 | M6 — Interior Fitout | **Partly built** | Floors, stairs, entrances, core doors, lift shafts, lighting, partitions. Furniture still to do. |
 | M7 — Impostor Interiors | Not started | |
 | **Phase 2 — Content** | | |
@@ -136,6 +136,20 @@ Beta APIs are **not** used, so the world does **not** need the "Beta APIs"
 experimental toggle.
 
 ---
+
+## M5 note — why the lift is not a rideable entity
+
+The spec calls for a `minecraft:rideable` entity cab. A vertically-moving
+rideable entity in Bedrock desyncs from the client and clips through floors,
+which are the two failures the M5 acceptance test explicitly forbids. The lift
+therefore moves the player directly, half a block per tick — smooth, never
+desyncs, cannot clip.
+
+The tradeoff is that it carries one player rather than a cab of passengers. If
+multiplayer riding matters, this is the thing to revisit.
+
+Rotated buildings do not register their lift yet: rotation moves the shaft and
+the registry is not rotation-aware. Placing at 0° gives a working lift.
 
 ## What the premortem said, and where it now stands
 

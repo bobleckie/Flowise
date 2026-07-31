@@ -11,7 +11,7 @@
  * tables. 51 x 33 combinations, ~10 pieces of code.
  */
 
-import { buildInterior } from './interior.mjs'
+import { buildInterior, coreRect } from './interior.mjs'
 
 /**
  * Material bindings, injected rather than read from disk so this module runs
@@ -559,5 +559,31 @@ function buildRoof(entry, put, palette, top, roofBase) {
             break
         default:
             for (let y = 1; y <= Math.max(1, cap); y++) ring(roofBase + y, 0, palette.trim)
+    }
+}
+
+
+/**
+ * Where the lift shaft is and which Y each floor lands on, in building-local
+ * coordinates. The runtime registers this when a building is placed so the
+ * elevator knows its stops without re-deriving them (SPEC.md M5).
+ */
+export function verticalRegistry(entry) {
+    const plates = floorPlates(entry)
+    const footprint = entry.massing.footprint
+    const core = coreRect(entry, footprint)
+
+    const lifts = (entry.vertical?.passenger_elevators ?? 0) + (entry.vertical?.service_elevators ?? 0)
+    const stairD = Math.min(core.d, 7)
+    const shaftD = lifts > 0 ? Math.max(0, core.d - stairD) : 0
+
+    return {
+        hasLift: shaftD > 0,
+        shaft: shaftD > 0 ? { x: core.x + 1, z: core.z + stairD, w: Math.max(1, core.w - 2), d: Math.max(1, shaftD - 1) } : null,
+        stops: plates.map((plate) => ({
+            floor: plate.floor,
+            y: plate.base + 1,
+            use: (entry.program ?? []).find((b) => plate.floor >= b.floors[0] && plate.floor <= b.floors[1])?.use ?? ''
+        }))
     }
 }

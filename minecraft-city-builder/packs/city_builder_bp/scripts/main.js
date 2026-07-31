@@ -11,6 +11,7 @@ import { ActionFormData, FormCancelationReason, ModalFormData } from '@minecraft
 import { probeOrientations, reportProbe } from './rotation_probe.js'
 import { placeBuilding, cancelBuild, isBuilding, catalogEntries, undoLast, lastPlacementFor, BUDGET } from './placer.js'
 import { totalHeight } from './lib/generate.js'
+import { openFloorPanel, shaftAt, shaftCount } from './elevator.js'
 
 const WAND_ITEM_ID = 'cb:build_wand'
 const PREFIX = '§6[City Builder]§r'
@@ -39,6 +40,7 @@ const MENU = [
     { label: 'Undo Last Build', handler: (player) => undoLast(player) },
     { label: 'Cancel Build', handler: (player) => cancelCurrent(player) },
     { label: 'Settings', handler: (player) => openSettings(player) },
+    { label: 'Call Lift Here', handler: (player) => callLift(player) },
     { label: 'Rotation Probe', handler: (player) => openProbeMenu(player) }
 ]
 
@@ -47,6 +49,12 @@ async function openBuildMenu(player) {
     openFor.add(player.id)
 
     try {
+        // Standing in a lift shaft, the wand is a call button first and a
+        // build menu second — that is what you want it to be at that moment.
+        if (shaftAt(player.location)) {
+            if (await openFloorPanel(player, showWhenReady)) return
+        }
+
         const form = new ActionFormData()
             .title('City Builder')
             .body(
@@ -166,6 +174,14 @@ function rebuildLast(player) {
     }
     const entry = catalogEntries().find((e) => e.id === id)
     if (entry) return confirmPlacement(player, entry)
+}
+
+async function callLift(player) {
+    if (!(await openFloorPanel(player, showWhenReady))) {
+        player.sendMessage(
+            `${PREFIX} no lift here. ${shaftCount()} shaft(s) registered — stand inside one and try again.`
+        )
+    }
 }
 
 function cancelCurrent(player) {

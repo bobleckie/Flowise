@@ -12,8 +12,9 @@
 
 import { system, world, BlockPermutation } from '@minecraft/server'
 import { CATALOG, MATERIAL_SYSTEMS, ROTATION_TABLE } from './lib/catalog_data.js'
-import { generateBuilding, setMaterials, totalHeight } from './lib/generate.js'
+import { generateBuilding, setMaterials, totalHeight, verticalRegistry } from './lib/generate.js'
 import { rotateModule, setRotationTable } from './lib/rotation.js'
+import { registerShaft, clearShaftsAt } from './elevator.js'
 
 setMaterials(MATERIAL_SYSTEMS)
 setRotationTable(ROTATION_TABLE)
@@ -101,6 +102,17 @@ export function placeBuilding(player, entry, origin, turns = 0) {
 
     lastPlacement.set(player.id, { entry, origin, footprint: module.footprint, turns })
 
+    // Register the lift so the floor panel works the moment the building lands.
+    // Rotation moves the shaft, so it is only registered for unrotated builds
+    // until the registry itself is rotation-aware.
+    if (!turns) {
+        try {
+            registerShaft(entry, verticalRegistry(entry), origin)
+        } catch (error) {
+            console.warn(`[City Builder] lift registration failed: ${error}`)
+        }
+    }
+
     player.sendMessage(
         `${PREFIX} building §a${entry.name}§r${turns ? ` (${turns * 90}°)` : ''} — ` +
             `${sorted.length.toLocaleString()} blocks, ${entry.massing.floors} floors, ` +
@@ -142,6 +154,7 @@ export function undoLast(player) {
     }
 
     lastPlacement.delete(player.id)
+    clearShaftsAt(record.origin, record.footprint)
     const sorted = blocks
     active = {
         entry: { name: `Undo ${record.entry.name}`, massing: record.entry.massing },
