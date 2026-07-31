@@ -1,0 +1,22 @@
+{
+    "format_version": 2,
+    "header": {
+        "name": "pack.name",
+        "description": "pack.description",
+        "uuid": "0bfb0583-4989-405b-b209-b856ea5c0c17",
+        "version": [0, 1, 0],
+        "min_engine_version": [1, 21, 20]
+    },
+    "modules": [
+        {
+            "type": "resources",
+            "uuid": "e2996f4c-1659-412d-927c-690f4c1ef548",
+            "version": [0, 1, 0]
+        }
+    ],
+    "metadata": {
+        "authors": ["Bob Leckie"],
+        "license": "MIT",
+        "product_type": "addon"
+    }
+}

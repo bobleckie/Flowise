@@ -1,0 +1,9 @@
+{
+    "resource_pack_name": "city_builder",
+    "texture_name": "atlas.items",
+    "texture_data": {
+        "build_wand": {
+            "textures": "textures/items/build_wand"
+        }
+    }
+}

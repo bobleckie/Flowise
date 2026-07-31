@@ -1,0 +1,5 @@
+pack.name=City Builder (Behavior)
+pack.description=Minecraft City Builder — building placer, assembler and elevators. Milestone M0.
+
+item.cb:build_wand=Build Wand
+item.cb:build_wand.name=Build Wand

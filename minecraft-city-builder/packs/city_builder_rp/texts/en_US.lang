@@ -1,0 +1,5 @@
+pack.name=City Builder (Resources)
+pack.description=Textures and models for the Minecraft City Builder add-on. Milestone M0.
+
+item.cb:build_wand=Build Wand
+item.cb:build_wand.name=Build Wand
