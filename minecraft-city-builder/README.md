@@ -202,14 +202,33 @@ Settings to trade smoothness for speed.
 
 Vanilla Minecraft has no angled roof block — stairs are the closest it gets, and
 stairs read as steps. Bedrock does support custom blocks with arbitrary
-geometry, so the pack ships its own: a genuine 45-degree shingled slope, ridge
-caps, hips, wall sconces, chandeliers, pendant and ceiling lights, framed
-artwork in five variants, and furniture with real arms, backs, legs and
-pedestals rather than a coloured cube.
+geometry, so the pack ships its own: a genuine 45-degree shingled slope, rolled
+ridge caps, hips, eaves fascias, dormers, canted bay windows, corbelled
+cornices, stoops, porch posts, wall sconces, chandeliers, pendant and ceiling
+lights, framed artwork in five variants, and furniture with real arms, backs,
+legs and pedestals rather than a coloured cube.
 
 ```sh
-node tools/gen-blocks.mjs      # 17 blocks, 17 geometries, 32 textures
+node tools/gen-blocks.mjs      # 23 blocks, 23 geometries, 41 textures
 ```
+
+Three things a roof block has to get right, each learned from a defect that
+reached a render:
+
+- **Solid under the surface.** A bare rotated plate leaves the lower half of its
+  block hollow, and you can see through every perimeter course to the block
+  behind. Slopes and hips are filled beneath their plane.
+- **A hip takes the lower of its two slopes.** Unioning two whole plates takes
+  the higher one, which bulges each hip block above its neighbours and breaks
+  the hip line into diamonds. Each plate is clipped at the diagonal.
+- **Eaves need somewhere to go.** Every module carries a one-block `margin` so
+  the roof plane can continue past the wall, with a fascia and soffit under it.
+  Cornices, bay windows and stoops live in that margin too.
+
+Pitched roofs honour the rise the catalog declares. A 45-degree hip over a
+40-wide building would rise twenty blocks; where the declared rise is lower the
+roof finishes on a flat deck ringed with ridge tiles, which is what a truncated
+hip — a mansard — actually is.
 
 Roof materials: slate, clay tile, wood shake, asphalt shingle and barrel
 (mission) tile — each with its own procedural pattern, so a barrel-tile roof of
@@ -234,6 +253,20 @@ all (`tools/lib/geo-voxels.mjs`), so what you see in a preview is the geometry
 Minecraft will build — not an approximation. Before that existed, a 45-degree
 wedge and a stack of cubes rendered identically, which made the roof impossible
 to judge.
+
+The camera is deliberately **not** isometric. True isometric looks down the
+(1,1,1) axis, and the normal of a 45-degree roof plane is exactly perpendicular
+to it — so every pitched slope in the library was edge-on to the camera and
+culled as a back face, leaving only the notches between courses. That, not the
+geometry, is why the roofs kept "looking like stairs". The camera now sits 35
+degrees round and 50 degrees down, and no principal plane of a building is
+degenerate.
+
+A block's facing convention: **the front is the -Z face.** North is -Z in
+Minecraft, so that is the only convention under which "facing north" and
+"unrotated" mean the same thing. The window, the framed art and the screen were
+built the other way round, which put every window frame, sill and head on the
+inside of the building and hung every picture facing the wall.
 
 **Not verified in-game:** the slope geometry is a plate rotated 45 degrees. The
 voxeliser confirms the profile is a clean diagonal, but the *sign* of the

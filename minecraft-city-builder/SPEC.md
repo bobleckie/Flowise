@@ -257,6 +257,17 @@ reports it, and `npm test` fails if any catalog entry stops fitting. Re-solve
 whenever the catalog changes — the current margin across all 68 buildings is
 **2 blocks**.
 
+### 4.6 The projection margin
+
+Every generated module is one block larger than its structure on each of the
+four sides, and reports that as `margin`. Real buildings project past their
+structure — eaves overhang, cornices corbel out, bay windows bulge, stoops reach
+the pavement — and without somewhere to put those blocks they are generated and
+then silently discarded, which is what was happening to every eaves course.
+
+City assembly must overlap neighbouring modules by `margin` where buildings
+share a party wall, or the street will read one block too wide.
+
 ---
 
 ## 5. Division of Labor

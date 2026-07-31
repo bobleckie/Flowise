@@ -167,14 +167,29 @@ export function totalHeight(entry) {
  * @returns 'wall' | 'glass' | 'frame' | 'trim' | 'accent' | 'open'
  */
 export function facadeCell(u, v, spec, ctx) {
-    const { interiorHeight, bay, isGround } = ctx
+    const { interiorHeight, bay, isGround, shopfront = true } = ctx
 
     if (v === 0) return 'trim' // structural slab band reads as a spandrel course
     if (isGround && spec.family !== 'open') {
-        // Ground floors are glazier and taller than what is above them: a plinth
-        // course, then shopfront glazing, then wall up to the first slab.
+        // A shopfront ground floor is glazier and taller than what is above it:
+        // a plinth course, then glazing, then wall up to the first slab.
+        //
+        // A house is not a shop. Giving every building the same glazed base put
+        // a storefront on the front of every bungalow in the catalog, which is
+        // the single most obvious tell that a street was generated.
         if (v === 1) return 'base'
-        if (v >= 2 && v <= interiorHeight - 1) return u % bay === 0 ? 'frame' : 'glass'
+        if (shopfront) {
+            if (v >= 2 && v <= interiorHeight - 1) return u % bay === 0 ? 'frame' : 'glass'
+            return 'wall'
+        }
+        // Otherwise the ground floor is a wall with windows in it, on the same
+        // bay rhythm as the floors above, headed a course below the top so a
+        // cornice course cannot erase the only row of glazing.
+        const head = interiorHeight - 1
+        if (v > 1 && v <= head) {
+            const inBay = u % bay >= 1 && u % bay <= (spec.width ?? 3)
+            return inBay ? 'glass' : 'wall'
+        }
         return 'wall'
     }
 
@@ -323,6 +338,22 @@ export function windowStyleFor(palette) {
     return 'dark'
 }
 
+/**
+ * Whether the ground floor is a glazed shopfront or a solid base.
+ *
+ * Driven by the ground treatment the catalog already records, falling back on
+ * the building type — a stoop, a portico or a carriage entrance means a wall
+ * with a door in it, not a shop window.
+ */
+const SOLID_BASE = /stoop|portico|portal|courtyard|carriage|garage_and_entry|landscaped_entry|concrete_walk|porte_cochere|undercroft/
+
+export function groundIsGlazed(entry) {
+    const treatment = entry.facade?.ground_treatment ?? ''
+    if (SOLID_BASE.test(treatment)) return false
+    if (/storefront|retail|arcade|colonnade|marquee|box_office|showroom/.test(treatment)) return true
+    return entry.type !== 'residential'
+}
+
 /** The way out of a wall cell, given the direction that wall faces. */
 const OUTWARD = { north: [0, -1], south: [0, 1], west: [-1, 0], east: [1, 0] }
 
@@ -396,6 +427,7 @@ export function generateBuilding(entry, { interior = true, shellOnly = false } =
         for (let x = sx - 2; x >= 0; x--) perimeter.push([ox + x, oz + sz - 1])
         for (let z = sz - 2; z >= 1; z--) perimeter.push([ox, oz + z])
 
+        const shopfront = groundIsGlazed(entry)
         const framed = FRAMED_WINDOW_FAMILIES.has(spec.family)
         const windowStyle = windowStyleFor(palette)
         const trimTone = trimToneFor(entry)
@@ -409,7 +441,7 @@ export function generateBuilding(entry, { interior = true, shellOnly = false } =
                 : 'east'
 
             for (let v = 0; v <= interiorHeight; v++) {
-                const role = facadeCell(u, v, spec, { interiorHeight, bay, isGround })
+                const role = facadeCell(u, v, spec, { interiorHeight, bay, isGround, shopfront })
                 if (role === 'open') continue
 
                 if (role === 'glass' && framed && !isGround) {
@@ -429,7 +461,7 @@ export function generateBuilding(entry, { interior = true, shellOnly = false } =
                 const [dx, dz] = OUTWARD[facing]
                 if (!onCorner) {
                     for (let v = 1; v < interiorHeight; v++) {
-                        if (facadeCell(u, v, spec, { interiorHeight, bay, isGround }) !== 'glass') continue
+                        if (facadeCell(u, v, spec, { interiorHeight, bay, isGround, shopfront }) !== 'glass') continue
                         put(x + dx, plate.base + v, z + dz, 'cb:bay_window', {
                             'cb:tone': trimTone,
                             'minecraft:cardinal_direction': facing
