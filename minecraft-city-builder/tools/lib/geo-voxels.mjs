@@ -120,3 +120,22 @@ export function rotateCell([x, y, z], resolution, facing) {
             return [x, y, z]
     }
 }
+
+
+/** The raw cubes of a block's geometry, or null when it has none. */
+const cubeCache = new Map()
+export function cubesForBlock(blockId) {
+    if (cubeCache.has(blockId)) return cubeCache.get(blockId)
+
+    const identifier = blockId.startsWith('cb:') ? geometryForBlock(blockId) : null
+    let cubes = null
+    if (identifier) {
+        const file = join(MODELS, `${identifier.replace('geometry.cb_', '')}.geo.json`)
+        if (existsSync(file)) {
+            const geo = JSON.parse(readFileSync(file, 'utf8'))['minecraft:geometry'][0]
+            cubes = geo.bones.flatMap((bone) => bone.cubes ?? [])
+        }
+    }
+    cubeCache.set(blockId, cubes)
+    return cubes
+}

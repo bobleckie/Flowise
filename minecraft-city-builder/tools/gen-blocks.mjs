@@ -85,7 +85,14 @@ const GEOMETRIES = {
     // each cube still rotates on a single axis as Bedrock requires.
     'geometry.cb_roof_hip': geometry('geometry.cb_roof_hip', [
         cube([-8, 6.5, -11.31], [16, 3, DIAGONAL], { pivot: [0, 8, 0], rotation: [SLOPE_ROTATION, 0, 0] }),
-        cube([-11.31, 6.5, -8], [DIAGONAL, 3, 16], { pivot: [0, 8, 0], rotation: [0, 0, -SLOPE_ROTATION] })
+        cube([-11.31, 6.5, -8], [DIAGONAL, 3, 16], { pivot: [0, 8, 0], rotation: [0, 0, -SLOPE_ROTATION] }),
+        // Two planes crossing leave the outer corner open, which showed as a
+        // notch every block down the hip line. These close it with a stepped
+        // corner that follows the diagonal the two slopes imply.
+        cube([-8, 0, -8], [10, 3, 10]),
+        cube([-8, 3, -8], [8, 3, 8]),
+        cube([-8, 6, -8], [5, 3, 5]),
+        cube([-8, 9, -8], [3, 3, 3])
     ]),
 
     // Wall sconce: backplate, arm, shade.

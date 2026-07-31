@@ -13,7 +13,8 @@
 
 import { deflateSync, crc32 as zlibCrc32 } from 'node:zlib'
 import { colorOf, colorOfPlaced, TRANSLUCENT } from './blocks.mjs'
-import { voxelizeGeometry, geometryForBlock, rotateCell } from './geo-voxels.mjs'
+import { cubesForBlock } from './geo-voxels.mjs'
+import { blockFaces, fillPolygon, shadeFor, UNIT_CUBE } from './polygon.mjs'
 
 // --- PNG --------------------------------------------------------------------
 
@@ -199,55 +200,24 @@ export function renderIso(blocks, { size, maxPixels = 1200, background, cutaway 
         return da - db
     })
 
-    // Custom blocks are drawn from their real geometry rather than as cubes.
-    // Sub-voxel resolution follows the zoom: there is no point rasterising a
-    // 45-degree wedge at 8x8x8 when the whole block is three pixels wide.
-    const subResolution = Math.max(2, Math.min(8, size))
-    const subSprite = size >= 2 ? cubeSprite(Math.max(1, size / subResolution)) : null
-    const subW = subSprite ? subSprite.w : 0
-    const subH = subSprite ? subSprite.h : 0
-    const subV = subSprite ? subSprite.v : 0
-
-    const draw = (spriteToUse, sx, sy, color, alpha) => {
-        for (let py = 0; py < spriteToUse.height; py++) {
-            const cy = sy + py
-            if (cy < 0 || cy >= height) continue
-            for (let px = 0; px < spriteToUse.width; px++) {
-                const face = spriteToUse.mask[py * spriteToUse.width + px]
-                if (!face) continue
-                const shade = SHADE[face]
-                canvas.set(sx + px, cy, [color[0] * shade, color[1] * shade, color[2] * shade], alpha)
-            }
-        }
-    }
+    // Project a point in continuous block space to the screen.
+    const project = (fx, fy, fz) => [originX + (fx - fz) * w, originY + (fx + fz) * h - fy * v]
 
     for (const block of order) {
         const [x, y, z] = block.pos
         const color = colorOfPlaced(block)
         const alpha = TRANSLUCENT.has(block.block) ? 0.55 : 1
 
-        const identifier = block.block.startsWith('cb:') ? geometryForBlock(block.block) : null
-        const cells = identifier && subSprite ? voxelizeGeometry(identifier, subResolution) : null
-
-        if (!cells || !cells.length) {
-            draw(sprite, originX + (x - z) * w - w, originY + (x + z) * h - y * v, color, alpha)
-            continue
-        }
-
+        const cubes = cubesForBlock(block.block) ?? UNIT_CUBE
         const facing = block.state?.['minecraft:cardinal_direction']
-        const placed = cells
-            .map((cell) => rotateCell(cell, subResolution, facing))
-            .sort((a, b) => a[0] + a[1] + a[2] - (b[0] + b[1] + b[2]))
+        const faces = blockFaces(cubes, [x, y, z], facing).sort((a, b) => a.depth - b.depth)
 
-        for (const [cx, cy2, cz] of placed) {
-            const fx = x + cx / subResolution
-            const fy = y + cy2 / subResolution
-            const fz = z + cz / subResolution
-            draw(
-                subSprite,
-                Math.round(originX + (fx - fz) * w - subW),
-                Math.round(originY + (fx + fz) * h - fy * v),
-                color,
+        for (const face of faces) {
+            const shade = shadeFor(face.normal)
+            fillPolygon(
+                canvas,
+                face.points.map(([fx, fy, fz]) => project(fx, fy, fz)),
+                [color[0] * shade, color[1] * shade, color[2] * shade],
                 alpha
             )
         }
