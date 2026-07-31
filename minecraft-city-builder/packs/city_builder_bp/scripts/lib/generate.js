@@ -11,7 +11,7 @@
  * tables. 51 x 33 combinations, ~10 pieces of code.
  */
 
-import { buildInterior } from './interior.mjs'
+import { buildInterior } from './interior.js'
 
 /**
  * Material bindings, injected rather than read from disk so this module runs

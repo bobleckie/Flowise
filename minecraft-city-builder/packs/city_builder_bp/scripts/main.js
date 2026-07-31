@@ -1,54 +1,26 @@
 /**
  * City Builder — runtime entry point.
  *
- * Milestone M0 (Skeleton): the Build Wand opens an ActionFormData menu with
- * three placeholder entries; selecting one prints a chat message.
- *
- * Everything below the `MENU` table is deliberately generic — later milestones
- * replace the placeholder handlers, not the menu plumbing.
+ * The Build Wand browses the bundled preset catalog and places a building at
+ * your feet. Geometry is generated in-game from the catalog description, on a
+ * per-tick block budget (see placer.js).
  */
 
 import { system, world } from '@minecraft/server'
-import { ActionFormData, FormCancelationReason } from '@minecraft/server-ui'
+import { ActionFormData, FormCancelationReason, ModalFormData } from '@minecraft/server-ui'
 import { probeOrientations, reportProbe } from './rotation_probe.js'
+import { placeBuilding, cancelBuild, isBuilding, catalogEntries, undoLast, lastPlacementFor, BUDGET } from './placer.js'
+import { totalHeight } from './lib/generate.js'
 
 const WAND_ITEM_ID = 'cb:build_wand'
-
-/** Chat prefix so City Builder output is distinguishable from vanilla messages. */
 const PREFIX = '§6[City Builder]§r'
 
-/**
- * Placeholder menu. `handler` receives the player and is the seam every later
- * milestone plugs into (M3 assembler, M6 typology picker, and so on).
- */
-const MENU = [
-    {
-        label: 'Place Building',
-        handler: (player) => player.sendMessage(`${PREFIX} Place Building — not implemented yet (M0 placeholder).`)
-    },
-    {
-        label: 'Choose Typology',
-        handler: (player) => player.sendMessage(`${PREFIX} Choose Typology — not implemented yet (M0 placeholder).`)
-    },
-    {
-        label: 'Settings',
-        handler: (player) => player.sendMessage(`${PREFIX} Settings — not implemented yet (M0 placeholder).`)
-    },
-    {
-        // M2 diagnostic: reads a placed rotation probe and reports any block
-        // state the rotation table predicted wrongly.
-        label: 'Rotation Probe',
-        handler: (player) => openProbeMenu(player)
-    }
-]
-
-/** Players with a City Builder form currently on screen, so a second right-click is a no-op. */
+/** Players with a City Builder form open, so a second right-click is a no-op. */
 const openFor = new Set()
 
 /**
  * `form.show()` fails with `UserBusy` when the player still has a screen open —
  * including the brief window right after the right-click that triggered us.
- * Retry until the player is free or we give up.
  */
 async function showWhenReady(player, form, timeoutTicks = 200) {
     const startTick = system.currentTick
@@ -59,25 +31,156 @@ async function showWhenReady(player, form, timeoutTicks = 200) {
     return undefined
 }
 
+// --- main menu -------------------------------------------------------------
+
+const MENU = [
+    { label: 'Place Building', handler: (player) => chooseType(player) },
+    { label: 'Rebuild Last', handler: (player) => rebuildLast(player) },
+    { label: 'Undo Last Build', handler: (player) => undoLast(player) },
+    { label: 'Cancel Build', handler: (player) => cancelCurrent(player) },
+    { label: 'Settings', handler: (player) => openSettings(player) },
+    { label: 'Rotation Probe', handler: (player) => openProbeMenu(player) }
+]
+
 async function openBuildMenu(player) {
     if (openFor.has(player.id)) return
     openFor.add(player.id)
 
     try {
-        const form = new ActionFormData().title('City Builder').body('Select an action.')
+        const form = new ActionFormData()
+            .title('City Builder')
+            .body(
+                isBuilding()
+                    ? '§eA build is in progress.§r'
+                    : `${catalogEntries().length} presets available.` +
+                      (lastPlacementFor(player.id) ? `\n§7Last: ${lastPlacementFor(player.id).entry.name}§r` : '')
+            )
         for (const entry of MENU) form.button(entry.label)
 
         const response = await showWhenReady(player, form)
         if (!response || response.canceled || response.selection === undefined) return
-
-        const entry = MENU[response.selection]
-        if (!entry) return
-        entry.handler(player)
+        await MENU[response.selection]?.handler(player)
     } catch (error) {
         console.warn(`[City Builder] build menu failed: ${error}`)
     } finally {
         openFor.delete(player.id)
     }
+}
+
+// --- preset browser --------------------------------------------------------
+
+/** Group the catalog by type so the list stays navigable at 68 entries. */
+function byType() {
+    const groups = new Map()
+    for (const entry of catalogEntries()) {
+        if (!groups.has(entry.type)) groups.set(entry.type, [])
+        groups.get(entry.type).push(entry)
+    }
+    for (const list of groups.values()) list.sort((a, b) => b.massing.floors - a.massing.floors)
+    return [...groups.entries()].sort((a, b) => a[0].localeCompare(b[0]))
+}
+
+const TYPE_LABELS = {
+    office: 'Office', residential: 'Residential', mixed_use: 'Mixed Use', hotel: 'Hotel',
+    retail: 'Retail', restaurant: 'Restaurant', automotive: 'Automotive', industrial: 'Industrial',
+    civic: 'Civic', institutional: 'Institutional', transit: 'Transit', religious: 'Religious',
+    entertainment: 'Entertainment', parking: 'Parking', healthcare: 'Healthcare', education: 'Education'
+}
+
+async function chooseType(player) {
+    const groups = byType()
+    const form = new ActionFormData().title('Choose a Category').body('Presets are grouped by building type.')
+    for (const [type, list] of groups) form.button(`${TYPE_LABELS[type] ?? type}\n§7${list.length} presets§r`)
+
+    const response = await showWhenReady(player, form)
+    if (!response || response.canceled || response.selection === undefined) return
+    await chooseBuilding(player, groups[response.selection])
+}
+
+async function chooseBuilding(player, [type, list]) {
+    const form = new ActionFormData()
+        .title(TYPE_LABELS[type] ?? type)
+        .body('Tallest first. The building is placed with its north-west corner at your feet.')
+    for (const entry of list) {
+        const [x, z] = entry.massing.footprint
+        form.button(`${entry.name}\n§7${entry.massing.floors}f · ${x}x${z} · ${totalHeight(entry)} tall§r`)
+    }
+
+    const response = await showWhenReady(player, form)
+    if (!response || response.canceled || response.selection === undefined) return
+    await confirmPlacement(player, list[response.selection])
+}
+
+async function confirmPlacement(player, entry) {
+    const [x, z] = entry.massing.footprint
+    const height = totalHeight(entry)
+    const origin = {
+        x: Math.floor(player.location.x),
+        y: Math.floor(player.location.y),
+        z: Math.floor(player.location.z)
+    }
+
+    const roomAbove = 320 - (origin.y + height)
+    const warning =
+        roomAbove < 0
+            ? `\n\n§cThis building is ${-roomAbove} blocks too tall here.§r Move down before building.`
+            : roomAbove < 20
+              ? `\n\n§eOnly ${roomAbove} blocks of headroom above.§r`
+              : ''
+
+    const form = new ModalFormData()
+        .title(entry.name)
+        .dropdown(
+            `${entry.massing.floors} floors · ${x} x ${z} · ${height} tall\n` +
+                `${entry.facade.system}\n` +
+                `Origin ${origin.x}, ${origin.y}, ${origin.z}${warning}\n\nRotation`,
+            ['0°', '90°', '180°', '270°'],
+            0
+        )
+        .toggle('Build here', true)
+
+    const response = await showWhenReady(player, form)
+    if (!response || response.canceled || !response.formValues) return
+
+    const [turns, confirmed] = response.formValues
+    if (!confirmed) return
+
+    if (roomAbove < 0) {
+        player.sendMessage(`${PREFIX} §crefusing to build — ${-roomAbove} blocks over the world ceiling.§r`)
+        return
+    }
+
+    lastBuilt.set(player.id, entry.id)
+    placeBuilding(player, entry, origin, turns)
+}
+
+// --- other menu actions ----------------------------------------------------
+
+const lastBuilt = new Map()
+
+function rebuildLast(player) {
+    const id = lastBuilt.get(player.id)
+    if (!id) {
+        player.sendMessage(`${PREFIX} nothing built yet this session.`)
+        return
+    }
+    const entry = catalogEntries().find((e) => e.id === id)
+    if (entry) return confirmPlacement(player, entry)
+}
+
+function cancelCurrent(player) {
+    player.sendMessage(cancelBuild() ? `${PREFIX} cancelling.` : `${PREFIX} nothing is building.`)
+}
+
+async function openSettings(player) {
+    const form = new ModalFormData()
+        .title('Settings')
+        .slider('Blocks placed per tick', 50, 2000, 50, BUDGET.blocksPerTick)
+
+    const response = await showWhenReady(player, form)
+    if (!response || response.canceled || !response.formValues) return
+    BUDGET.blocksPerTick = response.formValues[0]
+    player.sendMessage(`${PREFIX} block budget set to ${BUDGET.blocksPerTick} per tick.`)
 }
 
 async function openProbeMenu(player) {
@@ -89,13 +192,15 @@ async function openProbeMenu(player) {
 
     const form = new ActionFormData()
         .title('Rotation Probe')
-        .body('Stand at the probe\'s lowest north-west corner, then pick the orientation you placed.')
+        .body("Stand at the probe's lowest north-west corner, then pick the orientation you placed.")
     for (const label of orientations) form.button(label)
 
     const response = await showWhenReady(player, form)
     if (!response || response.canceled || response.selection === undefined) return
     reportProbe(player, orientations[response.selection])
 }
+
+// --- wiring ----------------------------------------------------------------
 
 world.afterEvents.itemUse.subscribe((event) => {
     if (event.itemStack?.typeId !== WAND_ITEM_ID) return
@@ -105,6 +210,7 @@ world.afterEvents.itemUse.subscribe((event) => {
 
 world.afterEvents.playerLeave.subscribe((event) => {
     openFor.delete(event.playerId)
+    lastBuilt.delete(event.playerId)
 })
 
-console.info('[City Builder] M0 skeleton loaded.')
+console.info(`[City Builder] loaded — ${catalogEntries().length} presets available.`)

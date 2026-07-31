@@ -12,6 +12,7 @@ import { writeFileSync, mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import './lib/materials.mjs' // binds the material palette into the generator
 import { loadCatalog } from './lib/catalog.mjs'
 import { generateBuilding, totalHeight } from './lib/generate.mjs'
 import { moduleToModel } from './lib/module-format.mjs'
@@ -31,13 +32,14 @@ const USAGE = `usage: build-preset [<id> ...] [options]
       --preview          also write an isometric PNG per building
       --sheet            write one contact sheet of all rendered buildings
       --shell-only       exterior skin only (much smaller; good for preview)
+      --cutaway          remove the near quadrant so interiors are visible
       --no-structure     skip .mcstructure output (JSON + preview only)
       --out <dir>        output directory (default dist/presets)`
 
 let args
 try {
     args = parseArgs(process.argv.slice(2), {
-        flags: ['all', 'preview', 'sheet', 'shell-only', 'no-structure'],
+        flags: ['all', 'preview', 'sheet', 'shell-only', 'no-structure', 'cutaway'],
         options: ['out']
     })
 } catch (error) {
@@ -79,7 +81,7 @@ for (const entry of selected) {
     }
 
     if (args.preview || args.sheet) {
-        const canvas = renderIso(module.blocks, { maxPixels: args.sheet ? 260 : 1100 })
+        const canvas = renderIso(module.blocks, { maxPixels: args.sheet ? 260 : 1100, cutaway: args.cutaway })
         if (args.preview) writeFileSync(join(outDir, `${entry.id}.png`), canvas.toPng())
         rendered.push({ entry, canvas })
     }

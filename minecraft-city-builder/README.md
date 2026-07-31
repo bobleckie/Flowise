@@ -8,7 +8,7 @@ cities from OpenStreetMap data.
 milestone sequence, and acceptance criteria. [MILESTONES.md](MILESTONES.md) tracks
 where the project actually is.
 
-**Current state: M0, M1, and M2 built — all awaiting in-game acceptance.**
+**Current state: usable.** Import the add-on, hold the Build Wand, pick a building, place it. 68 presets with walkable interiors, stairs, doors and lighting. Rotation and undo included.
 
 The deliverable is a preset library: named, placeable buildings and city
 districts that drop into a Bedrock Realm and are immediately walkable and
@@ -173,6 +173,26 @@ game actually produced and reports every disagreement — property, expected
 value, actual value. That output is what corrects the table.
 
 Full procedure in [MILESTONES.md](MILESTONES.md#m2-acceptance-test--current).
+
+## Using it
+
+1. `npm run build`, then double-click `dist/city_builder.mcaddon`.
+2. Activate *City Builder (Behavior)* on a creative world.
+3. `/give @s cb:build_wand`, then right-click.
+
+**Place Building** browses 68 presets grouped by type. Pick one, choose a
+rotation, and it builds from your feet outward with its north-west corner at
+your position. **Undo Last Build** clears it again. **Settings** tunes the
+per-tick block budget if placement feels slow or heavy.
+
+Buildings are generated *in-game* from a 122 KB bundle of catalog descriptions
+plus the generator itself — not shipped as `.mcstructure` files. Willis Tower
+alone would be ~14 MB as a structure, and Bedrock structure blocks cap at
+64x384x64 so the large presets could not be placed that way at all.
+
+Placement times at the default 400 blocks/tick: most buildings land in under 10
+seconds; the largest supertall takes about a minute. Raise the budget in
+Settings to trade smoothness for speed.
 
 ## Install (Windows / Bedrock)
 

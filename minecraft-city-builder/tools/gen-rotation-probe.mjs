@@ -23,6 +23,7 @@ import { writeFileSync, mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import './lib/rotation-table.mjs' // binds the rotation table
 import { rotateModule, ORIENTATIONS, TABLE } from './lib/rotation.mjs'
 import { moduleToModel } from './lib/module-format.mjs'
 import { writeMcStructure } from './lib/mcstructure.mjs'

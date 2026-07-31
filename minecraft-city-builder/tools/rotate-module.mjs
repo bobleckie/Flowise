@@ -9,6 +9,7 @@
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { dirname, basename, join } from 'node:path'
+import './lib/rotation-table.mjs' // binds the rotation table
 import { rotateModule, ORIENTATIONS } from './lib/rotation.mjs'
 import { validateModule } from './lib/module-format.mjs'
 import { parseArgs, fail, stringifyModule } from './lib/cli.mjs'

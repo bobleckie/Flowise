@@ -147,7 +147,10 @@ const SHADE = { 1: 1.0, 2: 0.76, 3: 0.55 }
  * @param options.size      cube size in pixels (auto-fitted when omitted)
  * @param options.maxPixels longest edge of the output image
  */
-export function renderIso(blocks, { size, maxPixels = 1200, background } = {}) {
+export function renderIso(blocks, { size, maxPixels = 1200, background, cutaway = false } = {}) {
+    // Air carries a colour in the table for palette maths, but drawing it would
+    // fill every hollowed interior with black cubes.
+    blocks = blocks.filter((b) => b.block !== 'minecraft:air')
     if (!blocks.length) throw new Error('nothing to render')
 
     let maxX = 0
@@ -158,6 +161,13 @@ export function renderIso(blocks, { size, maxPixels = 1200, background } = {}) {
         if (b.pos[1] > maxY) maxY = b.pos[1]
         if (b.pos[2] > maxZ) maxZ = b.pos[2]
     }
+    if (cutaway) {
+        const cx = maxX / 2
+        const cz = maxZ / 2
+        blocks = blocks.filter((b) => !(b.pos[0] > cx && b.pos[2] > cz))
+        if (!blocks.length) throw new Error('cutaway removed everything')
+    }
+
     const dx = maxX + 1
     const dy = maxY + 1
     const dz = maxZ + 1

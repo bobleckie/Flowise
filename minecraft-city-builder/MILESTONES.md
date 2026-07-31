@@ -14,9 +14,9 @@ the actual product; Phase 3 is cities.
 | M1 — Structure Emitter | Built, awaiting acceptance | Both converters, palette tokens. Needs a real in-game capture to accept. |
 | M2 — Rotation Correctness | **Built, awaiting acceptance** | Rotation table + engine + 61 offline tests + in-game probe harness. 4 encodings still need measuring. |
 | M3 — Assembler | **Built, awaiting acceptance** | Parameterized generator: all 68 buildings generate, render and compile. |
-| M4 — Animated Construction | Not started | |
-| M5 — Elevators | Not started | |
-| M6 — Interior Fitout | Not started | Gates the content library — without it every room is furnished by hand. |
+| M4 — Animated Construction | **Placement queue built** | Tick-budgeted placer with air-run bulk clearing, progress, cancel, undo. Scaffolding animation still to do. |
+| M5 — Elevators | Shaft built, cab not | Lift shaft and landing doors generate; the rideable cab is next. |
+| M6 — Interior Fitout | **Partly built** | Floors, stairs, entrances, core doors, lift shafts, lighting, partitions. Furniture still to do. |
 | M7 — Impostor Interiors | Not started | |
 | **Phase 2 — Content** | | |
 | M8 — Building Preset Library | **Catalog + geometry built** | 68 presets, all generating as placeable geometry. |

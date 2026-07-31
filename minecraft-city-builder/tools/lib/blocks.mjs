@@ -128,6 +128,16 @@ export const BLOCK_COLORS = {
     'minecraft:orange_stained_glass': [216, 127, 51],
     'minecraft:yellow_stained_glass': [229, 229, 51],
 
+    // light sources and fittings
+    'minecraft:glowstone': [225, 200, 120],
+    'minecraft:lantern': [220, 160, 80],
+    'minecraft:sea_lantern': [190, 210, 200],
+    'minecraft:shroomlight': [230, 140, 70],
+    'minecraft:redstone_lamp': [95, 58, 33],
+    'minecraft:torch': [230, 180, 90],
+    'minecraft:ladder': [140, 110, 65],
+    'minecraft:scaffolding': [180, 145, 85],
+
     // misc
     'minecraft:prismarine': [99, 156, 151],
     'minecraft:dark_prismarine': [51, 91, 75],
@@ -140,12 +150,38 @@ export const TRANSLUCENT = new Set(
     Object.keys(BLOCK_COLORS).filter((id) => id.includes('glass'))
 )
 
-export function colorOf(blockId) {
-    return BLOCK_COLORS[blockId] ?? [255, 0, 255] // magenta = unmapped, so it is obvious
+/**
+ * Shape variants (stairs, slabs, walls, doors, panes) take the colour of the
+ * block they are cut from, so the table only has to list base materials.
+ */
+const VARIANT = /^(minecraft:.+?)_(stairs|slab|double_slab|wall|fence|fence_gate|pane|button|pressure_plate|trapdoor|door)$/
+
+function deriveBase(blockId) {
+    const match = blockId.match(VARIANT)
+    if (!match) return null
+    const stem = match[1]
+    const candidates = [
+        stem,
+        `${stem}s`,
+        stem.replace(/_brick$/, '_bricks'),
+        `${stem}_block`,
+        `${stem}_planks`,
+        stem.replace(/^minecraft:/, 'minecraft:') + '_bricks'
+    ]
+    return candidates.find((c) => c in BLOCK_COLORS) ?? null
 }
 
+export function colorOf(blockId) {
+    const direct = BLOCK_COLORS[blockId]
+    if (direct) return direct
+    const base = deriveBase(blockId)
+    if (base) return BLOCK_COLORS[base]
+    return [255, 0, 255] // magenta = unmapped, so it is obvious on sight
+}
+
+/** True when the block has a colour, directly or through its base material. */
 export function isKnownBlock(blockId) {
-    return blockId in BLOCK_COLORS
+    return blockId in BLOCK_COLORS || deriveBase(blockId) !== null
 }
 
 // --- perceptual distance ---------------------------------------------------

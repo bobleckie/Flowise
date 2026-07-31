@@ -16,6 +16,7 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import '../lib/rotation-table.mjs' // binds the rotation table
 import {
     TABLE,
     rotateState,

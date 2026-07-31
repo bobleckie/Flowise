@@ -13,10 +13,12 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import '../lib/materials.mjs' // binds the material palette into the generator
 import { loadCatalog } from '../lib/catalog.mjs'
 import { generateBuilding, floorPlates, totalHeight, facadeCell, windowSpec, WINDOW_FAMILIES, MATERIALS } from '../lib/generate.mjs'
 import { validateModule, moduleToModel } from '../lib/module-format.mjs'
 import { writeMcStructure } from '../lib/mcstructure.mjs'
+import '../lib/rotation-table.mjs' // binds the rotation table
 import { rotateModule, ORIENTATIONS } from '../lib/rotation.mjs'
 import { isKnownBlock, colorOf, deltaE, SAME_MATERIAL_THRESHOLD } from '../lib/blocks.mjs'
 import { renderIso } from '../lib/render.mjs'
@@ -190,10 +192,12 @@ test('generation is deterministic — the same entry always yields the same buil
 
 test('generated buildings compile to .mcstructure and survive rotation', () => {
     // One from each height class, to keep the test quick.
-    const sample = ['willis_bundled_tube', 'monadnock_masonry_slab', 'chicago_bungalow', 'gas_station_canopy']
+    // Full interiors, so the directional blocks that interiors introduce —
+    // stairs, doors, lift doors — are exercised by the rotation engine.
+    const sample = ['monadnock_masonry_slab', 'chicago_bungalow', 'gas_station_canopy', 'loop_greystone_commercial']
     for (const id of sample) {
         const entry = catalog.find((e) => e.id === id)
-        const module = generateBuilding(entry, { shellOnly: true })
+        const module = generateBuilding(entry)
 
         assert.ok(writeMcStructure(moduleToModel(module)).length > 0, `${id} failed to serialize`)
 
@@ -254,4 +258,106 @@ test('the renderer draws something other than background', () => {
         if (canvas.data[i * 3] !== 26 || canvas.data[i * 3 + 1] !== 28 || canvas.data[i * 3 + 2] !== 34) painted++
     }
     assert.ok(painted > canvas.width * canvas.height * 0.1, 'render is nearly empty')
+})
+
+// --- emitted blocks --------------------------------------------------------
+
+test('every block the generator emits is colour-mapped', () => {
+    // Unmapped blocks render magenta, which is loud but only visible if someone
+    // looks. This catches it before anyone does — it already caught the whole
+    // interior fittings set (stairs, doors, lanterns) rendering as magenta.
+    const unmapped = new Set()
+    for (const entry of catalog) {
+        for (const block of generateBuilding(entry).blocks) {
+            if (!isKnownBlock(block.block)) unmapped.add(`${block.block} (${entry.id})`)
+        }
+    }
+    assert.deepEqual([...unmapped], [], `unmapped blocks:\n  ${[...unmapped].join('\n  ')}`)
+})
+
+test('interiors make every building enterable and climbable', () => {
+    // A shell you cannot walk into or up is not a usable building.
+    for (const entry of catalog) {
+        const module = generateBuilding(entry)
+        const blocks = module.blocks
+
+        const doors = blocks.filter((b) => b.block.endsWith('_door'))
+        assert.ok(doors.length >= 2, `${entry.id} has no entrance doors`)
+
+        if (entry.massing.floors > 1) {
+            const stairs = blocks.filter((b) => b.block.endsWith('_stairs'))
+            assert.ok(stairs.length > 0, `${entry.id} is ${entry.massing.floors} floors with no stairs`)
+        }
+
+        const lights = blocks.filter((b) => b.block === 'minecraft:glowstone' || b.block === 'minecraft:lantern')
+        assert.ok(lights.length > 0, `${entry.id} has no interior lighting`)
+
+        // Hollowed volume: a solid building would have almost no air.
+        const air = blocks.filter((b) => b.block === 'minecraft:air').length
+        assert.ok(air > blocks.length * 0.15, `${entry.id} is only ${Math.round((air / blocks.length) * 100)}% air — not hollow`)
+    }
+})
+
+test('doors and stairs carry the block states they need', () => {
+    const module = generateBuilding(catalog.find((e) => e.id === 'loop_greystone_commercial'))
+    for (const block of module.blocks) {
+        if (block.block.endsWith('_door')) {
+            assert.ok(block.state, `door at ${block.pos} has no state`)
+            assert.equal(typeof block.state.upper_block_bit, 'boolean', 'door needs upper_block_bit')
+            assert.equal(typeof block.state.direction, 'number', 'door needs direction')
+        }
+        if (block.block.endsWith('_stairs')) {
+            assert.ok(block.state, `stair at ${block.pos} has no state`)
+            assert.equal(typeof block.state.weirdo_direction, 'number', 'stair needs weirdo_direction')
+        }
+    }
+})
+
+test('every door has both halves', () => {
+    // A door missing its upper half is a broken block in-game, not a short door.
+    for (const entry of catalog) {
+        const doors = generateBuilding(entry).blocks.filter((b) => b.block.endsWith('_door'))
+        const lower = doors.filter((d) => d.state?.upper_block_bit === false).length
+        const upper = doors.filter((d) => d.state?.upper_block_bit === true).length
+        assert.equal(lower, upper, `${entry.id}: ${lower} door bottoms, ${upper} tops`)
+    }
+})
+
+
+test('rotating a finished building keeps it enterable and climbable', () => {
+    // Interiors introduce doors and stairs, which are the most rotation-sensitive
+    // blocks in the game. A building that rotates into a sealed box is useless.
+    for (const id of ['loop_greystone_commercial', 'chicago_bungalow', 'warehouse_loft']) {
+        const module = generateBuilding(catalog.find((e) => e.id === id))
+        const before = {
+            doors: module.blocks.filter((b) => b.block.endsWith('_door')).length,
+            stairs: module.blocks.filter((b) => b.block.endsWith('_stairs')).length
+        }
+
+        for (const turns of [1, 2, 3]) {
+            const { module: turned, unhandled } = rotateModule(module, { turns })
+            assert.equal(unhandled.size, 0, `${id} r${turns * 90}: unhandled ${[...unhandled.keys()]}`)
+            assert.deepEqual(validateModule(turned), [], `${id} r${turns * 90} is invalid`)
+
+            const doors = turned.blocks.filter((b) => b.block.endsWith('_door'))
+            assert.equal(doors.length, before.doors, `${id} r${turns * 90}: lost doors`)
+            assert.equal(
+                turned.blocks.filter((b) => b.block.endsWith('_stairs')).length,
+                before.stairs,
+                `${id} r${turns * 90}: lost stairs`
+            )
+
+            // Door halves must stay paired after the transform.
+            const lower = doors.filter((d) => d.state?.upper_block_bit === false).length
+            assert.equal(lower * 2, doors.length, `${id} r${turns * 90}: door halves unpaired`)
+
+            // Every stair must still face a legal direction.
+            for (const stair of turned.blocks.filter((b) => b.block.endsWith('_stairs'))) {
+                assert.ok(
+                    [0, 1, 2, 3].includes(stair.state.weirdo_direction),
+                    `${id} r${turns * 90}: stair facing ${stair.state.weirdo_direction}`
+                )
+            }
+        }
+    }
 })
