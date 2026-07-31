@@ -103,7 +103,7 @@ put([3, 1, 3], 'minecraft:air')
 // --- block entities --------------------------------------------------------
 
 const chestPos = [2, 1, 5]
-put(chestPos, 'minecraft:chest', { minecraft_cardinal_direction: 'south' })
+put(chestPos, 'minecraft:chest', { 'minecraft:cardinal_direction': 'south' })
 blockEntities.push({
     pos: chestPos,
     data: compound({

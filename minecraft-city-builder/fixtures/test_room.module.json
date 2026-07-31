@@ -70,7 +70,7 @@
     { "pos": [ 2, 0, 5 ], "block": "$STYLE_FLOOR" },
     { "pos": [ 2, 0, 6 ], "block": "$STYLE_FLOOR" },
     { "pos": [ 2, 1, 0 ], "block": "$STYLE_WALL" },
-    { "pos": [ 2, 1, 5 ], "block": "minecraft:chest", "state": { "minecraft_cardinal_direction": "south" } },
+    { "pos": [ 2, 1, 5 ], "block": "minecraft:chest", "state": { "minecraft:cardinal_direction": "south" } },
     { "pos": [ 2, 1, 6 ], "block": "$STYLE_WALL" },
     { "pos": [ 2, 2, 0 ], "block": "$STYLE_WALL" },
     {

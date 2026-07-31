@@ -10,6 +10,7 @@
 
 import { system, world } from '@minecraft/server'
 import { ActionFormData, FormCancelationReason } from '@minecraft/server-ui'
+import { probeOrientations, reportProbe } from './rotation_probe.js'
 
 const WAND_ITEM_ID = 'cb:build_wand'
 
@@ -32,6 +33,12 @@ const MENU = [
     {
         label: 'Settings',
         handler: (player) => player.sendMessage(`${PREFIX} Settings — not implemented yet (M0 placeholder).`)
+    },
+    {
+        // M2 diagnostic: reads a placed rotation probe and reports any block
+        // state the rotation table predicted wrongly.
+        label: 'Rotation Probe',
+        handler: (player) => openProbeMenu(player)
     }
 ]
 
@@ -71,6 +78,23 @@ async function openBuildMenu(player) {
     } finally {
         openFor.delete(player.id)
     }
+}
+
+async function openProbeMenu(player) {
+    const orientations = probeOrientations()
+    if (!orientations.length) {
+        player.sendMessage(`${PREFIX} No probe data — run "node tools/gen-rotation-probe.mjs" and rebuild the pack.`)
+        return
+    }
+
+    const form = new ActionFormData()
+        .title('Rotation Probe')
+        .body('Stand at the probe\'s lowest north-west corner, then pick the orientation you placed.')
+    for (const label of orientations) form.button(label)
+
+    const response = await showWhenReady(player, form)
+    if (!response || response.canceled || response.selection === undefined) return
+    reportProbe(player, orientations[response.selection])
 }
 
 world.afterEvents.itemUse.subscribe((event) => {

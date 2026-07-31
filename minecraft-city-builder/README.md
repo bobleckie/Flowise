@@ -8,7 +8,12 @@ cities from OpenStreetMap data.
 milestone sequence, and acceptance criteria. [MILESTONES.md](MILESTONES.md) tracks
 where the project actually is.
 
-**Current state: M0 (Skeleton) and M1 (Structure Emitter) — built, awaiting in-game acceptance.**
+**Current state: M0, M1, and M2 built — all awaiting in-game acceptance.**
+
+The deliverable is a preset library: named, placeable buildings and city
+districts that drop into a Bedrock Realm and are immediately walkable and
+furnished. Phase 1 (M0–M7) builds the engine; Phase 2 (M8–M11) is the content
+library and is the actual product; Phase 3 (M12–M15) is whole cities.
 
 ---
 
@@ -121,6 +126,53 @@ round-trip** means every block, state, block entity and entity survived the
 trip through the intermediate format. Tag *ordering* may legitimately differ
 from the game's own output, so byte equality at that layer is reported as a
 note rather than a failure.
+
+## Rotation (M2)
+
+Every preset and every city tile gets placed at some rotation, so a rotation bug
+corrupts the whole library at once. This is the highest-risk part of the project.
+
+```sh
+node tools/rotate-module.mjs room.module.json --turns 1
+node tools/rotate-module.mjs room.module.json --all --out-dir out/orientations
+```
+
+A turn is 90° clockwise viewed from above. Mirroring is applied **before** the
+turn. Axes follow Minecraft: north = −Z, south = +Z, east = +X, west = −X.
+
+`data/block-states/rotation.json` is the table, and it is data rather than code
+for a reason: it can be corrected from in-game measurements without touching the
+engine. Instead of one permutation table per block family, each property
+declares how its values *encode* a direction; the engine decodes to a semantic
+name, applies one shared compass rule, and re-encodes. One rule to get right
+instead of forty.
+
+Two safety nets:
+
+- **Confidence levels.** Every entry is marked `high`, `medium`, or `low`.
+  Anything below `high` is believed correct but unverified, and appears in the
+  probe below.
+- **Unhandled-property detection.** A state property that looks directional
+  (contains `direction`, `facing`, `axis`, `face`, `hinge`, `orientation`,
+  `connection`) but is not in the table is left untouched and *reported*, rather
+  than silently passed through facing the wrong way. `rotate-module.mjs` exits
+  with status 2 when this happens. This already caught one real bug — a typo'd
+  `minecraft_cardinal_direction` (underscore instead of colon) that would have
+  left every chest facing wrong after rotation.
+
+### The probe harness
+
+```sh
+node tools/gen-rotation-probe.mjs
+```
+
+Emits a 50-cell probe structure in all six orientations, plus the block states
+the table predicts. Place one in-game, stand at its lowest north-west corner,
+and run **Rotation Probe** from the Build Wand menu. The script reads what the
+game actually produced and reports every disagreement — property, expected
+value, actual value. That output is what corrects the table.
+
+Full procedure in [MILESTONES.md](MILESTONES.md#m2-acceptance-test--current).
 
 ## Install (Windows / Bedrock)
 

@@ -3,46 +3,129 @@
 Acceptance is binary and is performed **in-game by the owner**. Nothing moves to
 "passed" on Claude Code's say-so — see SPEC.md §5.
 
+Milestone numbering was restructured in SPEC.md revision 2 when the owner
+restated scope. Phase 1 is the engine; Phase 2 is the content library, which is
+the actual product; Phase 3 is cities.
+
 | Milestone | State | Notes |
 |---|---|---|
-| M0 — Skeleton | **Built, awaiting owner acceptance** | Packs load, Build Wand opens a 3-entry `ActionFormData`, selection prints to chat. |
-| M1 — Structure Emitter | **Built, awaiting owner acceptance** | Both converters, palette tokens, 32 offline tests. Needs a real in-game capture to accept. |
-| M2 — Rotation Correctness | Next | Highest-risk item in the project. |
+| **Phase 1 — Engine** | | |
+| M0 — Skeleton | Built, awaiting acceptance | Packs load, Build Wand opens a menu, selection prints to chat. |
+| M1 — Structure Emitter | Built, awaiting acceptance | Both converters, palette tokens. Needs a real in-game capture to accept. |
+| M2 — Rotation Correctness | **Built, awaiting acceptance** | Rotation table + engine + 61 offline tests + in-game probe harness. 4 encodings still need measuring. |
 | M3 — Assembler | Not started | |
 | M4 — Animated Construction | Not started | |
 | M5 — Elevators | Not started | |
-| M6 — Typology Library | Not started | |
+| M6 — Interior Fitout | Not started | Gates the content library — without it every room is furnished by hand. |
 | M7 — Impostor Interiors | Not started | |
-| M8 — Vertical Solver | Not started | Layer B. Do not start before M7 passes. |
-| M9 — Arnis Fork | Not started | Layer B. |
-| M10 — Subway | Not started | Layer B. |
+| **Phase 2 — Content** | | |
+| M8 — Building Preset Library | Not started | 40 presets, composed + monolithic tiers. |
+| M9 — Street & Infrastructure Kit | Not started | Streets, crosswalks, lighting, signals, bus stops, parking. |
+| M10 — Transit | Not started | Subway, light rail, stations. |
+| M11 — District Tiles | Not started | The unit that makes Realm placement possible. |
+| **Phase 3 — Cities** | | |
+| M12 — Vertical Solver | Not started | |
+| M13 — Arnis Fork | Not started | |
+| M14 — Real City Packages | Not started | NYC, Chicago, Boston, LA, Houston. |
+| M15 — Fictional City Packages | Not started | Gotham, Metropolis. |
+
+---
+
+## M2 acceptance test — current
+
+Two halves. The offline half is done and passing; the in-game half needs you.
+
+### What is already proven offline
+
+`npm test` runs 61 tests. The strongest of them do not depend on knowing
+Bedrock's true encodings: rotation and mirroring form a mathematical group, so
+`R⁴ = I`, `M² = I`, and `R² = Mx·Mz` must hold whatever the encodings are. An
+internally inconsistent table fails these. Also checked: no orientation pushes a
+state value outside its legal domain, every numeric encoding stays a permutation
+(so two directions can never collapse into one), positions stay in bounds with
+no collisions, block entities follow their blocks, and rotated modules still
+compile to `.mcstructure`.
+
+### What still needs measuring in-game
+
+Four state encodings are marked below `high` confidence in
+`data/block-states/rotation.json`. They are believed correct, not verified.
+Guessing wrong here would corrupt the whole preset library at once, so the probe
+measures them instead of trusting them.
+
+| Property | Risk |
+|---|---|
+| `direction` | Doors and trapdoors may not share a value order. This is the likeliest error. |
+| `ground_sign_direction` | Zero is south; the sense of increase needs confirming. |
+| `rail_direction` | Curve and ascending value order. |
+| `torch_facing_direction` | Value naming. |
+
+### Procedure
+
+1. Build the pack and generate the probe:
+   ```sh
+   node tools/gen-rotation-probe.mjs
+   node tools/build.mjs
+   ```
+2. Import the `.mcaddon`, then copy `dist/probe/*.mcstructure` into your world's
+   `structures` folder (or a behavior pack's `structures/` folder).
+3. In a flat creative world, place `rotation_probe_r0` with a structure block.
+   It is 24×4×21.
+4. Stand at the probe's **lowest north-west corner**, open the Build Wand menu,
+   choose **Rotation Probe**, then **r0**. Expect
+   `all 50 cells match the rotation table`.
+   - r0 is the control. If r0 fails, the emitter is wrong, not the rotation
+     table — stop and send me the output.
+5. Repeat for `r90`, `r180`, `r270`, `mirror_x`, `mirror_z`, placing each
+   structure and running the matching check.
+6. Send me any mismatch lines. They name the property, the expected value, and
+   what the game actually produced — which is exactly what I need to correct
+   the table. The full list also goes to the Content Log, which is copyable.
+
+**Accept when:** all six orientations report zero mismatches, *and* a furnished
+test room placed at all four rotations and both mirrors has zero visual defects
+— stairs facing right, doors swinging right, chests keeping contents, signs
+keeping text.
+
+Mismatches are the expected outcome of the first run, not a failure. That is
+what the harness is for.
+
+---
+
+## M1 acceptance test
+
+Still open. Author a room by hand in-game, capture it with a structure block,
+and run:
+
+```sh
+node tools/verify-roundtrip.mjs path/to/capture.mcstructure
+```
+
+Expect `NBT byte identity: PASS` and `module round-trip: PASS`. Then convert
+both ways and place the rebuilt structure beside the original; accept when they
+are visually identical, including chest contents, sign text, and waterlogging.
+Full procedure was in the M1 change log entry; the tooling is unchanged.
 
 ---
 
 ## M0 acceptance test
 
-Run through this in-game and report pass/fail on each line.
-
-1. **Pack loads clean.** Both packs appear in the world's Behavior/Resource pack
-   lists with icons and names, and activate without a red error banner. With
-   Content Log enabled (Settings → Creator → Content Log GUI), there are no
-   errors on world load.
-2. **Script attaches.** The Content Log shows `[City Builder] M0 skeleton loaded.`
-3. **Item exists.** `/give @s cb:build_wand` succeeds, or the Build Wand is
-   findable in the Creative inventory under Equipment. It shows the wand icon
-   and the name "Build Wand".
-4. **Menu opens.** Right-click (or long-press on controller/touch) while holding
-   the wand opens a form titled "City Builder" with body text "Select an action."
-   and exactly three buttons: Place Building, Choose Typology, Settings.
-5. **Selection registers.** Choosing any button closes the form and prints
+1. **Pack loads clean.** Both packs appear with icons and names and activate
+   without a red error banner. With Content Log enabled (Settings → Creator →
+   Content Log GUI), no errors on world load.
+2. **Script attaches.** Content Log shows `[City Builder] M0 skeleton loaded.`
+3. **Item exists.** `/give @s cb:build_wand` succeeds. Shows the wand icon and
+   the name "Build Wand".
+4. **Menu opens.** Right-click while holding the wand opens a form titled
+   "City Builder" with **four** buttons: Place Building, Choose Typology,
+   Settings, Rotation Probe.
+   - The first three are M0 placeholders. The fourth is the M2 harness and was
+     added after M0 was written; it is the only entry that does real work.
+5. **Selection registers.** Choosing one of the first three prints
    `[City Builder] <name> — not implemented yet (M0 placeholder).` in chat.
-6. **Cancel is clean.** Pressing Escape / Close closes the form and prints
-   nothing.
+6. **Cancel is clean.** Escape / Close closes the form and prints nothing.
 
 ### Known-good environment assumptions
-
-The manifest pins these; if the game reports an unsupported module version, see
-the "Version pinning" section of README.md before changing anything else.
 
 - `min_engine_version`: **1.21.20**
 - `@minecraft/server`: **1.13.0**
@@ -54,68 +137,18 @@ experimental toggle.
 
 ---
 
----
-
-## M1 acceptance test
-
-The spec's acceptance is a real in-game round trip, which needs you: author a
-room by hand, capture it, run it through both converters, place the result, and
-confirm it is visually identical.
-
-Offline, the pipeline is already proven against a generated reference module —
-`npm test` runs 32 tests covering directional states, block entity payloads,
-waterlogging, structure void, palette tokens, and byte-level determinism. What
-those tests cannot prove is that the file is valid *to Minecraft*, which is the
-whole point of this test.
-
-1. **Author a room.** Build something small (7×7 or 7×11, 4 high) with at least
-   one of each: stairs, a door, a chest with items in it, a sign with text, a
-   ladder, a trapdoor, and a waterlogged slab or fence.
-2. **Capture it** with a structure block in Save mode. Export gives you a
-   `.mcstructure` in
-   `...\LocalState\games\com.mojang\minecraftWorlds\<world>\structures\`
-   (or `behavior_packs\<pack>\structures\` for an exported pack).
-3. **Verify the round trip:**
-   ```sh
-   node tools/verify-roundtrip.mjs path/to/capture.mcstructure
-   ```
-   Expect `NBT byte identity: PASS` and `module round-trip: PASS`. If either
-   fails, the output names the exact block position and what changed — send it
-   over and stop; do not continue to step 4.
-4. **Convert both ways:**
-   ```sh
-   node tools/mcstructure-to-module.mjs capture.mcstructure --id my_room
-   node tools/module-to-mcstructure.mjs my_room.module.json -o my_room_rebuilt.mcstructure
-   ```
-5. **Place the rebuilt structure** in-game with a structure block in Load mode,
-   next to the original.
-
-**Accept when:** the rebuilt room is visually identical to the original —
-stairs face the same way, the door swings the same way, the chest still has its
-items, the sign still has its text, and the waterlogged block is still
-waterlogged.
-
-### What I could not verify
-
-The block-state `version` stamp is written as `1.21.20` (`18158592`) for blocks
-authored from scratch; captured blocks keep whatever version they came with. If
-your game writes a different version, captures still round-trip exactly — only
-freshly authored modules use the default, and `DEFAULT_BLOCK_VERSION` in
-`tools/lib/mcstructure.mjs` is the one place to change it.
-
-The reference module's block names target 1.21.x. If any turn up as "unknown
-block" in-game, tell me which and I will correct the fixture.
-
----
-
 ## Change log
 
+- **M2** — Rotation table as data with explicit confidence levels
+  (`data/block-states/rotation.json`); rotation engine that decodes each
+  property to a semantic direction and applies one shared compass rule rather
+  than forty per-family permutations; unhandled-property detection so an
+  unknown directional block warns instead of silently facing wrong;
+  `rotate-module.mjs`; `gen-rotation-probe.mjs` and the in-game checker wired
+  into the Build Wand menu; 29 rotation tests (61 total).
 - **M1** — Module intermediate format (SPEC.md §4.1) with validation;
   little-endian NBT reader/writer; `.mcstructure` reader/writer; both
-  converters; `$STYLE_*` palette token resolution with two placeholder styles;
-  `verify-roundtrip.mjs` acceptance tool; scripted reference module
-  (`tools/gen-test-room.mjs`, per §4.3); 32-test suite.
-- **M0** — Behavior + resource pack skeleton, `cb:build_wand` item, placeholder
-  three-entry menu, zero-dependency validator and `.mcaddon` bundler
-  (`tools/build.mjs`), reproducible placeholder art generator
-  (`tools/gen_placeholder_art.py`).
+  converters; `$STYLE_*` palette token resolution; `verify-roundtrip.mjs`;
+  scripted reference module.
+- **M0** — Behavior + resource pack skeleton, `cb:build_wand` item, menu,
+  zero-dependency validator and `.mcaddon` bundler, placeholder art generator.

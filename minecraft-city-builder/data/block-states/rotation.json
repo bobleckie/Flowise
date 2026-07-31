@@ -1,0 +1,146 @@
+{
+    "$comment": [
+        "Rotation/mirror semantics for Bedrock directional block states (SPEC.md M2).",
+        "",
+        "Rather than one permutation table per block family, each state property declares",
+        "how its values ENCODE a direction. The engine decodes to a semantic name, applies",
+        "one shared compass rule, and re-encodes. That way there is a single rotation rule",
+        "to get right instead of forty.",
+        "",
+        "Axes: north = -Z, south = +Z, east = +X, west = -X.",
+        "A turn is 90 degrees clockwise viewed from above: north -> east -> south -> west.",
+        "",
+        "confidence: 'high'   long-stable Bedrock encoding, safe to rely on.",
+        "            'medium' believed correct, worth confirming with the probe.",
+        "            'low'    guessed. MUST be measured before the library is authored.",
+        "",
+        "Run `node tools/gen-rotation-probe.mjs` to produce the in-game probe that",
+        "measures anything below 'high', then correct this file from the results."
+    ],
+
+    "properties": {
+        "facing_direction": {
+            "semantic": "face",
+            "values": { "0": "down", "1": "up", "2": "north", "3": "south", "4": "west", "5": "east" },
+            "confidence": "high",
+            "blocks": "ladder, furnace, dropper, dispenser, observer, piston, end_rod, hopper, barrel"
+        },
+        "weirdo_direction": {
+            "semantic": "face",
+            "values": { "0": "east", "1": "west", "2": "south", "3": "north" },
+            "confidence": "high",
+            "blocks": "all stairs"
+        },
+        "direction": {
+            "semantic": "face",
+            "values": { "0": "east", "1": "south", "2": "west", "3": "north" },
+            "confidence": "medium",
+            "blocks": "doors, trapdoors, big_dripleaf, cocoa, repeater, comparator",
+            "note": "Doors are believed to use this order. Trapdoors are the known risk — some references give them east/west/south/north instead. Measure before relying on it."
+        },
+        "ground_sign_direction": {
+            "semantic": "angle16",
+            "zero": "south",
+            "confidence": "medium",
+            "blocks": "standing signs, banners",
+            "note": "16 steps of 22.5 degrees. Zero direction confirmed as south; verify the sense of increase with the probe."
+        },
+        "minecraft:cardinal_direction": {
+            "semantic": "face",
+            "identity": true,
+            "confidence": "high",
+            "blocks": "chest, trapped_chest, furnace family, beehive, lectern, campfire (newer states)"
+        },
+        "minecraft:facing_direction": {
+            "semantic": "face",
+            "identity": true,
+            "confidence": "high",
+            "blocks": "newer string-encoded facing"
+        },
+        "minecraft:block_face": {
+            "semantic": "face",
+            "identity": true,
+            "confidence": "high",
+            "blocks": "buttons, levers, grindstone, bell"
+        },
+        "torch_facing_direction": {
+            "semantic": "face",
+            "identity": true,
+            "confidence": "medium",
+            "blocks": "wall torches, redstone torches",
+            "note": "Values are 'north'/'south'/'east'/'west'/'top'; 'top' is treated as unrotatable."
+        },
+        "pillar_axis": {
+            "semantic": "axis",
+            "identity": true,
+            "confidence": "high",
+            "blocks": "logs, stripped logs, basalt, quartz pillars, bone block, chains"
+        },
+        "door_hinge_bit": {
+            "semantic": "mirror_flip",
+            "confidence": "high",
+            "blocks": "all doors",
+            "note": "Rotation leaves the hinge alone; either mirror swaps which side it hangs on."
+        },
+        "rail_direction": {
+            "semantic": "rail",
+            "values": {
+                "0": { "kind": "straight", "axis": "z" },
+                "1": { "kind": "straight", "axis": "x" },
+                "2": { "kind": "ascending", "face": "east" },
+                "3": { "kind": "ascending", "face": "west" },
+                "4": { "kind": "ascending", "face": "north" },
+                "5": { "kind": "ascending", "face": "south" },
+                "6": { "kind": "curve", "faces": ["south", "east"] },
+                "7": { "kind": "curve", "faces": ["south", "west"] },
+                "8": { "kind": "curve", "faces": ["north", "west"] },
+                "9": { "kind": "curve", "faces": ["north", "east"] }
+            },
+            "confidence": "medium",
+            "blocks": "rail (curved variants); powered/detector/activator rails use 0-5 only"
+        },
+        "orientation": {
+            "semantic": "unhandled",
+            "confidence": "low",
+            "blocks": "jigsaw",
+            "note": "Not needed for the building library. Rotating a jigsaw block is reported as unhandled rather than silently wrong."
+        }
+    },
+
+    "faceSuffixedProperties": {
+        "$comment": "Properties whose NAME carries the face, so rotation renames the property rather than changing its value.",
+        "patterns": ["wall_connection_type_", "multi_face_direction_bits_"],
+        "confidence": "medium"
+    },
+
+    "unrotatedProperties": {
+        "$comment": "Directional-looking names that are genuinely unaffected by rotation about Y. Listed so the engine's unhandled-property warning stays quiet for them.",
+        "names": [
+            "upside_down_bit",
+            "open_bit",
+            "upper_block_bit",
+            "top_slot_bit",
+            "minecraft:vertical_half",
+            "hanging",
+            "attached_bit",
+            "in_wall_bit",
+            "occupied_bit",
+            "powered_bit",
+            "toggle_bit",
+            "head_piece_bit",
+            "persistent_bit",
+            "update_bit",
+            "liquid_depth",
+            "growth",
+            "age",
+            "age_bit",
+            "bite_counter",
+            "rotation"
+        ]
+    },
+
+    "suspiciousSubstrings": {
+        "$comment": "A property containing one of these but absent from `properties` and `unrotatedProperties` is reported as unhandled — the safety net for block families nobody has taught the engine about yet.",
+        "values": ["direction", "facing", "axis", "face", "hinge", "orientation", "connection"]
+    }
+}

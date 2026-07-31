@@ -1,33 +1,46 @@
 # Minecraft City Builder — Project Specification
 
 **Owner:** Bob Leckie
-**Purpose:** Build a Minecraft add-on that places detailed, furnished, elevator-served city buildings — scaling from a single placed building up to generation of entire real cities from map data.
+**Purpose:** Ship a library of placeable, fully-detailed building presets modelled on real buildings — every type from gas stations to skyscrapers, with working interiors, stairs, elevators, doors, furniture and fixtures — and then prepackaged cities, real and fictional, complete with streets and transit.
 
 This document is the persistent project brief. Claude Code should read it at the start of every session. It defines architecture, milestone sequence, and acceptance criteria. Do not skip milestones. Do not build systems in parallel.
+
+**Revision 2** — scope restated by the owner. The building library is the product, not a stepping stone to it. Real buildings, not generic typologies. Realm-placeable, not local-server-only. Streets and transit are in scope, not a stretch goal.
 
 ---
 
 ## 1. Product Definition
 
-Two layers that ship together:
+The deliverable is a **preset library**: named, placeable buildings and city districts that drop into a Bedrock world — including a Realm — and are immediately walkable, furnished, and functional.
+
+Three layers:
 
 **Layer A — Runtime Add-On (behavior pack + resource pack)**
-Player-facing. Building placer with menu UI, animated construction, working elevators, custom blocks and entities. This is what makes the world interactive.
+Player-facing. Preset browser and placer with menu UI, animated construction, working elevators, custom blocks and entities. This is what makes placement interactive and the world alive.
 
-**Layer B — World Generator (offline tool)**
-Reads OpenStreetMap data, solves vertical envelope, excavates terrain, and writes a complete city world file. Forked from Arnis (Rust, open source, MIT) with its building renderer replaced by our module/typology engine.
+**Layer B — Content Library (data)**
+The actual product. Building presets, interior fitout rules, street and transit kits, district layouts, city packages. Platform-neutral JSON compiled to `.mcstructure` at build time.
 
-Layer A is buildable standalone and delivers value on its own. Layer B depends on the building engine that Layer A establishes. **Build A first.**
+**Layer C — World Generator (offline tool)**
+Reads OpenStreetMap data, solves vertical envelope, excavates terrain, and writes city districts. Forked from Arnis (Rust, open source, MIT) with its building renderer replaced by our assembler.
+
+Layer A is buildable standalone. Layer B is where the value is and grows continuously once the engine exists. Layer C automates at city scale what Layer B does by hand. **Build A first, then B, then C** — but note that Layer B content authoring never stops; it runs in parallel with C once the engine is stable.
+
+### 1.1 Delivery target
+
+Presets must be placeable **in a Bedrock Realm**, which is the primary deployment target, not a local server.
+
+This has a hard consequence: **a full real city will not fit in a Realm.** Cities therefore ship as **district tiles** — self-contained, individually placeable chunks of city (a few square blocks each) with matching edges. A Realm gets the districts the owner chooses. A local server can place every tile of a city and get the whole thing. One content format, two deployment scales. Do not design a city package that only works as a monolith.
 
 ---
 
 ## 2. Platform Decision
 
-Start on **Bedrock**. Rationale: matches the owner's existing world, `.mcstructure` tooling is simpler than Java schematics, no compile loop, faster iteration to first visible result.
+Start on **Bedrock**. Rationale: matches the owner's existing world and Realm, `.mcstructure` tooling is simpler than Java schematics, no compile loop, faster iteration to first visible result.
 
-**Critical constraint on all work:** the module library and typology definitions are *data*, not platform code. They must be authored in a platform-neutral intermediate format (see §4.1) and compiled to `.mcstructure` at build time. Only the runtime scripting layer is Bedrock-specific.
+**Critical constraint on all work:** the preset library and fitout definitions are *data*, not platform code. They are authored in a platform-neutral intermediate format (see §4.1) and compiled to `.mcstructure` at build time. Only the runtime scripting layer is Bedrock-specific.
 
-This keeps a Java port to a rewrite of Layer A's scripting — roughly 20% of the codebase — rather than a restart. Do not embed Bedrock-specific assumptions in the module format, the typology schema, the assembler, or the vertical solver.
+This keeps a Java port to a rewrite of Layer A's scripting — roughly 20% of the codebase — rather than a restart. Do not embed Bedrock-specific assumptions in the module format, the preset schema, the assembler, the rotation engine, or the vertical solver.
 
 ---
 
@@ -35,71 +48,101 @@ This keeps a Java port to a rewrite of Layer A's scripting — roughly 20% of th
 
 Each milestone has a binary acceptance test performed in-game by the owner. Do not proceed to the next milestone until the current one passes. Report status against these milestones at the start of each session.
 
-### M0 — Skeleton
-Behavior pack + resource pack that loads without errors. One custom item ("Build Wand"). Right-click opens an `ActionFormData` menu with three placeholder entries. Selecting one prints a chat message.
+Claude Code cannot see the output and therefore cannot accept a milestone. Mark work "built, awaiting acceptance" — never "passed".
+
+### Phase 1 — Engine
+
+The engine is the minimum machinery needed before any preset is worth authoring. It is not the product; it is the thing without which the product cannot exist.
+
+#### M0 — Skeleton ✅ built
+Behavior pack + resource pack that loads without errors. One custom item ("Build Wand"). Right-click opens an `ActionFormData` menu. Selecting an entry prints a chat message.
 
 **Accept:** Pack loads clean, menu opens, selection registers.
 
-### M1 — Structure Emitter
-A build-time tool (Node or Python, runs outside Minecraft) that reads a module definition in the intermediate format and emits a valid `.mcstructure` file. Must correctly handle directional block states and block entities.
+#### M1 — Structure Emitter ✅ built
+Build-time tools that read a module definition in the intermediate format and emit a valid `.mcstructure`, and the reverse, so hand-built rooms can be captured in-game and brought into the pipeline. Must correctly handle directional block states and block entities.
 
-Also build the reverse: `.mcstructure` → intermediate format, so hand-built modules can be captured in-game and brought into the pipeline.
+**Accept:** Author a room by hand in-game, capture it with a structure block, round-trip it through both converters, place the result. Output is visually identical to the original.
 
-**Accept:** Author a room by hand in-game, capture it with a structure block, round-trip it through both converters, place the result. Output is byte-identical in appearance to the original.
-
-### M2 — Rotation Correctness
+#### M2 — Rotation Correctness ← current
 Rotation mapping table covering every directional block: stairs, slabs, trapdoors, doors, beds, signs, banners, chests, barrels, lanterns, glazed terracotta, buttons, levers, rails, glass panes, walls, fences, campfires, ladders.
 
-Build an automated test harness: place a reference module at all four rotations plus both mirrors, and diff the resulting block states against expected values.
+Automated test harness: place a reference module at all four rotations plus both mirrors, and diff the resulting block states against expected values.
 
 **Accept:** A furnished test room places correctly at 0°, 90°, 180°, 270° and both mirror axes, with zero visual defects. Chests retain contents, signs retain text, item frames retain items.
 
-> This milestone is the single highest-risk item in the project. Rotation bugs are the reason most add-ons of this type feel broken. Do not shortcut it and do not defer it.
+> This milestone is the single highest-risk item in the project. Every preset and every city tile is placed at some rotation; a rotation bug corrupts the entire library at once. Do not shortcut it and do not defer it.
 
-### M3 — Assembler
-Given a footprint polygon, floor count, and a style ID, assemble a complete building from modules:
-- Solve floor plans from interior module set (adjacency + circulation)
-- Wrap with facade modules on the correct bays
-- Place a vertical core (stairwell + elevator shaft) with consistent alignment across all floors
-- Cap with a roof module
-- Apply palette swap for the style
+#### M3 — Assembler
+Given a footprint polygon, floor count, and a style ID, assemble a complete building from modules: solve floor plans from the interior module set, wrap with facade modules on the correct bays, place a vertical core (stairwell + elevator shaft) aligned across all floors, cap with a roof module, apply the palette swap.
 
 **Accept:** A 6-story building generates with walkable interiors, connected stairs, correct facade rhythm, and no floating or intersecting geometry.
 
-### M4 — Animated Construction
+#### M4 — Animated Construction
 Deferred placement queue with a per-tick block budget. Scaffolding rises first, floors fill in behind it, scaffolding comes down. Particles and sounds at the active work layer.
 
 **Accept:** A 20-story building animates start to finish with no perceptible tick lag on the target hardware.
 
-### M5 — Elevators
+#### M5 — Elevators
 Custom entity cab with `minecraft:rideable`, no gravity. Call button block at each landing. Floor panel UI inside the cab, populated automatically from the assembler's floor registry. Door open/close with sounds.
 
 **Accept:** Ride from ground to top floor and back in a 40-story building. Motion is smooth, doors work, no desync, no clipping.
 
-### M6 — Typology Library
-Research and encode building typologies as parameter sets. Each typology defines: story count range, floor height, bay spacing, facade composition rules, material palette, window pattern, roof type, and which interior module set applies.
+#### M6 — Interior Fitout
+Rule-driven furniture and fixture placement, keyed by room type. A room declares what it is — office, hotel room, restaurant kitchen, dining room, retail floor, apartment bedroom, lobby, restroom, mechanical — and the fitout engine dresses it: furniture, lighting, signage, appliances, floor and wall treatment.
 
-Target set for v1: brownstone row, Chicago School commercial, Art Deco tower, mid-century curtain wall, Brutalist civic, Victorian commercial, warehouse loft, low-rise retail.
+Without this, every preset must be furnished by hand, and the library cannot scale past a handful of buildings.
 
-This is a text research task producing JSON. It is well-suited to Claude Code and does not require visual judgment.
+**Accept:** The same empty shell, fitted as five different room types, reads unambiguously as each one.
 
-**Accept:** Eight typologies generate and are visually distinguishable at a glance.
-
-### M7 — Impostor Interiors
+#### M7 — Impostor Interiors
 Floors beyond a configurable distance from the player get a 3-block-deep dressed shell behind the glass instead of a full interior. Lighting reads as occupied at night.
 
 **Accept:** A 90-story tower generates and runs at playable framerate. Exterior appearance is indistinguishable from full interiors.
 
----
+### Phase 2 — Content
 
-### Layer B milestones — do not start before M7 passes
+This is the product. It begins only once the engine can place a rotated, furnished, elevator-served building correctly.
 
-### M8 — Vertical Solver
+#### M8 — Building Preset Library
+Named presets modelled on real buildings, spanning the full size and type range. Each carries provenance metadata (§6.1).
+
+Two construction tiers, per §4.2:
+
+- **Composed** — anything with repeating floors: skyscrapers, office towers, apartment buildings, condominiums, hotels, mid-rise mixed use. Generated by the M3 assembler from modules.
+- **Monolithic** — anything without repeating floors: gas stations, restaurants, fast food, drive-throughs, strip retail, big-box stores, luxury homes, suburban houses, churches, schools, fire stations, small civic. Authored or scripted as complete structures.
+
+Both tiers use the same module intermediate format and the same rotation engine. A monolithic preset is a module with `category: "building"`.
+
+**v1 target:** 40 presets, no fewer than 6 per size class, covering every type named above.
+
+**Accept:** Every preset places cleanly at all four rotations, is walkable end to end, and is recognizable as the building type it claims to be.
+
+#### M9 — Street & Infrastructure Kit
+Streets, sidewalks, curbs, crosswalks, lane markings, street lights, traffic signals, signage, bus stops and routes, parking lots and structures, plazas, street trees, hydrants, mailboxes, utility fixtures.
+
+Includes an intersection solver: given two crossing streets of given widths, emit the correct corner radii, crosswalks, and signal placement.
+
+**Accept:** A four-block grid of streets generates with correct intersections, working lighting at night, and continuous sidewalks.
+
+#### M10 — Transit
+Subway tunnels, platforms, station halls, entrances, track. Light rail and streetcar at grade. Elevated rail. Bus route furniture tied to the M9 stops.
+
+**Accept:** Walk from a street entrance to a platform, ride to the next station, exit to street.
+
+#### M11 — District Tiles
+Compose presets, streets, and transit into self-contained, individually placeable district tiles with matching edges. Tile size fixed early and not varied.
+
+**Accept:** Three adjacent tiles place in a Realm, join seamlessly, and the result is walkable across the seams.
+
+### Phase 3 — Cities
+
+#### M12 — Vertical Solver
 Pre-pass over OSM data for a selected bounding box:
 1. Compute `max(street_elevation + building_height)` across all buildings in the box
 2. Add subsurface budget (subway alignments + foundations + parking)
 3. Compare required envelope against available world range
-4. If insufficient, emit a height datapack (Java) or behavior pack (Bedrock) rounded to the next multiple of 16
+4. If insufficient, emit a height behavior pack rounded to the next multiple of 16
 5. Set street datum at `world_min + subsurface_budget`
 6. Rebase terrain — preserve real relief, shift the surface so the lowest street point lands on datum. Do not flatten.
 7. Excavate the full box to datum and fill
@@ -108,15 +151,20 @@ Emit a manifest before generation begins: datum chosen, ceiling required, and an
 
 **Accept:** Solver produces correct envelopes for three test boxes — a small town, a mid-size downtown, and Lower Manhattan — with no manual configuration.
 
-### M9 — Arnis Fork
-Fork Arnis. Replace its building renderer with the M3 assembler. Keep its Overpass queries, projection, terrain, road network, and world-file writer untouched.
+#### M13 — Arnis Fork
+Fork Arnis. Replace its building renderer with the M3 assembler and the M8 preset library. Keep its Overpass queries, projection, terrain, road network, and world-file writer.
 
-**Accept:** Generate a four-square-block neighborhood with full facades, interiors, and elevators.
+**Accept:** Generate a four-square-block neighborhood with full facades, interiors, elevators, streets, and lighting.
 
-### M10 — Subway
-Cut tunnels along OSM `railway=subway` alignments. Place station modules at station nodes. Connect to street level.
+#### M14 — Real City Packages
+New York, Chicago, Boston, Los Angeles, Houston. Each shipped as district tiles per §1.1, with landmark presets hand-placed and the surrounding fabric generated.
 
-**Accept:** Walk from a street entrance to a platform, ride to the next station, exit to street.
+**Accept:** For each city, a recognizable downtown core places into a Realm as a set of tiles and is walkable.
+
+#### M15 — Fictional City Packages
+Gotham, Metropolis, and others. Authored layouts rather than OSM — these cities have no map data, only established visual identity.
+
+**Accept:** Each fictional city reads as itself at a glance and is walkable.
 
 ---
 
@@ -124,7 +172,7 @@ Cut tunnels along OSM `railway=subway` alignments. Place station modules at stat
 
 ### 4.1 Module Intermediate Format
 
-Platform-neutral JSON. This is the contract everything else depends on — get it right before writing the assembler.
+Platform-neutral JSON. This is the contract everything else depends on.
 
 ```json
 {
@@ -150,17 +198,21 @@ Platform-neutral JSON. This is the contract everything else depends on — get i
 }
 ```
 
-Palette tokens (`$STYLE_*`) resolve at generation time against the active typology. This is what allows one authored module to ship as five visually distinct styles.
+Palette tokens (`$STYLE_*`) resolve at generation time against the active style. This is what allows one authored module to ship as several visually distinct buildings.
 
-### 4.2 Module Footprints
+Categories: `interior`, `facade`, `roof`, `core`, `fixture`, `building` (a complete monolithic preset), `street`, `transit`, `district`.
 
-Fix these early and do not vary them. Interior modules: 7×11 and 7×7. Facade bays: 5 blocks wide. Floor height: 4 blocks (3 interior + 1 structural slab).
+### 4.2 Footprints — two tiers
 
-Consistent dimensions are what make the assembler tractable. Irregular module sizes turn floor planning into a bin-packing problem and are not worth it.
+**Tier 1, composed.** For buildings with repeating floors. Fixed and not varied: interior modules 7×11 and 7×7, facade bays 5 blocks wide, floor height 4 blocks (3 interior + 1 structural slab). Consistent dimensions are what make the assembler tractable; irregular module sizes turn floor planning into a bin-packing problem and are not worth it.
 
-### 4.3 Scripted Module Generation
+**Tier 2, monolithic.** For buildings without repeating floors — a gas station canopy, a diner, a ranch house. These have no meaningful module grid and forcing them onto one produces worse buildings for no benefit. Authored at their natural size, bounded at 64×48×64 so they stay placeable and reviewable.
 
-Repetitive interiors — cubicle grids, desk rows, corridors, hotel floors, parking decks — should be generated by script from a layout spec rather than hand-built. Only hero spaces are authored by hand.
+The decision rule is repetition, not size: if floors repeat, compose; if not, author whole.
+
+### 4.3 Scripted Generation
+
+Repetitive content — cubicle grids, desk rows, corridors, hotel floors, parking decks, street segments, track — is generated by script from a layout spec rather than hand-built. Only hero spaces and signature exteriors are authored by hand.
 
 ### 4.4 Performance Budgets
 
@@ -168,14 +220,15 @@ Repetitive interiors — cubicle grids, desk rows, corridors, hotel floors, park
 - Full interiors: nearest 8 floors to player, plus ground and top floor
 - Impostor depth: 3 blocks
 - Target: no frame below 50 FPS on RTX 5060 at 16 chunk render distance
+- District tile: sized so a Realm can hold a useful number of them (fixed at M11)
 
 ---
 
 ## 5. Division of Labor
 
-**Claude Code owns:** all code — emitter, converters, rotation tables, test harness, assembler, animation, elevators, palette system, typology research and JSON, vertical solver, Arnis fork, scripted module generation.
+**Claude Code owns:** all code and all data generation — emitter, converters, rotation tables, test harnesses, assembler, fitout engine, animation, elevators, palette system, preset research and JSON, street and transit kits, vertical solver, Arnis fork, city packages.
 
-**Owner owns:** hero-space authoring (lobbies, penthouses, distinctive rooms), and all visual quality judgment. Claude Code cannot see the output. Every milestone acceptance requires the owner to look at the result in-game and give feedback.
+**Owner owns:** hero-space authoring (lobbies, penthouses, distinctive rooms), signature exteriors where it matters, and all visual quality judgment. Claude Code cannot see the output. Every milestone acceptance requires the owner to look at the result in-game and give feedback.
 
 This is the loop that determines whether the project is good rather than merely working. Budget for it.
 
@@ -185,16 +238,38 @@ This is the loop that determines whether the project is good rather than merely 
 
 | Risk | Severity | Mitigation |
 |---|---|---|
-| Rotation / block-state bugs | High | M2 test harness before any assembler work |
-| Block entity loss on placement | High | Use native structure manager where possible; explicit repopulation pass |
-| Tick budget exhaustion on large builds | High | Hard per-tick cap; impostor interiors from M7 |
-| Bedrock JSON schema drift between versions | Medium | Pin `format_version`; keep a known-good reference pack to pattern-match |
-| Scope creep across parallel systems | High | Strict milestone gating; one system at a time |
-| Architectural copyright on post-1990 buildings | Medium | Generate typologies, not named landmarks. Revisit before any distribution. |
-| World size exceeds Realm limits | Low | City-scale output targets local server only |
+| Rotation / block-state bugs | High | M2 test harness before any preset authoring. A rotation bug corrupts the whole library at once. |
+| Realm size limits vs. city scale | High | District tiles (§1.1). Never design a city package as a monolith. |
+| Architectural copyright / trademark | High | Provenance metadata on every preset (§6.1). Decide distribution per preset, not per library. |
+| Block entity loss on placement | High | Explicit repopulation pass; covered by M1 round-trip tests. |
+| Tick budget exhaustion on large builds | High | Hard per-tick cap; impostor interiors from M7. |
+| Content authoring becomes the bottleneck | High | M6 fitout engine before M8. Never furnish a room by hand that a rule could dress. |
+| Bedrock JSON schema drift between versions | Medium | Pin `format_version`; keep a known-good reference pack to pattern-match. |
+| Scope creep across parallel systems | High | Strict milestone gating; one system at a time. |
+
+### 6.1 Provenance metadata
+
+Every preset modelled on a real building carries:
+
+```json
+"provenance": {
+  "inspiration": "Chicago School commercial block, State Street",
+  "city": "Chicago",
+  "era": "1895-1910",
+  "completed_before_1990": true,
+  "named_landmark": false,
+  "distribution": "unrestricted"
+}
+```
+
+`distribution` is one of `unrestricted` (generic or pre-1990 vernacular), `review` (recognizable but not landmark), or `personal_only` (named post-1990 landmark, or trademarked silhouette or name). Nothing is blocked from being built — this exists so a distribution decision can be made per preset later instead of unpicking the library retroactively.
+
+Fictional city names (Gotham, Metropolis) are third-party trademarks. Their packages are `personal_only` regardless of content.
 
 ---
 
 ## 7. Out of Scope for v1
 
-Gun turrets, NPCs, vehicles, weather effects, destructible buildings, multiplayer sync beyond vanilla behavior. Log these as v2 candidates. Do not build them during v1 regardless of how tempting they become mid-milestone.
+NPCs with behavior, vehicles that drive, weather effects, destructible buildings, multiplayer sync beyond vanilla behavior, building interiors for parked vehicles. Log these as v2 candidates. Do not build them during v1 regardless of how tempting they become mid-milestone.
+
+Static parked vehicles, static rolling stock, and static aircraft are **in** scope as fixtures — they are set dressing, not systems.
