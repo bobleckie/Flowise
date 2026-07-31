@@ -1,0 +1,10 @@
+{
+    "id": "brownstone",
+    "description": "Warm brick and dark timber. Placeholder bindings for M1 pipeline testing — real palettes land in M6.",
+    "tokens": {
+        "$STYLE_WALL": { "block": "minecraft:brick_block" },
+        "$STYLE_FLOOR": { "block": "minecraft:dark_oak_planks" },
+        "$STYLE_CEILING": { "block": "minecraft:stripped_dark_oak_log", "state": { "pillar_axis": "x" } },
+        "$STYLE_TRIM": { "block": "minecraft:dark_oak_stairs" }
+    }
+}

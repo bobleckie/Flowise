@@ -1,0 +1,277 @@
+{
+  "id": "test_room_7x7",
+  "footprint": [ 7, 4, 7 ],
+  "category": "interior",
+  "connections": { "north": [ "exterior_wall" ], "south": [ "door" ], "east": [ "corridor" ], "west": [ "corridor" ] },
+  "palette": { "wall": "$STYLE_WALL", "floor": "$STYLE_FLOOR", "ceiling": "$STYLE_CEILING" },
+  "blocks": [
+    { "pos": [ 0, 0, 0 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 0, 0, 1 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 0, 0, 2 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 0, 0, 3 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 0, 0, 4 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 0, 0, 5 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 0, 0, 6 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 0, 1, 0 ], "block": "$STYLE_WALL" },
+    { "pos": [ 0, 1, 1 ], "block": "$STYLE_WALL" },
+    { "pos": [ 0, 1, 2 ], "block": "$STYLE_WALL" },
+    { "pos": [ 0, 1, 3 ], "block": "$STYLE_WALL" },
+    { "pos": [ 0, 1, 4 ], "block": "$STYLE_WALL" },
+    { "pos": [ 0, 1, 5 ], "block": "$STYLE_WALL" },
+    { "pos": [ 0, 1, 6 ], "block": "$STYLE_WALL" },
+    { "pos": [ 0, 2, 0 ], "block": "$STYLE_WALL" },
+    { "pos": [ 0, 2, 1 ], "block": "$STYLE_WALL" },
+    { "pos": [ 0, 2, 2 ], "block": "$STYLE_WALL" },
+    { "pos": [ 0, 2, 3 ], "block": "$STYLE_WALL" },
+    { "pos": [ 0, 2, 4 ], "block": "$STYLE_WALL" },
+    { "pos": [ 0, 2, 5 ], "block": "$STYLE_WALL" },
+    { "pos": [ 0, 2, 6 ], "block": "$STYLE_WALL" },
+    { "pos": [ 0, 3, 0 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 0, 3, 1 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 0, 3, 2 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 0, 3, 3 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 0, 3, 4 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 0, 3, 5 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 0, 3, 6 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 1, 0, 0 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 1, 0, 1 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 1, 0, 2 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 1, 0, 3 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 1, 0, 4 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 1, 0, 5 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 1, 0, 6 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 1, 1, 0 ], "block": "$STYLE_WALL" },
+    {
+      "pos": [ 1, 1, 1 ],
+      "block": "minecraft:oak_stairs",
+      "state": { "weirdo_direction": 0, "upside_down_bit": false }
+    },
+    {
+      "pos": [ 1, 1, 5 ],
+      "block": "minecraft:oak_stairs",
+      "state": { "weirdo_direction": 2, "upside_down_bit": false }
+    },
+    { "pos": [ 1, 1, 6 ], "block": "$STYLE_WALL" },
+    { "pos": [ 1, 2, 0 ], "block": "$STYLE_WALL" },
+    { "pos": [ 1, 2, 3 ], "block": "minecraft:ladder", "state": { "facing_direction": 4 } },
+    { "pos": [ 1, 2, 6 ], "block": "$STYLE_WALL" },
+    { "pos": [ 1, 3, 0 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 1, 3, 1 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 1, 3, 2 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 1, 3, 3 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 1, 3, 4 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 1, 3, 5 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 1, 3, 6 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 2, 0, 0 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 2, 0, 1 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 2, 0, 2 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 2, 0, 3 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 2, 0, 4 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 2, 0, 5 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 2, 0, 6 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 2, 1, 0 ], "block": "$STYLE_WALL" },
+    { "pos": [ 2, 1, 5 ], "block": "minecraft:chest", "state": { "minecraft_cardinal_direction": "south" } },
+    { "pos": [ 2, 1, 6 ], "block": "$STYLE_WALL" },
+    { "pos": [ 2, 2, 0 ], "block": "$STYLE_WALL" },
+    {
+      "pos": [ 2, 2, 1 ],
+      "block": "minecraft:oak_trapdoor",
+      "state": { "direction": 2, "open_bit": true, "upside_down_bit": false }
+    },
+    { "pos": [ 2, 2, 6 ], "block": "minecraft:glass_pane" },
+    { "pos": [ 2, 3, 0 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 2, 3, 1 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 2, 3, 2 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 2, 3, 3 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 2, 3, 4 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 2, 3, 5 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 2, 3, 6 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 3, 0, 0 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 3, 0, 1 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 3, 0, 2 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 3, 0, 3 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 3, 0, 4 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 3, 0, 5 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 3, 0, 6 ], "block": "$STYLE_FLOOR" },
+    {
+      "pos": [ 3, 1, 0 ],
+      "block": "minecraft:oak_door",
+      "state": { "direction": 0, "door_hinge_bit": false, "open_bit": false, "upper_block_bit": false }
+    },
+    { "pos": [ 3, 1, 3 ], "block": "minecraft:air" },
+    { "pos": [ 3, 1, 6 ], "block": "$STYLE_WALL" },
+    {
+      "pos": [ 3, 2, 0 ],
+      "block": "minecraft:oak_door",
+      "state": { "direction": 0, "door_hinge_bit": false, "open_bit": false, "upper_block_bit": true }
+    },
+    { "pos": [ 3, 2, 6 ], "block": "minecraft:glass_pane" },
+    { "pos": [ 3, 3, 0 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 3, 3, 1 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 3, 3, 2 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 3, 3, 3 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 3, 3, 4 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 3, 3, 5 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 3, 3, 6 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 4, 0, 0 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 4, 0, 1 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 4, 0, 2 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 4, 0, 3 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 4, 0, 4 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 4, 0, 5 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 4, 0, 6 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 4, 1, 0 ], "block": "$STYLE_WALL" },
+    {
+      "pos": [ 4, 1, 3 ],
+      "block": "minecraft:oak_slab",
+      "state": { "minecraft:vertical_half": "bottom" },
+      "waterlogged": true
+    },
+    { "pos": [ 4, 1, 6 ], "block": "$STYLE_WALL" },
+    { "pos": [ 4, 2, 0 ], "block": "$STYLE_WALL" },
+    { "pos": [ 4, 2, 1 ], "block": "minecraft:standing_sign", "state": { "ground_sign_direction": 8 } },
+    { "pos": [ 4, 2, 6 ], "block": "minecraft:glass_pane" },
+    { "pos": [ 4, 3, 0 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 4, 3, 1 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 4, 3, 2 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 4, 3, 3 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 4, 3, 4 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 4, 3, 5 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 4, 3, 6 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 5, 0, 0 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 5, 0, 1 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 5, 0, 2 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 5, 0, 3 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 5, 0, 4 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 5, 0, 5 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 5, 0, 6 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 5, 1, 0 ], "block": "$STYLE_WALL" },
+    {
+      "pos": [ 5, 1, 1 ],
+      "block": "minecraft:oak_stairs",
+      "state": { "weirdo_direction": 1, "upside_down_bit": false }
+    },
+    {
+      "pos": [ 5, 1, 5 ],
+      "block": "minecraft:oak_stairs",
+      "state": { "weirdo_direction": 3, "upside_down_bit": true }
+    },
+    { "pos": [ 5, 1, 6 ], "block": "$STYLE_WALL" },
+    { "pos": [ 5, 2, 0 ], "block": "$STYLE_WALL" },
+    { "pos": [ 5, 2, 6 ], "block": "$STYLE_WALL" },
+    { "pos": [ 5, 3, 0 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 5, 3, 1 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 5, 3, 2 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 5, 3, 3 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 5, 3, 4 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 5, 3, 5 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 5, 3, 6 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 6, 0, 0 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 6, 0, 1 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 6, 0, 2 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 6, 0, 3 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 6, 0, 4 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 6, 0, 5 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 6, 0, 6 ], "block": "$STYLE_FLOOR" },
+    { "pos": [ 6, 1, 0 ], "block": "$STYLE_WALL" },
+    { "pos": [ 6, 1, 1 ], "block": "$STYLE_WALL" },
+    { "pos": [ 6, 1, 2 ], "block": "$STYLE_WALL" },
+    { "pos": [ 6, 1, 3 ], "block": "$STYLE_WALL" },
+    { "pos": [ 6, 1, 4 ], "block": "$STYLE_WALL" },
+    { "pos": [ 6, 1, 5 ], "block": "$STYLE_WALL" },
+    { "pos": [ 6, 1, 6 ], "block": "$STYLE_WALL" },
+    { "pos": [ 6, 2, 0 ], "block": "$STYLE_WALL" },
+    { "pos": [ 6, 2, 1 ], "block": "$STYLE_WALL" },
+    { "pos": [ 6, 2, 2 ], "block": "$STYLE_WALL" },
+    { "pos": [ 6, 2, 3 ], "block": "$STYLE_WALL" },
+    { "pos": [ 6, 2, 4 ], "block": "$STYLE_WALL" },
+    { "pos": [ 6, 2, 5 ], "block": "$STYLE_WALL" },
+    { "pos": [ 6, 2, 6 ], "block": "$STYLE_WALL" },
+    { "pos": [ 6, 3, 0 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 6, 3, 1 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 6, 3, 2 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 6, 3, 3 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 6, 3, 4 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 6, 3, 5 ], "block": "$STYLE_CEILING" },
+    { "pos": [ 6, 3, 6 ], "block": "$STYLE_CEILING" }
+  ],
+  "block_entities": [
+    {
+      "pos": [ 2, 1, 5 ],
+      "data": {
+        "type": "compound",
+        "value": {
+          "id": { "type": "string", "value": "Chest" },
+          "isMovable": { "type": "byte", "value": 1 },
+          "x": { "type": "int", "value": 2 },
+          "y": { "type": "int", "value": 1 },
+          "z": { "type": "int", "value": 5 },
+          "Findable": { "type": "byte", "value": 0 },
+          "Items": {
+            "type": "list",
+            "elementType": "compound",
+            "value": [
+              {
+                "type": "compound",
+                "value": {
+                  "Count": { "type": "byte", "value": 12 },
+                  "Damage": { "type": "short", "value": 0 },
+                  "Name": { "type": "string", "value": "minecraft:oak_planks" },
+                  "Slot": { "type": "byte", "value": 0 },
+                  "WasPickedUp": { "type": "byte", "value": 0 }
+                }
+              },
+              {
+                "type": "compound",
+                "value": {
+                  "Count": { "type": "byte", "value": 1 },
+                  "Damage": { "type": "short", "value": 0 },
+                  "Name": { "type": "string", "value": "minecraft:diamond_pickaxe" },
+                  "Slot": { "type": "byte", "value": 4 },
+                  "WasPickedUp": { "type": "byte", "value": 0 }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "pos": [ 4, 2, 1 ],
+      "data": {
+        "type": "compound",
+        "value": {
+          "id": { "type": "string", "value": "Sign" },
+          "isMovable": { "type": "byte", "value": 1 },
+          "x": { "type": "int", "value": 4 },
+          "y": { "type": "int", "value": 2 },
+          "z": { "type": "int", "value": 1 },
+          "IsWaxed": { "type": "byte", "value": 0 },
+          "FrontText": {
+            "type": "compound",
+            "value": {
+              "HideGlowOutline": { "type": "byte", "value": 0 },
+              "IgnoreLighting": { "type": "byte", "value": 0 },
+              "PersistFormatting": { "type": "byte", "value": 1 },
+              "SignTextColor": { "type": "int", "value": -16777216 },
+              "Text": { "type": "string", "value": "CITY BUILDER\nM1 test room" },
+              "TextOwner": { "type": "string", "value": "" }
+            }
+          },
+          "BackText": {
+            "type": "compound",
+            "value": {
+              "HideGlowOutline": { "type": "byte", "value": 0 },
+              "IgnoreLighting": { "type": "byte", "value": 0 },
+              "PersistFormatting": { "type": "byte", "value": 1 },
+              "SignTextColor": { "type": "int", "value": -16777216 },
+              "Text": { "type": "string", "value": "" },
+              "TextOwner": { "type": "string", "value": "" }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "entities": []
+}

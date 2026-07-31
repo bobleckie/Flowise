@@ -8,7 +8,7 @@ cities from OpenStreetMap data.
 milestone sequence, and acceptance criteria. [MILESTONES.md](MILESTONES.md) tracks
 where the project actually is.
 
-**Current state: M0 (Skeleton) — built, awaiting in-game acceptance.**
+**Current state: M0 (Skeleton) and M1 (Structure Emitter) — built, awaiting in-game acceptance.**
 
 ---
 
@@ -17,7 +17,7 @@ where the project actually is.
 ```
 minecraft-city-builder/
 ├── SPEC.md                       persistent project brief
-├── MILESTONES.md                 status + the current acceptance test
+├── MILESTONES.md                 status + the current acceptance tests
 ├── packs/
 │   ├── city_builder_bp/          behavior pack (data + scripts)
 │   │   ├── manifest.json
@@ -25,25 +25,30 @@ minecraft-city-builder/
 │   │   ├── scripts/main.js       runtime entry point
 │   │   └── texts/
 │   └── city_builder_rp/          resource pack (textures + text)
-│       ├── manifest.json
-│       ├── textures/
-│       └── texts/
+├── data/styles/                  $STYLE_* token bindings (placeholders until M6)
+├── fixtures/                     generated reference modules
 ├── tools/
 │   ├── build.mjs                 validate packs + bundle dist/city_builder.mcaddon
-│   └── gen_placeholder_art.py    regenerate the placeholder PNGs
+│   ├── module-to-mcstructure.mjs module JSON  ->  .mcstructure
+│   ├── mcstructure-to-module.mjs .mcstructure ->  module JSON
+│   ├── verify-roundtrip.mjs      M1 acceptance check on a captured structure
+│   ├── gen-test-room.mjs         regenerate the reference module
+│   ├── gen_placeholder_art.py    regenerate the placeholder PNGs
+│   ├── lib/                      nbt, nbt-json, mcstructure, module-format, palette
+│   └── test/                     node --test suite
 └── dist/                         build output (gitignored)
 ```
 
 Only `packs/city_builder_bp/scripts/` is Bedrock-specific. Per SPEC.md §2, the
-module library and typology definitions land in `packs/.../modules/` and
-`data/typologies/` as platform-neutral JSON and are compiled to `.mcstructure`
-at build time — do not push Bedrock assumptions into that data.
+module library and typology definitions are platform-neutral JSON compiled to
+`.mcstructure` at build time — do not push Bedrock assumptions into that data.
 
 ## Build
 
 Requires Node 18+. No dependencies, no install step.
 
 ```sh
+npm test                        # 32 tests over the M1 pipeline
 node tools/build.mjs            # validate, then write dist/city_builder.mcaddon
 node tools/build.mjs --check    # validate only (CI-friendly, non-zero on failure)
 ```
@@ -63,6 +68,59 @@ python3 tools/gen_placeholder_art.py
 
 The art is a stand-in. Replace the PNGs directly when real art exists; nothing
 in the build reads the generator.
+
+## The module pipeline (M1)
+
+A module is platform-neutral JSON (SPEC.md §4.1). Block names may be concrete
+(`minecraft:oak_stairs`) or `$STYLE_*` tokens that a style file binds, which is
+how one authored module ships as several visually distinct styles.
+
+```sh
+# module -> .mcstructure, with tokens resolved against a style
+node tools/module-to-mcstructure.mjs fixtures/test_room.module.json \
+     --style data/styles/brownstone.json -o out/test_room.mcstructure
+
+# the reverse: a structure-block capture becomes an editable module
+node tools/mcstructure-to-module.mjs captures/lobby.mcstructure \
+     --id lobby_hero --category interior
+
+# what tokens does this module need?
+node tools/module-to-mcstructure.mjs fixtures/test_room.module.json --list-tokens
+
+# what's actually in this structure?
+node tools/mcstructure-to-module.mjs captures/lobby.mcstructure --summary
+```
+
+Details worth knowing:
+
+- **Structure void vs. air.** A position absent from `blocks` is written as
+  index `-1` and left untouched on placement. An explicit `minecraft:air`
+  clears. The reference module exercises both.
+- **Waterlogging** is layer 1 of the structure. Set `"waterlogged": true` on a
+  block; the rare non-water case uses `"extra": { "block": ... }`.
+- **Block entities** (chest contents, sign text) carry arbitrary NBT, so they
+  use an explicitly typed JSON encoding — `{ "type": "int", "value": 5 }` —
+  rather than bare JSON, which has no way to tell a byte from an int.
+- **Block states** need no such wrapper: Bedrock only uses byte/int/string, so
+  `true`, `3`, and `"short"` map unambiguously.
+- **`--enforce-dimensions`** checks a module against the §4.2 fixed footprints.
+  Off by default so test modules are not blocked.
+
+### Verifying a capture
+
+`verify-roundtrip.mjs` is the M1 acceptance tool. Point it at a `.mcstructure`
+captured in-game:
+
+```sh
+node tools/verify-roundtrip.mjs captures/my_room.mcstructure
+```
+
+It reports two independent results. **NBT byte identity** means bytes → tree →
+bytes came back identical; a failure there is a reader/writer bug. **Module
+round-trip** means every block, state, block entity and entity survived the
+trip through the intermediate format. Tag *ordering* may legitimately differ
+from the game's own output, so byte equality at that layer is reported as a
+note rather than a failure.
 
 ## Install (Windows / Bedrock)
 

@@ -1,0 +1,18 @@
+{
+    "name": "minecraft-city-builder",
+    "version": "0.2.0",
+    "private": true,
+    "type": "module",
+    "description": "Bedrock add-on and offline pipeline that place furnished, elevator-served city buildings.",
+    "license": "MIT",
+    "engines": {
+        "node": ">=18"
+    },
+    "scripts": {
+        "test": "node --test \"tools/test/*.test.mjs\"",
+        "check": "node tools/build.mjs --check",
+        "build": "node tools/build.mjs",
+        "gen:fixture": "node tools/gen-test-room.mjs",
+        "gen:art": "python3 tools/gen_placeholder_art.py"
+    }
+}
