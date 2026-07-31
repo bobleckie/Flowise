@@ -61,6 +61,75 @@
         "cb_stone_concrete": {
             "textures": "textures/blocks/cb_stone_concrete"
         },
+        "cb_road_plain": {
+            "textures": "textures/blocks/cb_road_plain"
+        },
+        "cb_road_center": {
+            "textures": "textures/blocks/cb_road_center"
+        },
+        "cb_road_double": {
+            "textures": "textures/blocks/cb_road_double"
+        },
+        "cb_road_dash": {
+            "textures": "textures/blocks/cb_road_dash"
+        },
+        "cb_road_edge": {
+            "textures": "textures/blocks/cb_road_edge"
+        },
+        "cb_road_stop": {
+            "textures": "textures/blocks/cb_road_stop"
+        },
+        "cb_road_crossing": {
+            "textures": "textures/blocks/cb_road_crossing"
+        },
+        "cb_road_arrow": {
+            "textures": "textures/blocks/cb_road_arrow"
+        },
+        "cb_asphalt": {
+            "textures": "textures/blocks/cb_asphalt"
+        },
+        "cb_paving_concrete": {
+            "textures": "textures/blocks/cb_paving_concrete"
+        },
+        "cb_paving_granite": {
+            "textures": "textures/blocks/cb_paving_granite"
+        },
+        "cb_paving_bluestone": {
+            "textures": "textures/blocks/cb_paving_bluestone"
+        },
+        "cb_paving_brick": {
+            "textures": "textures/blocks/cb_paving_brick"
+        },
+        "cb_kerb": {
+            "textures": "textures/blocks/cb_kerb"
+        },
+        "cb_paint_black": {
+            "textures": "textures/blocks/cb_paint_black"
+        },
+        "cb_paint_green": {
+            "textures": "textures/blocks/cb_paint_green"
+        },
+        "cb_paint_grey": {
+            "textures": "textures/blocks/cb_paint_grey"
+        },
+        "cb_paint_silver": {
+            "textures": "textures/blocks/cb_paint_silver"
+        },
+        "cb_paint_red": {
+            "textures": "textures/blocks/cb_paint_red"
+        },
+        "cb_signal_face": {
+            "textures": "textures/blocks/cb_signal_face"
+        },
+        "cb_sign_blade": {
+            "textures": "textures/blocks/cb_sign_blade"
+        },
+        "cb_manhole": {
+            "textures": "textures/blocks/cb_manhole"
+        },
+        "cb_lamp_lens": {
+            "textures": "textures/blocks/cb_lamp_lens"
+        },
         "cb_brass": {
             "textures": "textures/blocks/cb_brass"
         },

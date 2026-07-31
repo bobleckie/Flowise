@@ -1,0 +1,80 @@
+{
+    "format_version": "1.21.10",
+    "minecraft:block": {
+        "description": {
+            "identifier": "cb:paving",
+            "menu_category": {
+                "category": "construction"
+            },
+            "states": {
+                "cb:paving": [
+                    "concrete",
+                    "granite",
+                    "bluestone",
+                    "brick"
+                ]
+            }
+        },
+        "components": {
+            "minecraft:geometry": "geometry.cb_slab_full",
+            "minecraft:material_instances": {
+                "*": {
+                    "texture": "cb_paving_concrete",
+                    "render_method": "opaque"
+                }
+            },
+            "minecraft:destructible_by_mining": {
+                "seconds_to_destroy": 1.5
+            },
+            "minecraft:destructible_by_explosion": {
+                "explosion_resistance": 3
+            }
+        },
+        "permutations": [
+            {
+                "condition": "q.block_state('cb:paving') == 'concrete'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_paving_concrete",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:paving') == 'granite'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_paving_granite",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:paving') == 'bluestone'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_paving_bluestone",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:paving') == 'brick'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_paving_brick",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            }
+        ]
+    }
+}

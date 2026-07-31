@@ -274,6 +274,38 @@ rotation cannot be checked without the game. If roofs render sloping inward,
 flip `SLOPE_ROTATION` in `tools/gen-blocks.mjs` — that one constant controls
 every roof in the library.
 
+## Streets and district tiles
+
+A city is mostly the ground between its buildings, and a generated one gives
+itself away on that ground before you ever look up.
+
+```sh
+node tools/build-street.mjs --list
+node tools/build-street.mjs residential --length 40 --preview
+node tools/build-street.mjs arterial --cross commercial --preview
+node tools/build-district.mjs near_north_residential --preview
+```
+
+Cross-sections are data (`data/streets/chicago.json`), at Chicago's dimensions
+and one block to the metre: a 66 ft right of way is 20 blocks, an arterial's
+100 ft is 30, and the alley behind every block is 16 ft — five. A street is a
+run of bands (sidewalk, parkway, roadway, median); the generator derives the
+kerb line, the lane markings from the lane count, and the furniture spacing from
+the run's absolute offset, so two segments of the same street read as one street
+rather than restarting at every tile boundary.
+
+Intersections get crossings on all four approaches, stop bars a lane back, and
+either signal heads or a stop-controlled corner.
+
+A **district tile** is one city block: streets on its north and west edges only,
+so tiles abut without doubling the road; an alley down the middle; and buildings
+laid along both lot rows, the south row turned to face its own street.
+`data/districts/chicago.json` names three — the Loop, a Near North residential
+block, and a neighbourhood commercial strip.
+
+Tiles are placed in game from the wand, not shipped as structures: the Loop tile
+is 150x160x124, far past the 64x384x64 structure-block limit.
+
 ## Interiors and fitout
 
 Buildings are not shells. Every floor gets a walkable surface, the stair core

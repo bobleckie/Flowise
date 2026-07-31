@@ -1,0 +1,184 @@
+{
+    "format_version": "1.21.10",
+    "minecraft:block": {
+        "description": {
+            "identifier": "cb:road_line",
+            "menu_category": {
+                "category": "construction"
+            },
+            "states": {
+                "cb:marking": [
+                    "plain",
+                    "center",
+                    "double",
+                    "dash",
+                    "edge",
+                    "stop",
+                    "crossing",
+                    "arrow"
+                ]
+            },
+            "traits": {
+                "minecraft:placement_direction": {
+                    "enabled_states": [
+                        "minecraft:cardinal_direction"
+                    ],
+                    "y_rotation_offset": 180
+                }
+            }
+        },
+        "components": {
+            "minecraft:geometry": "geometry.cb_slab_full",
+            "minecraft:material_instances": {
+                "*": {
+                    "texture": "cb_road_center",
+                    "render_method": "opaque"
+                }
+            },
+            "minecraft:destructible_by_mining": {
+                "seconds_to_destroy": 1.5
+            },
+            "minecraft:destructible_by_explosion": {
+                "explosion_resistance": 3
+            }
+        },
+        "permutations": [
+            {
+                "condition": "q.block_state('cb:marking') == 'plain'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_road_plain",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:marking') == 'center'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_road_center",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:marking') == 'double'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_road_double",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:marking') == 'dash'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_road_dash",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:marking') == 'edge'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_road_edge",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:marking') == 'stop'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_road_stop",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:marking') == 'crossing'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_road_crossing",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:marking') == 'arrow'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_road_arrow",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'north'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            0,
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'east'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            90,
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'south'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            180,
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('minecraft:cardinal_direction') == 'west'",
+                "components": {
+                    "minecraft:transformation": {
+                        "rotation": [
+                            0,
+                            270,
+                            0
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+}

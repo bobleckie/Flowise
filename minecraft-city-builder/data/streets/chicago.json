@@ -1,0 +1,80 @@
+{
+    "$comment": "Chicago street cross-sections, at 1 block = 1 metre. Chicago's grid is eight blocks to the mile with a standard 66 ft right of way (20 blocks) and 100 ft on the major arterials (30 blocks); a mid-block alley runs the length of nearly every block at 16 ft (5 blocks). Bands are listed from the west or south edge inward. See SPEC.md M9.",
+    "defaults": {
+        "paving": "concrete",
+        "pole_tone": "grey",
+        "signal_tone": "black",
+        "light_spacing": 14,
+        "hydrant_spacing": 28,
+        "tree_spacing": 7,
+        "meter_spacing": 4,
+        "manhole_spacing": 18
+    },
+    "types": {
+        "arterial": {
+            "name": "Arterial",
+            "row": 30,
+            "bands": [
+                { "kind": "sidewalk", "width": 5 },
+                { "kind": "roadway", "width": 20, "lanes": 4, "parking": true },
+                { "kind": "sidewalk", "width": 5 }
+            ],
+            "signals": true,
+            "meters": true,
+            "trees": false,
+            "light_spacing": 12,
+            "paving": "granite"
+        },
+        "boulevard": {
+            "name": "Boulevard",
+            "row": 34,
+            "bands": [
+                { "kind": "sidewalk", "width": 5 },
+                { "kind": "roadway", "width": 10, "lanes": 2, "parking": true, "oneway": true },
+                { "kind": "median", "width": 4 },
+                { "kind": "roadway", "width": 10, "lanes": 2, "parking": true, "oneway": true },
+                { "kind": "sidewalk", "width": 5 }
+            ],
+            "signals": true,
+            "trees": true,
+            "paving": "bluestone"
+        },
+        "commercial": {
+            "name": "Commercial Street",
+            "row": 20,
+            "bands": [
+                { "kind": "sidewalk", "width": 4 },
+                { "kind": "roadway", "width": 12, "lanes": 2, "parking": true },
+                { "kind": "sidewalk", "width": 4 }
+            ],
+            "signals": true,
+            "meters": true,
+            "trees": true,
+            "paving": "concrete"
+        },
+        "residential": {
+            "name": "Residential Street",
+            "row": 20,
+            "bands": [
+                { "kind": "sidewalk", "width": 3 },
+                { "kind": "parkway", "width": 2 },
+                { "kind": "roadway", "width": 10, "lanes": 2, "parking": true },
+                { "kind": "parkway", "width": 2 },
+                { "kind": "sidewalk", "width": 3 }
+            ],
+            "signals": false,
+            "trees": true,
+            "light_spacing": 18,
+            "paving": "concrete"
+        },
+        "alley": {
+            "name": "Alley",
+            "row": 5,
+            "bands": [{ "kind": "roadway", "width": 5, "lanes": 1, "unmarked": true, "surface": "concrete" }],
+            "signals": false,
+            "trees": false,
+            "lights": false,
+            "paving": "concrete"
+        }
+    }
+}

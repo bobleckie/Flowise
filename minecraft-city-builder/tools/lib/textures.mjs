@@ -420,3 +420,178 @@ export function panel(name, face, border) {
 }
 
 export { Tex }
+
+/**
+ * Asphalt: a dark aggregate with a fine speckle and no visible course, so a
+ * road reads as poured rather than as laid blocks.
+ */
+export function asphalt(name, base) {
+    const random = rng(name)
+    const tex = new Tex()
+    for (let y = 0; y < 16; y++) {
+        for (let x = 0; x < 16; x++) {
+            let tone = 0.9 + random() * 0.2
+            // Occasional lighter aggregate.
+            if (random() > 0.93) tone *= 1.22
+            tex.set(x, y, shade(base, tone))
+        }
+    }
+    return tex
+}
+
+/**
+ * Sidewalk: cast concrete panels with a tooled joint and a broom finish. The
+ * joint is what stops a pavement reading as a grey slab.
+ */
+export function pavement(name, base, { panel = 8 } = {}) {
+    const random = rng(name)
+    const tex = new Tex()
+    for (let y = 0; y < 16; y++) {
+        for (let x = 0; x < 16; x++) {
+            let tone = 0.96 + random() * 0.08
+            // Broom finish: a fine directional texture.
+            if (y % 2 === 0) tone *= 0.985
+            if (x % panel === 0 || y % panel === 0) tone *= 0.78 // tooled joint
+            if (x % panel === 1 || y % panel === 1) tone *= 1.05 // the lit lip beside it
+            tex.set(x, y, shade(base, tone))
+        }
+    }
+    return tex
+}
+
+/** Painted steelwork — poles, signal housings, hydrants. Barely varying. */
+export function paint(name, base) {
+    const random = rng(name)
+    const tex = new Tex()
+    for (let y = 0; y < 16; y++) {
+        for (let x = 0; x < 16; x++) {
+            let tone = 0.98 + random() * 0.04
+            const edge = Math.min(x, 15 - x)
+            if (edge === 0) tone *= 0.88
+            tex.set(x, y, shade(base, tone))
+        }
+    }
+    return tex
+}
+
+/** A traffic signal face: three lenses on a dark housing. */
+export function signalFace(name) {
+    const tex = new Tex().fill([26, 28, 26, 255])
+    const lenses = [[[186, 40, 34], 3], [[214, 168, 44], 8], [[62, 176, 86], 13]]
+    for (const [color, cy] of lenses) {
+        for (let y = -2; y <= 2; y++) {
+            for (let x = -2; x <= 2; x++) {
+                if (Math.abs(x) + Math.abs(y) > 3) continue
+                const lit = 1 - (Math.abs(x) + Math.abs(y)) * 0.09
+                tex.set(8 + x, cy + y, shade(color, lit))
+            }
+        }
+    }
+    return tex
+}
+
+/** A street-name blade: white lettering suggested on a coloured ground. */
+export function signBlade(name, base) {
+    const random = rng(name)
+    const tex = new Tex()
+    for (let y = 0; y < 16; y++) {
+        for (let x = 0; x < 16; x++) {
+            const edge = Math.min(x, y, 15 - x, 15 - y)
+            if (edge < 1) {
+                tex.set(x, y, [235, 235, 230])
+                continue
+            }
+            // Suggest lettering: irregular light marks across the middle band.
+            const lettering = y >= 6 && y <= 10 && random() > 0.55
+            tex.set(x, y, lettering ? [228, 230, 226] : shade(base, 0.96 + random() * 0.08))
+        }
+    }
+    return tex
+}
+
+/** Cast-iron cover: a radial pattern in a raised rim. */
+export function ironCover(name, base) {
+    const tex = new Tex()
+    for (let y = 0; y < 16; y++) {
+        for (let x = 0; x < 16; x++) {
+            const dx = x - 7.5
+            const dy = y - 7.5
+            const r = Math.hypot(dx, dy)
+            let tone = 0.9
+            if (r > 7) tone = 0.66 // outside the cover
+            else if (r > 6.2) tone = 1.12 // rim
+            else {
+                const spoke = (Math.atan2(dy, dx) + Math.PI) / (Math.PI / 6)
+                tone = spoke % 1 < 0.42 ? 0.78 : 1.0
+                if (r < 1.6) tone = 0.7
+            }
+            tex.set(x, y, shade(base, tone))
+        }
+    }
+    return tex
+}
+
+/**
+ * Road markings, painted onto asphalt.
+ *
+ * The line runs north-south in texture space; the block's cardinal direction
+ * turns the whole model, so one texture serves both axes.
+ */
+export function roadMarking(name, kind, base = [46, 47, 50]) {
+    const random = rng(name)
+    const tex = asphalt(name, base)
+    const white = [226, 226, 218]
+    const yellow = [216, 176, 52]
+
+    const stripe = (from, to, color) => {
+        for (let y = 0; y < 16; y++) {
+            for (let x = from; x < to; x++) {
+                // Worn paint: the edges of a line go first.
+                const wear = 0.82 + random() * 0.22
+                const edge = x === from || x === to - 1 ? 0.9 : 1
+                tex.set(x, y, shade(color, wear * edge))
+            }
+        }
+    }
+    const band = (from, to, color) => {
+        for (let y = from; y < to; y++) {
+            for (let x = 0; x < 16; x++) tex.set(x, y, shade(color, 0.84 + random() * 0.2))
+        }
+    }
+
+    switch (kind) {
+        case 'center':
+            stripe(7, 9, yellow)
+            break
+        case 'double':
+            stripe(5, 7, yellow)
+            stripe(9, 11, yellow)
+            break
+        case 'dash':
+            // Half a tile of paint, so a run of them reads as a dashed lane line.
+            for (let y = 0; y < 8; y++) {
+                for (let x = 7; x < 9; x++) tex.set(x, y, shade(white, 0.84 + random() * 0.2))
+            }
+            break
+        case 'edge':
+            stripe(1, 3, white)
+            break
+        case 'stop':
+            band(2, 6, white)
+            break
+        case 'crossing':
+            // A full painted tile: crosswalk bars are laid a block at a time.
+            band(0, 16, white)
+            break
+        case 'arrow': {
+            stripe(7, 9, white)
+            for (let i = 0; i < 5; i++) {
+                for (let x = 7 - i; x < 9 + i; x++) tex.set(x, 3 + i, shade(white, 0.9))
+            }
+            break
+        }
+        default:
+            break
+    }
+    return tex
+}

@@ -31,6 +31,51 @@
     "cb:porch_post": {
         "sound": "wood"
     },
+    "cb:asphalt": {
+        "sound": "stone"
+    },
+    "cb:road_line": {
+        "sound": "stone"
+    },
+    "cb:paving": {
+        "sound": "stone"
+    },
+    "cb:curb": {
+        "sound": "stone"
+    },
+    "cb:manhole": {
+        "sound": "stone"
+    },
+    "cb:street_light": {
+        "sound": "glass"
+    },
+    "cb:light_pole": {
+        "sound": "glass"
+    },
+    "cb:traffic_signal": {
+        "sound": "metal"
+    },
+    "cb:hydrant": {
+        "sound": "metal"
+    },
+    "cb:bollard": {
+        "sound": "metal"
+    },
+    "cb:parking_meter": {
+        "sound": "metal"
+    },
+    "cb:street_sign": {
+        "sound": "metal"
+    },
+    "cb:bench": {
+        "sound": "wood"
+    },
+    "cb:trash_can": {
+        "sound": "metal"
+    },
+    "cb:shelter_glass": {
+        "sound": "glass"
+    },
     "cb:window": {
         "sound": "glass"
     },

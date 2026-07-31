@@ -176,6 +176,30 @@ export const BLOCK_COLORS = {
     'cb:stoop': [130, 88, 62],
     'cb:porch_post': [226, 224, 216],
 
+    // street kit
+    'cb:asphalt': [46, 47, 50],
+    'cb:road_line': [46, 47, 50],
+    'cb:paving': [166, 164, 158],
+    'cb:curb': [150, 148, 144],
+    'cb:manhole': [64, 62, 60],
+    'cb:street_light': [118, 120, 122],
+    'cb:light_pole': [118, 120, 122],
+    'cb:traffic_signal': [38, 40, 44],
+    'cb:hydrant': [162, 44, 38],
+    'cb:bollard': [38, 40, 44],
+    'cb:parking_meter': [118, 120, 122],
+    'cb:street_sign': [42, 72, 54],
+    'cb:bench': [162, 130, 84],
+    'cb:trash_can': [42, 72, 54],
+    'cb:shelter_glass': [176, 178, 180],
+
+    // ground and planting
+    'minecraft:gravel': [131, 127, 126],
+    'minecraft:dirt': [134, 96, 67],
+    'minecraft:grass_block': [92, 133, 62],
+    'minecraft:oak_log': [109, 85, 51],
+    'minecraft:oak_leaves': [62, 112, 44],
+
     // misc
     'minecraft:prismarine': [99, 156, 151],
     'minecraft:dark_prismarine': [51, 91, 75],
@@ -220,6 +244,18 @@ const TRIM_COLORS = {
     grey: [128, 132, 138],
     wood: [118, 88, 58]
 }
+const PAVING_COLORS = {
+    concrete: [166, 164, 158],
+    granite: [138, 136, 134],
+    bluestone: [116, 122, 126],
+    brick: [146, 92, 72]
+}
+const PAINT_COLORS = {
+    black: [38, 40, 44],
+    green: [42, 72, 54],
+    grey: [118, 120, 122],
+    silver: [176, 178, 180]
+}
 const STONE_COLORS = {
     limestone: [206, 198, 178],
     granite: [126, 126, 128],
@@ -240,7 +276,24 @@ const STATE_COLORS = {
     'cb:bay_window': ['cb:tone', TRIM_COLORS],
     'cb:porch_post': ['cb:tone', TRIM_COLORS],
     'cb:cornice': ['cb:stone', STONE_COLORS],
-    'cb:stoop': ['cb:stone', STONE_COLORS]
+    'cb:stoop': ['cb:stone', STONE_COLORS],
+    'cb:paving': ['cb:paving', PAVING_COLORS],
+    'cb:curb': ['cb:paving', PAVING_COLORS],
+    // Markings are what make a road read as a road from above, so the preview
+    // has to show them rather than a uniform sheet of asphalt.
+    'cb:road_line': ['cb:marking', {
+        plain: [46, 47, 50],
+        center: [186, 154, 54],
+        double: [186, 154, 54],
+        dash: [150, 150, 144],
+        edge: [150, 150, 144],
+        stop: [206, 206, 198],
+        crossing: [216, 216, 208],
+        arrow: [196, 196, 190]
+    }],
+    'cb:street_light': ['cb:tone', PAINT_COLORS],
+    'cb:light_pole': ['cb:tone', PAINT_COLORS],
+    'cb:bollard': ['cb:tone', PAINT_COLORS]
 }
 
 /** Colour for a placed block, taking its state into account. */

@@ -9,7 +9,10 @@
 import { system, world } from '@minecraft/server'
 import { ActionFormData, FormCancelationReason, ModalFormData } from '@minecraft/server-ui'
 import { probeOrientations, reportProbe } from './rotation_probe.js'
-import { placeBuilding, cancelBuild, isBuilding, catalogEntries, undoLast, lastPlacementFor, BUDGET } from './placer.js'
+import {
+    placeBuilding, cancelBuild, isBuilding, catalogEntries, undoLast, lastPlacementFor, BUDGET,
+    districtEntries, placeDistrict
+} from './placer.js'
 import { totalHeight } from './lib/generate.js'
 import { openFloorPanel, shaftAt, shaftCount } from './elevator.js'
 
@@ -36,6 +39,7 @@ async function showWhenReady(player, form, timeoutTicks = 200) {
 
 const MENU = [
     { label: 'Place Building', handler: (player) => chooseType(player) },
+    { label: 'Place District Tile', handler: (player) => chooseDistrict(player) },
     { label: 'Rebuild Last', handler: (player) => rebuildLast(player) },
     { label: 'Undo Last Build', handler: (player) => undoLast(player) },
     { label: 'Cancel Build', handler: (player) => cancelCurrent(player) },
@@ -73,6 +77,37 @@ async function openBuildMenu(player) {
     } finally {
         openFor.delete(player.id)
     }
+}
+
+// --- district browser ------------------------------------------------------
+
+/**
+ * A district tile is a whole city block: two streets, the alley behind, and the
+ * buildings on both lot rows. It is laid from its north-west corner, so stand
+ * on the corner you want the intersection to sit on.
+ */
+async function chooseDistrict(player) {
+    const tiles = districtEntries()
+    const form = new ActionFormData()
+        .title('Place a District Tile')
+        .body(
+            'A tile carries its own north and west streets, so tiles abut without ' +
+            'doubling the road. Laid from the north-west corner at your feet.'
+        )
+    for (const tile of tiles) {
+        form.button(`${tile.name}\n§7${tile.size[0]}x${tile.size[1]} · ${tile.buildings.length} types§r`)
+    }
+
+    const response = await showWhenReady(player, form)
+    if (!response || response.canceled || response.selection === undefined) return
+
+    const tile = tiles[response.selection]
+    const origin = {
+        x: Math.floor(player.location.x),
+        y: Math.floor(player.location.y),
+        z: Math.floor(player.location.z)
+    }
+    placeDistrict(player, tile, origin)
 }
 
 // --- preset browser --------------------------------------------------------

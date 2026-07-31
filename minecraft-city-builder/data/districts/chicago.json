@@ -1,0 +1,60 @@
+{
+    "$comment": "District tiles for Chicago, at 1 block = 1 metre. A tile carries the streets on its own north and west edges only, so tiles abut without doubling the right of way. Depth is two lot rows either side of the alley; Chicago's standard is a 125 ft lot (38 blocks) and a 16 ft alley (5 blocks), relaxed here to whatever the deepest building on the block needs. `block_length` is the frontage; a full Chicago block is 660 ft (200 blocks), and these are half-blocks. See SPEC.md M11.",
+    "tiles": {
+        "loop_commercial": {
+            "id": "district_loop_commercial",
+            "name": "The Loop \u2014 commercial",
+            "north_street": "arterial",
+            "west_street": "arterial",
+            "block_length": 120,
+            "lot_depth": 44,
+            "alley": 6,
+            "height": 160,
+            "paving": "granite",
+            "bus_stop": true,
+            "buildings": [
+                "loop_greystone_commercial",
+                "reliance_glass_pioneer",
+                "river_north_glass_condo",
+                "palmolive_deco_setback"
+            ],
+            "ground": "paved"
+        },
+        "near_north_residential": {
+            "id": "district_near_north_residential",
+            "name": "Near North \u2014 residential",
+            "north_street": "residential",
+            "west_street": "residential",
+            "block_length": 120,
+            "lot_depth": 48,
+            "alley": 6,
+            "height": 48,
+            "paving": "concrete",
+            "buildings": [
+                "chicago_bungalow",
+                "workers_cottage",
+                "brownstone_rowhouse",
+                "townhouse_row_modern"
+            ]
+        },
+        "commercial_strip": {
+            "id": "district_commercial_strip",
+            "name": "Neighbourhood commercial strip",
+            "north_street": "commercial",
+            "west_street": "residential",
+            "block_length": 120,
+            "lot_depth": 34,
+            "alley": 6,
+            "height": 48,
+            "paving": "concrete",
+            "bus_stop": true,
+            "buildings": [
+                "strip_retail_row",
+                "convenience_store",
+                "roadside_diner",
+                "fast_food_drive_through"
+            ],
+            "ground": "paved"
+        }
+    }
+}

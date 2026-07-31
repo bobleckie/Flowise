@@ -11,8 +11,10 @@
  */
 
 import { system, world, BlockPermutation } from '@minecraft/server'
-import { CATALOG, MATERIAL_SYSTEMS, ROTATION_TABLE } from './lib/catalog_data.js'
+import { CATALOG, MATERIAL_SYSTEMS, ROTATION_TABLE, STREETS, DISTRICTS } from './lib/catalog_data.js'
 import { generateBuilding, setMaterials, totalHeight, verticalRegistry } from './lib/generate.js'
+import { setStreets } from './lib/street.js'
+import { generateDistrict, tileSize } from './lib/district.js'
 import { rotateModule, setRotationTable } from './lib/rotation.js'
 import { registerShaft, clearShaftsAt } from './elevator.js'
 
@@ -117,6 +119,75 @@ export function placeBuilding(player, entry, origin, turns = 0) {
         `${PREFIX} building §a${entry.name}§r${turns ? ` (${turns * 90}°)` : ''} — ` +
             `${sorted.length.toLocaleString()} blocks, ${entry.massing.floors} floors, ` +
             `${totalHeight(entry)} blocks tall`
+    )
+    return true
+}
+
+// --- districts -------------------------------------------------------------
+//
+// A district tile is far past the 64x384x64 structure-block limit — the Loop
+// tile is 150x160x124 — so like the buildings it is generated in game and fed
+// through the same tick-budgeted placer.
+
+setStreets(STREETS)
+
+export function districtEntries() {
+    return Object.entries(DISTRICTS).map(([key, plan]) => ({ key, ...plan, size: tileSize(plan) }))
+}
+
+const buildingCache = new Map()
+function buildingModule(id) {
+    if (!buildingCache.has(id)) {
+        const entry = entryById(id)
+        buildingCache.set(id, entry ? generateBuilding(entry) : null)
+    }
+    return buildingCache.get(id)
+}
+
+export function placeDistrict(player, plan, origin) {
+    if (active) {
+        player.sendMessage(`${PREFIX} §ealready building ${active.entry.name} — cancel it first.§r`)
+        return false
+    }
+
+    let module
+    try {
+        module = generateDistrict(plan, buildingModule)
+    } catch (error) {
+        player.sendMessage(`${PREFIX} §cdistrict generation failed:§r ${error}`)
+        return false
+    }
+
+    const sorted = module.blocks
+        .slice()
+        .sort((a, b) => a.pos[1] - b.pos[1] || a.pos[0] - b.pos[0] || a.pos[2] - b.pos[2])
+    const runs = airRuns(sorted)
+    const solids = sorted.filter((b) => b.block !== AIR)
+
+    const entry = { id: plan.id, name: plan.name ?? plan.id, massing: { floors: 0 } }
+    active = {
+        entry,
+        player,
+        dimension: player.dimension,
+        origin,
+        runs,
+        runIndex: 0,
+        blocks: solids,
+        index: 0,
+        total: sorted.length,
+        placed: 0,
+        failed: 0,
+        deferred: [],
+        lastReport: 0,
+        cancelled: false,
+        startTick: system.currentTick
+    }
+
+    lastPlacement.set(player.id, { entry, origin, footprint: module.footprint, turns: 0 })
+
+    player.sendMessage(
+        `${PREFIX} laying §a${entry.name}§r — ${sorted.length.toLocaleString()} blocks, ` +
+            `${module.footprint[0]}x${module.footprint[2]}, ${module.contents.length} buildings`
     )
     return true
 }

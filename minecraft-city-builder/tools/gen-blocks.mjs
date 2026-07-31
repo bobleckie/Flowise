@@ -21,7 +21,8 @@ import { fileURLToPath } from 'node:url'
 
 import {
     shingle, shake, barrelTile, window as windowTex, ridge, fabric, wood, metal,
-    glowPanel, framedArt, panel, clapboard, ashlar
+    glowPanel, framedArt, panel, clapboard, ashlar,
+    asphalt, pavement, paint, signalFace, signBlade, ironCover, roadMarking
 } from './lib/textures.mjs'
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)))
@@ -332,6 +333,88 @@ const GEOMETRIES = {
         cube([-8, 0, -8], [16, 3, 1]) // sill
     ]),
 
+    // --- street kit ---------------------------------------------------------
+    //
+    // A city is mostly the ground between its buildings. These are the pieces
+    // that ground is made of.
+
+    /** A plain full cube, for paving that only differs by texture. */
+    'geometry.cb_slab_full': geometry('geometry.cb_slab_full', [cube([-8, 0, -8], [16, 16, 16])]),
+
+    // Kerb: a granite face standing a little proud of the paving behind it.
+    'geometry.cb_curb': geometry('geometry.cb_curb', [
+        cube([-8, 0, -8], [16, 16, 3], { faces: { '*': 'kerb' } }),
+        cube([-8, 0, -5], [16, 16, 13])
+    ]),
+
+    // Cobra-head street light: shaft, mast arm, luminaire. Chicago's arm reaches
+    // out over the parking lane, which is why a street reads as lit rather than
+    // as a row of lamp posts.
+    'geometry.cb_street_light': geometry('geometry.cb_street_light', [
+        cube([-3, 0, -3], [6, 10, 6]), // shaft
+        cube([-1.5, 10, -8], [3, 3, 10]), // mast arm
+        cube([-3, 8, -8], [6, 3, 6], { faces: { down: 'lamp' } }) // luminaire
+    ], [3, 3, 3]),
+
+    'geometry.cb_light_pole': geometry('geometry.cb_light_pole', [
+        cube([-3, 0, -3], [6, 16, 6])
+    ]),
+
+    // Signal head on a bracket, faces pointing the way traffic comes from.
+    'geometry.cb_traffic_signal': geometry('geometry.cb_traffic_signal', [
+        cube([-1.5, 0, -1.5], [3, 16, 3]), // post
+        cube([-1.5, 9, -5], [3, 2, 4]), // bracket
+        cube([-3, 4, -8], [6, 12, 4], { faces: { north: 'signal' } })
+    ], [3, 3, 3]),
+
+    // Hydrant: barrel, bonnet, two nozzles.
+    'geometry.cb_hydrant': geometry('geometry.cb_hydrant', [
+        cube([-3, 0, -3], [6, 1, 6]),
+        cube([-2, 1, -2], [4, 9, 4]),
+        cube([-3, 10, -3], [6, 2, 6]),
+        cube([-1.5, 12, -1.5], [3, 2, 3]),
+        cube([-1, 5, -4], [2, 3, 2]),
+        cube([-1, 5, 2], [2, 3, 2])
+    ]),
+
+    'geometry.cb_bollard': geometry('geometry.cb_bollard', [
+        cube([-2.5, 0, -2.5], [5, 1, 5]),
+        cube([-2, 1, -2], [4, 9, 4]),
+        cube([-2.5, 10, -2.5], [5, 1, 5])
+    ]),
+
+    'geometry.cb_parking_meter': geometry('geometry.cb_parking_meter', [
+        cube([-1, 0, -1], [2, 10, 2]),
+        cube([-2.5, 10, -2], [5, 5, 4], { faces: { north: 'lamp' } })
+    ]),
+
+    // Street-name blade on a post.
+    'geometry.cb_street_sign': geometry('geometry.cb_street_sign', [
+        cube([-1, 0, -1], [2, 14, 2]),
+        cube([-7, 12, -1.5], [14, 4, 1], { faces: { '*': 'blade' } })
+    ], [3, 3, 3]),
+
+    'geometry.cb_bench': geometry('geometry.cb_bench', [
+        cube([-8, 4, -3], [16, 2, 7]), // seat
+        cube([-8, 6, 2], [16, 6, 2]), // back
+        cube([-7, 0, -2], [2, 4, 5]),
+        cube([5, 0, -2], [2, 4, 5])
+    ]),
+
+    'geometry.cb_trash_can': geometry('geometry.cb_trash_can', [
+        cube([-4, 0, -4], [8, 12, 8]),
+        cube([-5, 12, -5], [10, 2, 10])
+    ]),
+
+    // Glazed panel of a bus shelter: a frame with glass in it.
+    'geometry.cb_shelter_glass': geometry('geometry.cb_shelter_glass', [
+        cube([-8, 0, -2], [1, 16, 4]),
+        cube([7, 0, -2], [1, 16, 4]),
+        cube([-8, 15, -2], [16, 1, 4]),
+        cube([-8, 0, -2], [16, 1, 4]),
+        cube([-7, 1, -0.5], [14, 14, 1], { faces: { '*': 'glass' } })
+    ]),
+
     // Planter.
     'geometry.cb_planter': geometry('geometry.cb_planter', [
         cube([-5, 0, -5], [10, 6, 10]),
@@ -385,6 +468,41 @@ export const STONE_TONES = {
 for (const [tone, color] of Object.entries(STONE_TONES)) {
     TEXTURES[`cb_stone_${tone}`] = ashlar(`stone_${tone}`, color)
 }
+
+// --- street kit textures ---------------------------------------------------
+
+const ASPHALT = [46, 47, 50]
+export const MARKINGS = ['plain', 'center', 'double', 'dash', 'edge', 'stop', 'crossing', 'arrow']
+for (const kind of MARKINGS) {
+    TEXTURES[`cb_road_${kind}`] = roadMarking(`road_${kind}`, kind, ASPHALT)
+}
+TEXTURES.cb_asphalt = asphalt('asphalt', ASPHALT)
+
+export const PAVING = {
+    concrete: [166, 164, 158],
+    granite: [138, 136, 134],
+    bluestone: [116, 122, 126],
+    brick: [146, 92, 72]
+}
+for (const [tone, color] of Object.entries(PAVING)) {
+    TEXTURES[`cb_paving_${tone}`] = pavement(`paving_${tone}`, color, { panel: tone === 'brick' ? 4 : 8 })
+}
+TEXTURES.cb_kerb = ashlar('kerb', [122, 120, 118], { course: 8, length: 16 })
+
+export const STREET_PAINT = {
+    black: [38, 40, 44],
+    green: [42, 72, 54],
+    grey: [118, 120, 122],
+    silver: [176, 178, 180]
+}
+for (const [tone, color] of Object.entries(STREET_PAINT)) {
+    TEXTURES[`cb_paint_${tone}`] = paint(`paint_${tone}`, color)
+}
+TEXTURES.cb_paint_red = paint('paint_red', [162, 44, 38])
+TEXTURES.cb_signal_face = signalFace('signal_face')
+TEXTURES.cb_sign_blade = signBlade('sign_blade', [42, 72, 54])
+TEXTURES.cb_manhole = ironCover('manhole', [64, 62, 60])
+TEXTURES.cb_lamp_lens = glowPanel('lamp_lens', [255, 244, 210], [86, 84, 78])
 
 TEXTURES.cb_brass = metal('brass', [176, 138, 66])
 TEXTURES.cb_glow_warm = glowPanel('glow_warm', [255, 236, 190], [92, 76, 52])
@@ -571,6 +689,179 @@ const SPEC = [
         category: 'construction'
     },
 
+    // --- street kit ---------------------------------------------------------
+    {
+        id: 'asphalt',
+        name: 'Asphalt',
+        geometry: 'geometry.cb_slab_full',
+        texture: 'cb_asphalt',
+        category: 'construction'
+    },
+    {
+        id: 'road_line',
+        name: 'Road Marking',
+        geometry: 'geometry.cb_slab_full',
+        texture: 'cb_road_center',
+        states: { 'cb:marking': MARKINGS },
+        traits: CARDINAL_TRAIT,
+        permutations: [...materialPermutations('cb_road', MARKINGS, 'cb:marking'), ...facingPermutations()],
+        category: 'construction'
+    },
+    {
+        id: 'paving',
+        name: 'Paving',
+        geometry: 'geometry.cb_slab_full',
+        texture: 'cb_paving_concrete',
+        states: { 'cb:paving': Object.keys(PAVING) },
+        permutations: materialPermutations('cb_paving', Object.keys(PAVING), 'cb:paving'),
+        category: 'construction'
+    },
+    {
+        id: 'curb',
+        name: 'Kerb',
+        geometry: 'geometry.cb_curb',
+        texture: 'cb_paving_concrete',
+        instances: { kerb: { texture: 'cb_kerb', render_method: 'opaque' } },
+        states: { 'cb:paving': Object.keys(PAVING) },
+        traits: CARDINAL_TRAIT,
+        permutations: [
+            ...Object.keys(PAVING).map((tone) => ({
+                condition: `q.block_state('cb:paving') == '${tone}'`,
+                components: {
+                    'minecraft:material_instances': {
+                        '*': { texture: `cb_paving_${tone}`, render_method: 'opaque' },
+                        kerb: { texture: 'cb_kerb', render_method: 'opaque' }
+                    }
+                }
+            })),
+            ...facingPermutations()
+        ],
+        category: 'construction'
+    },
+    {
+        id: 'manhole',
+        name: 'Manhole Cover',
+        geometry: 'geometry.cb_slab_full',
+        texture: 'cb_manhole',
+        category: 'construction'
+    },
+    {
+        id: 'street_light',
+        name: 'Street Light',
+        geometry: 'geometry.cb_street_light',
+        texture: 'cb_paint_grey',
+        instances: { lamp: { texture: 'cb_lamp_lens', render_method: 'opaque' } },
+        states: { 'cb:tone': Object.keys(STREET_PAINT) },
+        traits: CARDINAL_TRAIT,
+        permutations: [
+            ...Object.keys(STREET_PAINT).map((tone) => ({
+                condition: `q.block_state('cb:tone') == '${tone}'`,
+                components: {
+                    'minecraft:material_instances': {
+                        '*': { texture: `cb_paint_${tone}`, render_method: 'opaque' },
+                        lamp: { texture: 'cb_lamp_lens', render_method: 'opaque' }
+                    }
+                }
+            })),
+            ...facingPermutations()
+        ],
+        light: 15,
+        collision: { origin: [-2, 0, -2], size: [4, 16, 4] },
+        category: 'construction'
+    },
+    {
+        id: 'light_pole',
+        name: 'Light Pole',
+        geometry: 'geometry.cb_light_pole',
+        texture: 'cb_paint_grey',
+        states: { 'cb:tone': Object.keys(STREET_PAINT) },
+        permutations: materialPermutations('cb_paint', Object.keys(STREET_PAINT), 'cb:tone'),
+        collision: { origin: [-3, 0, -3], size: [6, 16, 6] },
+        category: 'construction'
+    },
+    {
+        id: 'traffic_signal',
+        name: 'Traffic Signal',
+        geometry: 'geometry.cb_traffic_signal',
+        texture: 'cb_paint_black',
+        instances: { signal: { texture: 'cb_signal_face', render_method: 'opaque' } },
+        traits: CARDINAL_TRAIT,
+        permutations: facingPermutations(),
+        light: 7,
+        collision: { origin: [-2, 0, -2], size: [4, 16, 4] },
+        category: 'construction'
+    },
+    {
+        id: 'hydrant',
+        name: 'Fire Hydrant',
+        geometry: 'geometry.cb_hydrant',
+        texture: 'cb_paint_red',
+        collision: { origin: [-3, 0, -3], size: [6, 14, 6] },
+        category: 'construction'
+    },
+    {
+        id: 'bollard',
+        name: 'Bollard',
+        geometry: 'geometry.cb_bollard',
+        texture: 'cb_paint_black',
+        states: { 'cb:tone': Object.keys(STREET_PAINT) },
+        permutations: materialPermutations('cb_paint', Object.keys(STREET_PAINT), 'cb:tone'),
+        collision: { origin: [-3, 0, -3], size: [6, 11, 6] },
+        category: 'construction'
+    },
+    {
+        id: 'parking_meter',
+        name: 'Parking Meter',
+        geometry: 'geometry.cb_parking_meter',
+        texture: 'cb_paint_grey',
+        instances: { lamp: { texture: 'cb_lamp_lens', render_method: 'opaque' } },
+        traits: CARDINAL_TRAIT,
+        permutations: facingPermutations(),
+        collision: 'none',
+        category: 'construction'
+    },
+    {
+        id: 'street_sign',
+        name: 'Street Sign',
+        geometry: 'geometry.cb_street_sign',
+        texture: 'cb_paint_green',
+        instances: { blade: { texture: 'cb_sign_blade', render_method: 'opaque' } },
+        traits: CARDINAL_TRAIT,
+        permutations: facingPermutations(),
+        collision: 'none',
+        category: 'construction'
+    },
+    {
+        id: 'bench',
+        name: 'Bench',
+        geometry: 'geometry.cb_bench',
+        texture: 'cb_wood_oak',
+        traits: CARDINAL_TRAIT,
+        permutations: facingPermutations(),
+        collision: { origin: [-8, 0, -3], size: [16, 12, 8] },
+        category: 'items'
+    },
+    {
+        id: 'trash_can',
+        name: 'Litter Bin',
+        geometry: 'geometry.cb_trash_can',
+        texture: 'cb_paint_green',
+        collision: { origin: [-5, 0, -5], size: [10, 14, 10] },
+        category: 'items'
+    },
+    {
+        id: 'shelter_glass',
+        name: 'Shelter Glazing',
+        geometry: 'geometry.cb_shelter_glass',
+        texture: 'cb_paint_silver',
+        glass: true,
+        render: 'blend',
+        traits: CARDINAL_TRAIT,
+        permutations: facingPermutations(),
+        collision: { origin: [-8, 0, -2], size: [16, 16, 4] },
+        category: 'construction'
+    },
+
     {
         id: 'window',
         name: 'Window',
@@ -736,9 +1027,10 @@ for (const spec of SPEC) {
         'minecraft:geometry': spec.geometry,
         'minecraft:material_instances': {
             '*': { texture: spec.texture, render_method: spec.render ?? 'opaque' },
-            // A geometry that names a `glass` instance must find one declared on
-            // the base components too, not only inside the permutations.
-            ...(spec.glass ? { glass: { texture: 'cb_window_dark', render_method: 'blend' } } : {})
+            // A geometry that names an instance must find it declared on the
+            // base components too, not only inside the permutations.
+            ...(spec.glass ? { glass: { texture: 'cb_window_dark', render_method: 'blend' } } : {}),
+            ...(spec.instances ?? {})
         },
         'minecraft:destructible_by_mining': { seconds_to_destroy: 1.5 },
         'minecraft:destructible_by_explosion': { explosion_resistance: 3 }
@@ -800,8 +1092,9 @@ writeFileSync(
                 `cb:${spec.id}`,
                 {
                     sound:
-                        /roof|cornice|stoop/.test(spec.id) ? 'stone'
-                        : /sconce|chandelier|light|screen|window/.test(spec.id) ? 'glass'
+                        /roof|cornice|stoop|asphalt|road|paving|curb|manhole/.test(spec.id) ? 'stone'
+                        : /sconce|chandelier|light|screen|window|shelter/.test(spec.id) ? 'glass'
+                        : /signal|hydrant|bollard|meter|sign|trash|pole/.test(spec.id) ? 'metal'
                         : 'wood'
                 }
             ])

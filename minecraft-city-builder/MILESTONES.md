@@ -20,9 +20,9 @@ the actual product; Phase 3 is cities.
 | M7 — Impostor Interiors | Not started | |
 | **Phase 2 — Content** | | |
 | M8 — Building Preset Library | **Catalog + geometry built** | 68 presets, all generating as placeable geometry. |
-| M9 — Street & Infrastructure Kit | Not started | Streets, crosswalks, lighting, signals, bus stops, parking. |
+| M9 — Street & Infrastructure Kit | **Built, awaiting acceptance** | Five Chicago cross-sections, lane markings, kerbs, crosswalks, signals, lights, hydrants, meters, trees, bins, benches, bus shelters, manholes. 15 new custom blocks. |
 | M10 — Transit | Not started | Subway, light rail, stations. |
-| M11 — District Tiles | Not started | The unit that makes Realm placement possible. |
+| M11 — District Tiles | **Built, awaiting acceptance** | Three Chicago tiles: streets on two edges, alley behind, buildings on both lot rows. Placed in game from the wand — a tile is far past the structure-block limit. |
 | **Phase 3 — Cities** | | |
 | M12 — Vertical Solver | Not started | |
 | M13 — Arnis Fork | Not started | |
