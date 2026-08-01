@@ -210,7 +210,22 @@ function placeBuildings(plan, buildFor, put, { interiorX, interiorZ, interiorW, 
         while (x < interiorW && guard++ < 64) {
             const remaining = interiorW - x
             const module = pickBuilding(list, index++, buildFor, remaining, plan.lot_depth)
-            if (!module) break
+            if (!module) {
+                // Whatever frontage is left over becomes a surface car park,
+                // which is what a gap in a Chicago block actually is. Leaving it
+                // as bare paving reads as an unfinished model.
+                if (remaining >= 8) {
+                    parkingLot(put, interiorX + x, row.z, remaining, plan.lot_depth, GRADE + datum, row.facing)
+                    placed.push({
+                        kind: 'parking',
+                        id: 'surface_parking',
+                        at: [interiorX + x, GRADE + datum, row.z],
+                        size: [remaining, plan.lot_depth],
+                        facing: row.facing
+                    })
+                }
+                break
+            }
 
             const [mw, , md] = module.footprint
             const id = module.id
@@ -218,7 +233,7 @@ function placeBuildings(plan, buildFor, put, { interiorX, interiorZ, interiorW, 
             // The south row faces the far street, so it is turned to face out.
             const z = row.facing === 'north' ? row.z : row.z + plan.lot_depth - md
             stampBuilding(module, put, interiorX + x, GRADE + datum, z, row.facing === 'south')
-            placed.push({ id, at: [interiorX + x, GRADE + datum, z], facing: row.facing })
+            placed.push({ kind: 'building', id, at: [interiorX + x, GRADE + datum, z], facing: row.facing })
             x += mw
         }
     }
@@ -268,9 +283,49 @@ function layTransit(plan, put, stamp, { width, depth, westWidth, northWidth, dat
         return
     }
 
-    const module = generateElevated(street, transit.line, { length, offset: 0, station })
+    const module = generateElevated(street, transit.line, { length, offset: transit.offset ?? 0, station })
     if (overNorth) stampRotated(module, put, westWidth, datum, 0)
     else stamp(module, 0, datum, northWidth)
+}
+
+/**
+ * A surface car park: asphalt, bays marked off a drive aisle, a kerb line at
+ * the frontage and lamp standards down the middle.
+ */
+function parkingLot(put, x0, z0, w, d, grade, facing) {
+    const y = grade - 1
+    const aisle = Math.floor(d / 2)
+
+    for (let x = 0; x < w; x++) {
+        for (let z = 0; z < d; z++) {
+            put(x0 + x, y, z0 + z, STREET_BLOCKS.asphalt)
+        }
+        // Bay lines, every third block, on both sides of the aisle.
+        if (x % 3 === 0) {
+            for (let z = 1; z < aisle - 1; z++) {
+                put(x0 + x, y, z0 + z, STREET_BLOCKS.line, {
+                    'cb:marking': 'edge', 'minecraft:cardinal_direction': 'east'
+                })
+            }
+            for (let z = aisle + 2; z < d - 1; z++) {
+                put(x0 + x, y, z0 + z, STREET_BLOCKS.line, {
+                    'cb:marking': 'edge', 'minecraft:cardinal_direction': 'east'
+                })
+            }
+        }
+        // A kerb along the frontage, so the lot does not bleed into the walk.
+        const frontage = facing === 'north' ? 0 : d - 1
+        put(x0 + x, y, z0 + frontage, STREET_BLOCKS.curb, {
+            'cb:paving': 'concrete',
+            'minecraft:cardinal_direction': facing === 'north' ? 'north' : 'south'
+        })
+        if (x % 10 === 5) {
+            for (let dy = 1; dy <= 4; dy++) put(x0 + x, y + dy, z0 + aisle, STREET_BLOCKS.pole, { 'cb:tone': 'grey' })
+            put(x0 + x, y + 5, z0 + aisle, STREET_BLOCKS.light, {
+                'cb:tone': 'grey', 'minecraft:cardinal_direction': 'north'
+            })
+        }
+    }
 }
 
 /** Place a building, optionally turned to face the opposite street. */

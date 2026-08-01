@@ -11,7 +11,7 @@ import { ActionFormData, FormCancelationReason, ModalFormData } from '@minecraft
 import { probeOrientations, reportProbe } from './rotation_probe.js'
 import {
     placeBuilding, cancelBuild, isBuilding, catalogEntries, undoLast, lastPlacementFor, BUDGET,
-    districtEntries, placeDistrict
+    districtEntries, placeDistrict, cityEntries, placeCity
 } from './placer.js'
 import { totalHeight } from './lib/generate.js'
 import { openFloorPanel, shaftAt, shaftCount } from './elevator.js'
@@ -40,6 +40,7 @@ async function showWhenReady(player, form, timeoutTicks = 200) {
 const MENU = [
     { label: 'Place Building', handler: (player) => chooseType(player) },
     { label: 'Place District Tile', handler: (player) => chooseDistrict(player) },
+    { label: 'Place City', handler: (player) => chooseCity(player) },
     { label: 'Rebuild Last', handler: (player) => rebuildLast(player) },
     { label: 'Undo Last Build', handler: (player) => undoLast(player) },
     { label: 'Cancel Build', handler: (player) => cancelCurrent(player) },
@@ -108,6 +109,36 @@ async function chooseDistrict(player) {
         z: Math.floor(player.location.z)
     }
     placeDistrict(player, tile, origin)
+}
+
+// --- city browser ----------------------------------------------------------
+
+/**
+ * A city is a grid of district tiles with its streets agreed once across the
+ * whole grid. Generation happens up front and takes a few seconds; placement
+ * then runs on the same tick budget as everything else.
+ */
+async function chooseCity(player) {
+    const cities = cityEntries()
+    const form = new ActionFormData()
+        .title('Place a City')
+        .body(
+            '§eThis is a very large build.§r Laid from the north-west corner at your feet. ' +
+            'Use Cancel Build to stop it, or Undo Last Build to clear it.'
+        )
+    for (const city of cities) {
+        form.button(`${city.name}\n§7${city.size[0]}x${city.size[1]} · ${city.blocks} blocks§r`)
+    }
+
+    const response = await showWhenReady(player, form)
+    if (!response || response.canceled || response.selection === undefined) return
+
+    const city = cities[response.selection]
+    placeCity(player, city, {
+        x: Math.floor(player.location.x),
+        y: Math.floor(player.location.y),
+        z: Math.floor(player.location.z)
+    })
 }
 
 // --- preset browser --------------------------------------------------------

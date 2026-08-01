@@ -164,7 +164,7 @@ test('no district building stands in the alley or in the street', () => {
         const alleyFrom = northWidth + plan.lot_depth
         const alleyTo = alleyFrom + plan.alley
 
-        for (const placed of module.contents) {
+        for (const placed of module.contents.filter((c) => c.kind === 'building')) {
             const module_ = buildFor(placed.id)
             const [w, , d] = module_.footprint
             const [x, , z] = placed.at
@@ -184,7 +184,9 @@ test('buildings on a tile do not overlap each other', () => {
     for (const [key, plan] of Object.entries(TILES)) {
         const module = generateDistrict(plan, buildFor)
         const boxes = module.contents.map((placed) => {
-            const [w, , d] = buildFor(placed.id).footprint
+            const [w, d] = placed.kind === 'parking'
+                ? placed.size
+                : [buildFor(placed.id).footprint[0], buildFor(placed.id).footprint[2]]
             return { id: placed.id, x: placed.at[0], z: placed.at[2], w, d }
         })
 
@@ -204,7 +206,7 @@ test('a tile stands its buildings on the pavement, not in it', () => {
     const module = generateDistrict(plan, buildFor)
     const byPos = new Map(module.blocks.map((b) => [b.pos.join(','), b]))
 
-    for (const placed of module.contents.slice(0, 4)) {
+    for (const placed of module.contents.filter((c) => c.kind === 'building').slice(0, 4)) {
         const [x, y, z] = placed.at
         assert.equal(y, GRADE, `${placed.id} is not at grade`)
         // The pavement course must exist directly under the building's corner.

@@ -331,6 +331,38 @@ is the same lever §4.5 uses to fit a supertall under the world ceiling.
 Lines are data (`data/transit/chicago.json`) and the CTA names them by colour,
 so the platform tiling and the station boards take the line's own colour.
 
+## Cities
+
+```sh
+node tools/build-city.mjs --list
+node tools/build-city.mjs near_north --preview --shell
+```
+
+A tile carries streets on its north and west edges only, so tiles abut without
+doubling the road — but only if the tile across the street agrees about how wide
+that street is. Rather than trust separate tile descriptions to stay consistent,
+a city declares its grid once (`data/cities/chicago.json`): a street and a block
+length per column, a street and a lot depth per row, a tile kind per cell. Every
+tile plan is derived from that, so a street cannot be 20 blocks wide on one side
+and 30 on the other.
+
+Transit is declared per avenue rather than per tile — an L that stops at a tile
+boundary is a bridge to nowhere — and each tile continues the structure's column
+rhythm from the grid offset rather than restarting it.
+
+The grid closes with a street on its east and south edges, because a city that
+ends in a building face rather than a kerb reads as a cut-off model. Frontage a
+tile cannot fill becomes a surface car park, which is what a gap in a Chicago
+block actually is.
+
+| City | Size | Blocks | Buildings |
+|---|---|---|---|
+| `loop` | 300x268 | 424,438 | 30 |
+| `near_north` | 280x264 | 254,482 | 36 |
+
+Those counts are shells; with interiors they are several times larger. Both are
+placed in game from the wand on the same tick budget as a single building.
+
 ## Interiors and fitout
 
 Buildings are not shells. Every floor gets a walkable surface, the stair core

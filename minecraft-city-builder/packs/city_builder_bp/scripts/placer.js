@@ -11,11 +11,12 @@
  */
 
 import { system, world, BlockPermutation } from '@minecraft/server'
-import { CATALOG, MATERIAL_SYSTEMS, ROTATION_TABLE, STREETS, DISTRICTS, TRANSIT } from './lib/catalog_data.js'
+import { CATALOG, MATERIAL_SYSTEMS, ROTATION_TABLE, STREETS, DISTRICTS, TRANSIT, CITIES } from './lib/catalog_data.js'
 import { generateBuilding, setMaterials, totalHeight, verticalRegistry } from './lib/generate.js'
 import { setStreets } from './lib/street.js'
 import { setTransit } from './lib/transit.js'
 import { generateDistrict, tileSize } from './lib/district.js'
+import { generateCity, cityLayout } from './lib/city.js'
 import { rotateModule, setRotationTable } from './lib/rotation.js'
 import { registerShaft, clearShaftsAt } from './elevator.js'
 
@@ -190,6 +191,69 @@ export function placeDistrict(player, plan, origin) {
     player.sendMessage(
         `${PREFIX} laying §a${entry.name}§r — ${sorted.length.toLocaleString()} blocks, ` +
             `${module.footprint[0]}x${module.footprint[2]}, ${module.contents.length} buildings`
+    )
+    return true
+}
+
+// --- cities ----------------------------------------------------------------
+//
+// A city is a grid of district tiles. The Near North grid is a quarter of a
+// million blocks before interiors, so it goes through the same placer — there
+// is no other way to put it in a world.
+
+export function cityEntries() {
+    return Object.entries(CITIES).map(([key, plan]) => {
+        const layout = cityLayout(plan)
+        return { key, ...plan, size: [layout.width, layout.depth], blocks: plan.rows.length * plan.columns.length }
+    })
+}
+
+export function placeCity(player, plan, origin) {
+    if (active) {
+        player.sendMessage(`${PREFIX} §ealready building ${active.entry.name} — cancel it first.§r`)
+        return false
+    }
+
+    player.sendMessage(`${PREFIX} generating §a${plan.name}§r — this takes a moment before anything appears.`)
+
+    let city
+    try {
+        city = generateCity(plan, buildingModule)
+    } catch (error) {
+        player.sendMessage(`${PREFIX} §ccity generation failed:§r ${error}`)
+        return false
+    }
+
+    const sorted = city.blocks
+        .slice()
+        .sort((a, b) => a.pos[1] - b.pos[1] || a.pos[0] - b.pos[0] || a.pos[2] - b.pos[2])
+    const runs = airRuns(sorted)
+    const solids = sorted.filter((b) => b.block !== AIR)
+
+    const entry = { id: city.id, name: plan.name, massing: { floors: 0 } }
+    active = {
+        entry,
+        player,
+        dimension: player.dimension,
+        origin,
+        runs,
+        runIndex: 0,
+        blocks: solids,
+        index: 0,
+        total: sorted.length,
+        placed: 0,
+        failed: 0,
+        deferred: [],
+        lastReport: 0,
+        cancelled: false,
+        startTick: system.currentTick
+    }
+
+    lastPlacement.set(player.id, { entry, origin, footprint: city.footprint, turns: 0 })
+
+    player.sendMessage(
+        `${PREFIX} laying §a${plan.name}§r — ${sorted.length.toLocaleString()} blocks, ` +
+            `${city.footprint[0]}x${city.footprint[2]}, ${city.contents.length} buildings`
     )
     return true
 }

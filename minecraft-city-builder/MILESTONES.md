@@ -26,7 +26,7 @@ the actual product; Phase 3 is cities.
 | **Phase 3 — Cities** | | |
 | M12 — Vertical Solver | Not started | |
 | M13 — Arnis Fork | Not started | |
-| M14 — Real City Packages | Not started | NYC, Chicago, Boston, LA, Houston. |
+| M14 — Real City Packages | **Chicago in progress** | Grid assembler built; two Chicago districts assemble and place (the Loop, Near North). Needs the rest of the catalog wired in, the river and lake, and the other four cities. |
 | M15 — Fictional City Packages | Not started | Gotham, Metropolis. |
 
 ---

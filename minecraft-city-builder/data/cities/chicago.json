@@ -1,0 +1,80 @@
+{
+    "$comment": "Chicago, assembled from district tiles. The grid is declared once — a street and a block length per column, a street and a lot depth per row — and every tile plan is derived from it, so a street cannot be 20 blocks wide on one side and 30 on the other. Transit is declared per avenue, not per tile: an L that stops at a tile boundary is a bridge to nowhere. See SPEC.md M14.",
+    "cities": {
+        "loop": {
+            "id": "chicago_loop",
+            "name": "Chicago — the Loop",
+            "height": 176,
+            "east_street": "arterial",
+            "south_street": "arterial",
+            "columns": [
+                { "west_street": "arterial", "block_length": 110 },
+                { "west_street": "commercial", "block_length": 110 }
+            ],
+            "rows": [
+                { "north_street": "arterial", "lot_depth": 44, "alley": 6 },
+                { "north_street": "commercial", "lot_depth": 44, "alley": 6 }
+            ],
+            "transit": [
+                { "line": "loop_elevated", "kind": "elevated", "along": "column", "at": 1, "stations": [0] }
+            ],
+            "cells": [
+                ["loop_tower", "loop_block"],
+                ["loop_block", "loop_tower"]
+            ],
+            "tiles": {
+                "loop_tower": {
+                    "name": "Loop — towers",
+                    "height": 176,
+                    "paving": "granite",
+                    "ground": "paved",
+                    "bus_stop": true,
+                    "buildings": ["river_north_glass_condo", "palmolive_deco_setback", "reliance_glass_pioneer"]
+                },
+                "loop_block": {
+                    "name": "Loop — commercial",
+                    "height": 176,
+                    "paving": "granite",
+                    "ground": "paved",
+                    "buildings": ["loop_greystone_commercial", "reliance_glass_pioneer", "river_north_glass_condo"]
+                }
+            }
+        },
+        "near_north": {
+            "id": "chicago_near_north",
+            "name": "Chicago — Near North",
+            "height": 64,
+            "east_street": "residential",
+            "south_street": "residential",
+            "columns": [
+                { "west_street": "commercial", "block_length": 110 },
+                { "west_street": "residential", "block_length": 110 }
+            ],
+            "rows": [
+                { "north_street": "residential", "lot_depth": 48, "alley": 6 },
+                { "north_street": "residential", "lot_depth": 48, "alley": 6 }
+            ],
+            "transit": [],
+            "cells": [
+                ["strip", "houses"],
+                ["houses", "houses"]
+            ],
+            "tiles": {
+                "houses": {
+                    "name": "Near North — houses",
+                    "height": 64,
+                    "paving": "concrete",
+                    "buildings": ["chicago_bungalow", "workers_cottage", "brownstone_rowhouse", "townhouse_row_modern"]
+                },
+                "strip": {
+                    "name": "Near North — strip",
+                    "height": 64,
+                    "paving": "concrete",
+                    "ground": "paved",
+                    "bus_stop": true,
+                    "buildings": ["strip_retail_row", "convenience_store", "roadside_diner"]
+                }
+            }
+        }
+    }
+}
