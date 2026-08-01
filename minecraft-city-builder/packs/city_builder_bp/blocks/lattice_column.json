@@ -1,0 +1,124 @@
+{
+    "format_version": "1.21.10",
+    "minecraft:block": {
+        "description": {
+            "identifier": "cb:lattice_column",
+            "menu_category": {
+                "category": "construction"
+            },
+            "states": {
+                "cb:steel": [
+                    "oxide",
+                    "grey",
+                    "green",
+                    "cream"
+                ]
+            }
+        },
+        "components": {
+            "minecraft:geometry": "geometry.cb_lattice_column",
+            "minecraft:material_instances": {
+                "*": {
+                    "texture": "cb_steel_oxide",
+                    "render_method": "opaque"
+                },
+                "lattice": {
+                    "texture": "cb_lattice_oxide",
+                    "render_method": "opaque"
+                }
+            },
+            "minecraft:destructible_by_mining": {
+                "seconds_to_destroy": 1.5
+            },
+            "minecraft:destructible_by_explosion": {
+                "explosion_resistance": 3
+            },
+            "minecraft:collision_box": {
+                "origin": [
+                    -5,
+                    0,
+                    -5
+                ],
+                "size": [
+                    10,
+                    16,
+                    10
+                ]
+            },
+            "minecraft:selection_box": {
+                "origin": [
+                    -5,
+                    0,
+                    -5
+                ],
+                "size": [
+                    10,
+                    16,
+                    10
+                ]
+            }
+        },
+        "permutations": [
+            {
+                "condition": "q.block_state('cb:steel') == 'oxide'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_steel_oxide",
+                            "render_method": "opaque"
+                        },
+                        "lattice": {
+                            "texture": "cb_lattice_oxide",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:steel') == 'grey'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_steel_grey",
+                            "render_method": "opaque"
+                        },
+                        "lattice": {
+                            "texture": "cb_lattice_grey",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:steel') == 'green'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_steel_green",
+                            "render_method": "opaque"
+                        },
+                        "lattice": {
+                            "texture": "cb_lattice_green",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            },
+            {
+                "condition": "q.block_state('cb:steel') == 'cream'",
+                "components": {
+                    "minecraft:material_instances": {
+                        "*": {
+                            "texture": "cb_steel_cream",
+                            "render_method": "opaque"
+                        },
+                        "lattice": {
+                            "texture": "cb_lattice_cream",
+                            "render_method": "opaque"
+                        }
+                    }
+                }
+            }
+        ]
+    }
+}

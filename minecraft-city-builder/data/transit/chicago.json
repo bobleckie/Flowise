@@ -1,0 +1,49 @@
+{
+    "$comment": "Chicago transit lines. Colour is the line's own — the CTA names its lines by colour, and the platform tiling and station boards follow it. `steel` is the paint on the elevated structure; the Loop's is oxide red. See SPEC.md M10.",
+    "defaults": {
+        "tracks": 2,
+        "steel": "oxide",
+        "station_spacing": 120
+    },
+    "lines": {
+        "loop_elevated": {
+            "name": "The Loop",
+            "kind": "elevated",
+            "colour": "brown",
+            "steel": "oxide",
+            "tracks": 2
+        },
+        "green_elevated": {
+            "name": "Green Line",
+            "kind": "elevated",
+            "colour": "green",
+            "steel": "green",
+            "tracks": 2
+        },
+        "red_subway": {
+            "name": "Red Line",
+            "kind": "subway",
+            "colour": "red",
+            "tracks": 2
+        },
+        "blue_subway": {
+            "name": "Blue Line",
+            "kind": "subway",
+            "colour": "blue",
+            "tracks": 2
+        },
+        "orange_elevated": {
+            "name": "Orange Line",
+            "kind": "elevated",
+            "colour": "orange",
+            "steel": "grey",
+            "tracks": 2
+        },
+        "streetcar": {
+            "name": "Streetcar",
+            "kind": "streetcar",
+            "colour": "purple",
+            "tracks": 2
+        }
+    }
+}

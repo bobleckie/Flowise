@@ -306,6 +306,31 @@ block, and a neighbourhood commercial strip.
 Tiles are placed in game from the wand, not shipped as structures: the Loop tile
 is 150x160x124, far past the 64x384x64 structure-block limit.
 
+## Transit
+
+```sh
+node tools/build-transit.mjs --list
+node tools/build-transit.mjs loop_elevated --over arterial --station --preview
+node tools/build-transit.mjs red_subway   --over arterial --station --preview
+```
+
+The L is real structure, not a texture: lattice columns standing in the
+roadway, plate girders spanning between them under the deck edges, ballasted
+track beds, handrails, and a station with an island platform, canopies, fare
+gates and a stair down to the pavement. The structure is about thirty feet wide
+over a hundred-foot street — Chicago's L covers the middle of the road and
+leaves daylight either side, and spanning the full right of way turned the
+block below into a tunnel.
+
+The subway is dug from the street datum down: a tiled station box, an island
+platform, a cross passage under the carriageway, and a stair up to a kiosk that
+breaks the pavement — never the road. It reports its own `grade`, and a district
+tile carrying one lifts the whole city by the tunnel depth to make room, which
+is the same lever §4.5 uses to fit a supertall under the world ceiling.
+
+Lines are data (`data/transit/chicago.json`) and the CTA names them by colour,
+so the platform tiling and the station boards take the line's own colour.
+
 ## Interiors and fitout
 
 Buildings are not shells. Every floor gets a walkable surface, the stair core

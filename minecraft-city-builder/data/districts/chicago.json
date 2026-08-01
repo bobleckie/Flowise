@@ -18,7 +18,13 @@
                 "river_north_glass_condo",
                 "palmolive_deco_setback"
             ],
-            "ground": "paved"
+            "ground": "paved",
+            "transit": {
+                "line": "loop_elevated",
+                "kind": "elevated",
+                "over": "west",
+                "station": true
+            }
         },
         "near_north_residential": {
             "id": "district_near_north_residential",
@@ -54,7 +60,13 @@
                 "roadside_diner",
                 "fast_food_drive_through"
             ],
-            "ground": "paved"
+            "ground": "paved",
+            "transit": {
+                "line": "red_subway",
+                "kind": "subway",
+                "over": "north",
+                "station": true
+            }
         }
     }
 }

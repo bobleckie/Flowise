@@ -22,7 +22,8 @@ import { fileURLToPath } from 'node:url'
 import {
     shingle, shake, barrelTile, window as windowTex, ridge, fabric, wood, metal,
     glowPanel, framedArt, panel, clapboard, ashlar,
-    asphalt, pavement, paint, signalFace, signBlade, ironCover, roadMarking
+    asphalt, pavement, paint, signalFace, signBlade, ironCover, roadMarking,
+    rivetedSteel, lattice, stationTile, trackBed
 } from './lib/textures.mjs'
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)))
@@ -415,6 +416,69 @@ const GEOMETRIES = {
         cube([-7, 1, -0.5], [14, 14, 1], { faces: { '*': 'glass' } })
     ]),
 
+    // --- transit ------------------------------------------------------------
+
+    // Plate girder: an I-beam running the length of the block, which is what
+    // carries an elevated railway between its columns.
+    'geometry.cb_girder': geometry('geometry.cb_girder', [
+        cube([-8, 2, -3], [16, 2, 6]), // bottom flange
+        cube([-8, 4, -1.5], [16, 8, 3]), // web
+        cube([-8, 12, -3], [16, 2, 6]) // top flange
+    ]),
+
+    // Lattice column: the braced steel post the girders sit on.
+    'geometry.cb_lattice_column': geometry('geometry.cb_lattice_column', [
+        cube([-4, 0, -4], [8, 16, 8], { faces: { '*': 'lattice' } }),
+        cube([-5, 0, -5], [2, 16, 2]),
+        cube([3, 0, -5], [2, 16, 2]),
+        cube([-5, 0, 3], [2, 16, 2]),
+        cube([3, 0, 3], [2, 16, 2])
+    ]),
+
+    // The deck a rail sits on: timber ties on ballast.
+    'geometry.cb_track_bed': geometry('geometry.cb_track_bed', [cube([-8, 0, -8], [16, 16, 16])]),
+
+    // Handrail: two rails on posts, for platform edges and the deck.
+    // One post per block, not one at each end: a post every eight units meant
+    // adjacent rails rendered as a solid comb of pickets rather than as a rail.
+    'geometry.cb_handrail': geometry('geometry.cb_handrail', [
+        cube([-1.5, 0, -6.5], [3, 14, 3]),
+        cube([-8, 12, -6], [16, 2, 2]),
+        cube([-8, 6, -6], [16, 1.5, 2])
+    ]),
+
+    // Platform canopy: a butterfly roof on a bracket, over the platform edge.
+    'geometry.cb_platform_canopy': geometry('geometry.cb_platform_canopy', [
+        cube([-8, 12, -8], [16, 2, 16]),
+        cube([-2, 8, -2], [4, 4, 4]),
+        cube([-8, 14, -3], [16, 2, 6])
+    ], [3, 3, 3]),
+
+    // Glazed station wall, with the coloured band a line is known by.
+    'geometry.cb_station_tile': geometry('geometry.cb_station_tile', [cube([-8, 0, -8], [16, 16, 16])]),
+
+    // Fare gate.
+    'geometry.cb_turnstile': geometry('geometry.cb_turnstile', [
+        cube([-7, 0, -3], [4, 12, 6]),
+        cube([3, 0, -3], [4, 12, 6]),
+        cube([-3, 6, -1], [6, 2, 2]),
+        cube([-3, 6, -3], [2, 2, 6])
+    ]),
+
+    // Catenary mast for a streetcar: pole with a bracket arm over the track.
+    'geometry.cb_catenary': geometry('geometry.cb_catenary', [
+        cube([-2, 0, -2], [4, 16, 4]),
+        cube([-1, 13, -8], [2, 2, 8]),
+        cube([-1, 12, -8], [2, 1, 2])
+    ], [3, 3, 3]),
+
+    // Station name panel, hung from the canopy or fixed to the wall.
+    'geometry.cb_transit_sign': geometry('geometry.cb_transit_sign', [
+        cube([-8, 5, -2], [16, 8, 2], { faces: { '*': 'blade' } }),
+        cube([-6, 13, -1.5], [2, 3, 1]),
+        cube([4, 13, -1.5], [2, 3, 1])
+    ]),
+
     // Planter.
     'geometry.cb_planter': geometry('geometry.cb_planter', [
         cube([-5, 0, -5], [10, 6, 10]),
@@ -503,6 +567,35 @@ TEXTURES.cb_signal_face = signalFace('signal_face')
 TEXTURES.cb_sign_blade = signBlade('sign_blade', [42, 72, 54])
 TEXTURES.cb_manhole = ironCover('manhole', [64, 62, 60])
 TEXTURES.cb_lamp_lens = glowPanel('lamp_lens', [255, 244, 210], [86, 84, 78])
+
+// --- transit textures -------------------------------------------------------
+
+export const STEEL_TONES = {
+    oxide: [118, 74, 58],
+    grey: [104, 106, 110],
+    green: [56, 74, 62],
+    cream: [186, 178, 158]
+}
+for (const [tone, color] of Object.entries(STEEL_TONES)) {
+    TEXTURES[`cb_steel_${tone}`] = rivetedSteel(`steel_${tone}`, color)
+    TEXTURES[`cb_lattice_${tone}`] = lattice(`lattice_${tone}`, color)
+}
+
+/** Chicago runs its lines by colour, and the platform tile says which. */
+export const LINE_COLOURS = {
+    red: [176, 44, 42],
+    blue: [42, 74, 152],
+    brown: [98, 62, 38],
+    green: [40, 118, 66],
+    orange: [206, 118, 34],
+    purple: [92, 54, 132]
+}
+for (const [line, color] of Object.entries(LINE_COLOURS)) {
+    TEXTURES[`cb_tile_${line}`] = stationTile(`tile_${line}`, [222, 220, 212], color)
+    TEXTURES[`cb_blade_${line}`] = signBlade(`blade_${line}`, color)
+}
+
+TEXTURES.cb_track_bed = trackBed('track_bed', [96, 72, 50], [122, 120, 116])
 
 TEXTURES.cb_brass = metal('brass', [176, 138, 66])
 TEXTURES.cb_glow_warm = glowPanel('glow_warm', [255, 236, 190], [92, 76, 52])
@@ -686,6 +779,119 @@ const SPEC = [
         states: { 'cb:tone': TRIM_LIST },
         permutations: materialPermutations('cb_trim', TRIM_LIST, 'cb:tone'),
         collision: { origin: [-4, 0, -4], size: [8, 16, 8] },
+        category: 'construction'
+    },
+
+    // --- transit -------------------------------------------------------------
+    {
+        id: 'girder',
+        name: 'Plate Girder',
+        geometry: 'geometry.cb_girder',
+        texture: 'cb_steel_oxide',
+        states: { 'cb:steel': Object.keys(STEEL_TONES) },
+        traits: CARDINAL_TRAIT,
+        permutations: [...materialPermutations('cb_steel', Object.keys(STEEL_TONES), 'cb:steel'), ...facingPermutations()],
+        collision: { origin: [-8, 0, -8], size: [16, 16, 16] },
+        category: 'construction'
+    },
+    {
+        id: 'lattice_column',
+        name: 'Lattice Column',
+        geometry: 'geometry.cb_lattice_column',
+        texture: 'cb_steel_oxide',
+        instances: { lattice: { texture: 'cb_lattice_oxide', render_method: 'opaque' } },
+        states: { 'cb:steel': Object.keys(STEEL_TONES) },
+        permutations: Object.keys(STEEL_TONES).map((tone) => ({
+            condition: `q.block_state('cb:steel') == '${tone}'`,
+            components: {
+                'minecraft:material_instances': {
+                    '*': { texture: `cb_steel_${tone}`, render_method: 'opaque' },
+                    lattice: { texture: `cb_lattice_${tone}`, render_method: 'opaque' }
+                }
+            }
+        })),
+        collision: { origin: [-5, 0, -5], size: [10, 16, 10] },
+        category: 'construction'
+    },
+    {
+        id: 'track_bed',
+        name: 'Track Bed',
+        geometry: 'geometry.cb_track_bed',
+        texture: 'cb_track_bed',
+        category: 'construction'
+    },
+    {
+        id: 'handrail',
+        name: 'Handrail',
+        geometry: 'geometry.cb_handrail',
+        texture: 'cb_paint_grey',
+        states: { 'cb:tone': Object.keys(STREET_PAINT) },
+        traits: CARDINAL_TRAIT,
+        permutations: [...materialPermutations('cb_paint', Object.keys(STREET_PAINT), 'cb:tone'), ...facingPermutations()],
+        collision: { origin: [-8, 0, -7], size: [16, 14, 4] },
+        category: 'construction'
+    },
+    {
+        id: 'platform_canopy',
+        name: 'Platform Canopy',
+        geometry: 'geometry.cb_platform_canopy',
+        texture: 'cb_paint_silver',
+        traits: CARDINAL_TRAIT,
+        permutations: facingPermutations(),
+        collision: { origin: [-8, 8, -8], size: [16, 8, 16] },
+        category: 'construction'
+    },
+    {
+        id: 'station_tile',
+        name: 'Station Tiling',
+        geometry: 'geometry.cb_station_tile',
+        texture: 'cb_tile_red',
+        states: { 'cb:line': Object.keys(LINE_COLOURS) },
+        permutations: materialPermutations('cb_tile', Object.keys(LINE_COLOURS), 'cb:line'),
+        category: 'construction'
+    },
+    {
+        id: 'turnstile',
+        name: 'Fare Gate',
+        geometry: 'geometry.cb_turnstile',
+        texture: 'cb_paint_silver',
+        traits: CARDINAL_TRAIT,
+        permutations: facingPermutations(),
+        collision: { origin: [-8, 0, -3], size: [16, 12, 6] },
+        category: 'construction'
+    },
+    {
+        id: 'catenary',
+        name: 'Catenary Mast',
+        geometry: 'geometry.cb_catenary',
+        texture: 'cb_paint_grey',
+        states: { 'cb:tone': Object.keys(STREET_PAINT) },
+        traits: CARDINAL_TRAIT,
+        permutations: [...materialPermutations('cb_paint', Object.keys(STREET_PAINT), 'cb:tone'), ...facingPermutations()],
+        collision: { origin: [-3, 0, -3], size: [6, 16, 6] },
+        category: 'construction'
+    },
+    {
+        id: 'transit_sign',
+        name: 'Station Sign',
+        geometry: 'geometry.cb_transit_sign',
+        texture: 'cb_paint_grey',
+        instances: { blade: { texture: 'cb_blade_red', render_method: 'opaque' } },
+        states: { 'cb:line': Object.keys(LINE_COLOURS) },
+        traits: CARDINAL_TRAIT,
+        permutations: [
+            ...Object.keys(LINE_COLOURS).map((line) => ({
+                condition: `q.block_state('cb:line') == '${line}'`,
+                components: {
+                    'minecraft:material_instances': {
+                        '*': { texture: 'cb_paint_grey', render_method: 'opaque' },
+                        blade: { texture: `cb_blade_${line}`, render_method: 'opaque' }
+                    }
+                }
+            })),
+            ...facingPermutations()
+        ],
+        collision: 'none',
         category: 'construction'
     },
 
@@ -1092,9 +1298,9 @@ writeFileSync(
                 `cb:${spec.id}`,
                 {
                     sound:
-                        /roof|cornice|stoop|asphalt|road|paving|curb|manhole/.test(spec.id) ? 'stone'
+                        /roof|cornice|stoop|asphalt|road|paving|curb|manhole|tile/.test(spec.id) ? 'stone'
                         : /sconce|chandelier|light|screen|window|shelter/.test(spec.id) ? 'glass'
-                        : /signal|hydrant|bollard|meter|sign|trash|pole/.test(spec.id) ? 'metal'
+                        : /signal|hydrant|bollard|meter|sign|trash|pole|girder|lattice|rail|turnstile|catenary|canopy/.test(spec.id) ? 'metal'
                         : 'wood'
                 }
             ])

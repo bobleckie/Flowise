@@ -21,7 +21,7 @@ the actual product; Phase 3 is cities.
 | **Phase 2 — Content** | | |
 | M8 — Building Preset Library | **Catalog + geometry built** | 68 presets, all generating as placeable geometry. |
 | M9 — Street & Infrastructure Kit | **Built, awaiting acceptance** | Five Chicago cross-sections, lane markings, kerbs, crosswalks, signals, lights, hydrants, meters, trees, bins, benches, bus shelters, manholes. 15 new custom blocks. |
-| M10 — Transit | Not started | Subway, light rail, stations. |
+| M10 — Transit | **Built, awaiting acceptance** | Elevated railway with lattice columns, plate girders and a station you can climb to; subway with a tiled station box, cross passage and pavement kiosk; streetcar track in the carriageway with overhead. Six CTA lines. |
 | M11 — District Tiles | **Built, awaiting acceptance** | Three Chicago tiles: streets on two edges, alley behind, buildings on both lot rows. Placed in game from the wand — a tile is far past the structure-block limit. |
 | **Phase 3 — Cities** | | |
 | M12 — Vertical Solver | Not started | |

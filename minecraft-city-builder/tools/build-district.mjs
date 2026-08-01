@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url'
 
 import './lib/materials.mjs'
 import './lib/streets.mjs'
+import './lib/transit-data.mjs'
 import { loadCatalog } from './lib/catalog.mjs'
 import { generateBuilding } from './lib/generate.mjs'
 import { generateDistrict, tileSize } from './lib/district.mjs'

@@ -11,9 +11,10 @@
  */
 
 import { system, world, BlockPermutation } from '@minecraft/server'
-import { CATALOG, MATERIAL_SYSTEMS, ROTATION_TABLE, STREETS, DISTRICTS } from './lib/catalog_data.js'
+import { CATALOG, MATERIAL_SYSTEMS, ROTATION_TABLE, STREETS, DISTRICTS, TRANSIT } from './lib/catalog_data.js'
 import { generateBuilding, setMaterials, totalHeight, verticalRegistry } from './lib/generate.js'
 import { setStreets } from './lib/street.js'
+import { setTransit } from './lib/transit.js'
 import { generateDistrict, tileSize } from './lib/district.js'
 import { rotateModule, setRotationTable } from './lib/rotation.js'
 import { registerShaft, clearShaftsAt } from './elevator.js'
@@ -130,6 +131,7 @@ export function placeBuilding(player, entry, origin, turns = 0) {
 // through the same tick-budgeted placer.
 
 setStreets(STREETS)
+setTransit(TRANSIT)
 
 export function districtEntries() {
     return Object.entries(DISTRICTS).map(([key, plan]) => ({ key, ...plan, size: tileSize(plan) }))

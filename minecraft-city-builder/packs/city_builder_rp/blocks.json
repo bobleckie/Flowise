@@ -31,6 +31,33 @@
     "cb:porch_post": {
         "sound": "wood"
     },
+    "cb:girder": {
+        "sound": "metal"
+    },
+    "cb:lattice_column": {
+        "sound": "metal"
+    },
+    "cb:track_bed": {
+        "sound": "wood"
+    },
+    "cb:handrail": {
+        "sound": "metal"
+    },
+    "cb:platform_canopy": {
+        "sound": "metal"
+    },
+    "cb:station_tile": {
+        "sound": "stone"
+    },
+    "cb:turnstile": {
+        "sound": "stone"
+    },
+    "cb:catenary": {
+        "sound": "metal"
+    },
+    "cb:transit_sign": {
+        "sound": "metal"
+    },
     "cb:asphalt": {
         "sound": "stone"
     },

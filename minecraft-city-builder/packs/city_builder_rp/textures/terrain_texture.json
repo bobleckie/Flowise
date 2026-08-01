@@ -130,6 +130,69 @@
         "cb_lamp_lens": {
             "textures": "textures/blocks/cb_lamp_lens"
         },
+        "cb_steel_oxide": {
+            "textures": "textures/blocks/cb_steel_oxide"
+        },
+        "cb_lattice_oxide": {
+            "textures": "textures/blocks/cb_lattice_oxide"
+        },
+        "cb_steel_grey": {
+            "textures": "textures/blocks/cb_steel_grey"
+        },
+        "cb_lattice_grey": {
+            "textures": "textures/blocks/cb_lattice_grey"
+        },
+        "cb_steel_green": {
+            "textures": "textures/blocks/cb_steel_green"
+        },
+        "cb_lattice_green": {
+            "textures": "textures/blocks/cb_lattice_green"
+        },
+        "cb_steel_cream": {
+            "textures": "textures/blocks/cb_steel_cream"
+        },
+        "cb_lattice_cream": {
+            "textures": "textures/blocks/cb_lattice_cream"
+        },
+        "cb_tile_red": {
+            "textures": "textures/blocks/cb_tile_red"
+        },
+        "cb_blade_red": {
+            "textures": "textures/blocks/cb_blade_red"
+        },
+        "cb_tile_blue": {
+            "textures": "textures/blocks/cb_tile_blue"
+        },
+        "cb_blade_blue": {
+            "textures": "textures/blocks/cb_blade_blue"
+        },
+        "cb_tile_brown": {
+            "textures": "textures/blocks/cb_tile_brown"
+        },
+        "cb_blade_brown": {
+            "textures": "textures/blocks/cb_blade_brown"
+        },
+        "cb_tile_green": {
+            "textures": "textures/blocks/cb_tile_green"
+        },
+        "cb_blade_green": {
+            "textures": "textures/blocks/cb_blade_green"
+        },
+        "cb_tile_orange": {
+            "textures": "textures/blocks/cb_tile_orange"
+        },
+        "cb_blade_orange": {
+            "textures": "textures/blocks/cb_blade_orange"
+        },
+        "cb_tile_purple": {
+            "textures": "textures/blocks/cb_tile_purple"
+        },
+        "cb_blade_purple": {
+            "textures": "textures/blocks/cb_blade_purple"
+        },
+        "cb_track_bed": {
+            "textures": "textures/blocks/cb_track_bed"
+        },
         "cb_brass": {
             "textures": "textures/blocks/cb_brass"
         },

@@ -193,6 +193,18 @@ export const BLOCK_COLORS = {
     'cb:trash_can': [42, 72, 54],
     'cb:shelter_glass': [176, 178, 180],
 
+    // transit
+    'cb:girder': [118, 74, 58],
+    'cb:lattice_column': [118, 74, 58],
+    'cb:track_bed': [104, 92, 74],
+    'cb:handrail': [118, 120, 122],
+    'cb:platform_canopy': [176, 178, 180],
+    'cb:station_tile': [214, 212, 204],
+    'cb:turnstile': [176, 178, 180],
+    'cb:catenary': [38, 40, 44],
+    'cb:transit_sign': [118, 120, 122],
+    'minecraft:rail': [140, 122, 96],
+
     // ground and planting
     'minecraft:gravel': [131, 127, 126],
     'minecraft:dirt': [134, 96, 67],
@@ -256,6 +268,24 @@ const PAINT_COLORS = {
     grey: [118, 120, 122],
     silver: [176, 178, 180]
 }
+const STEEL_COLORS = {
+    oxide: [118, 74, 58],
+    grey: [104, 106, 110],
+    green: [56, 74, 62],
+    cream: [186, 178, 158]
+}
+const LINE_COLORS = {
+    red: [176, 44, 42],
+    blue: [42, 74, 152],
+    brown: [98, 62, 38],
+    green: [40, 118, 66],
+    orange: [206, 118, 34],
+    purple: [92, 54, 132]
+}
+/** The tile is mostly white field with a coloured band, so it reads pale. */
+const TILE_COLORS = Object.fromEntries(
+    Object.entries(LINE_COLORS).map(([line, rgb]) => [line, rgb.map((c) => Math.round(c * 0.28 + 214 * 0.72))])
+)
 const STONE_COLORS = {
     limestone: [206, 198, 178],
     granite: [126, 126, 128],
@@ -293,7 +323,15 @@ const STATE_COLORS = {
     }],
     'cb:street_light': ['cb:tone', PAINT_COLORS],
     'cb:light_pole': ['cb:tone', PAINT_COLORS],
-    'cb:bollard': ['cb:tone', PAINT_COLORS]
+    'cb:bollard': ['cb:tone', PAINT_COLORS],
+    'cb:handrail': ['cb:tone', PAINT_COLORS],
+    'cb:catenary': ['cb:tone', PAINT_COLORS],
+    'cb:girder': ['cb:steel', STEEL_COLORS],
+    'cb:lattice_column': ['cb:steel', STEEL_COLORS],
+    // The platform tiling and the station board are how you know which line
+    // you are standing on, so the preview has to keep the colour.
+    'cb:station_tile': ['cb:line', TILE_COLORS],
+    'cb:transit_sign': ['cb:line', LINE_COLORS]
 }
 
 /** Colour for a placed block, taking its state into account. */

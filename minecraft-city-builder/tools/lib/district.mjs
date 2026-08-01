@@ -15,6 +15,7 @@
  */
 
 import { crossSection, generateStreet, generateIntersection, rowWidth, streetType, STREET_BLOCKS } from './street.mjs'
+import { generateElevated, generateSubway, transitLine, TUNNEL_DEPTH } from './transit.mjs'
 
 /** Lots are laid along the street frontage at Chicago's 25 ft standard. */
 export const LOT_WIDTH = 8
@@ -30,6 +31,17 @@ export function tileSize(plan) {
     const west = rowWidth(streetType(plan.west_street))
     const north = rowWidth(streetType(plan.north_street))
     return [west + plan.block_length, north + plan.lot_depth * 2 + plan.alley]
+}
+
+/**
+ * Where the street surface sits inside the tile.
+ *
+ * A tile with a subway under it is dug: the whole city moves up by the tunnel
+ * depth so the tunnel has somewhere to be, which is the same lever SPEC §4.5
+ * uses to fit a supertall under the world ceiling.
+ */
+export function tileDatum(plan) {
+    return plan.transit?.kind === 'subway' ? TUNNEL_DEPTH : 0
 }
 
 /**
@@ -49,7 +61,8 @@ export function generateDistrict(plan, buildFor) {
     const northWidth = rowWidth(northType)
 
     const [width, depth] = tileSize(plan)
-    const height = plan.height ?? 96
+    const datum = tileDatum(plan)
+    const height = (plan.height ?? 96) + datum
 
     const cells = new Map()
     const put = (x, y, z, block, state) => {
@@ -68,20 +81,23 @@ export function generateDistrict(plan, buildFor) {
 
     // --- the two streets on the tile's own edges, and their intersection
     const intersection = generateIntersection(plan.west_street, plan.north_street)
-    stamp(intersection, 0, 0, 0)
+    stamp(intersection, 0, datum, 0)
 
     const westRun = generateStreet(plan.west_street, {
         length: depth - northWidth,
         offset: northWidth
     })
-    stamp(westRun, 0, 0, northWidth)
+    stamp(westRun, 0, datum, northWidth)
 
     const northRun = generateStreet(plan.north_street, {
         length: width - westWidth,
         offset: westWidth,
         busStop: Boolean(plan.bus_stop)
     })
-    stampRotated(northRun, put, westWidth, 0, 0)
+    stampRotated(northRun, put, westWidth, datum, 0)
+
+    // --- transit, if the tile carries a line
+    layTransit(plan, put, stamp, { width, depth, westWidth, northWidth, datum })
 
     // --- the block interior: two rows of lots either side of the alley
     const interiorX = westWidth
@@ -90,10 +106,10 @@ export function generateDistrict(plan, buildFor) {
     const interiorD = depth - northWidth
 
     const alleyZ = interiorZ + plan.lot_depth
-    pave(put, interiorX, interiorZ, interiorW, interiorD, plan, { alleyZ, alley: plan.alley })
+    pave(put, interiorX, interiorZ, interiorW, interiorD, plan, { alleyZ, alley: plan.alley, datum })
 
     const placed = placeBuildings(plan, buildFor, put, {
-        interiorX, interiorZ, interiorW, alleyZ
+        interiorX, interiorZ, interiorW, alleyZ, datum
     })
 
     const blocks = [...cells.values()].sort(
@@ -146,7 +162,7 @@ function stampRotated(module, put, ox, oy, oz) {
  * is garden, not pavement. Paving the whole interior turned a Chicago block
  * into a car park with houses on it.
  */
-function pave(put, x0, z0, w, d, plan, { alleyZ, alley }) {
+function pave(put, x0, z0, w, d, plan, { alleyZ, alley, datum = 0 }) {
     const paved = plan.ground === 'paved'
     const paving = { 'cb:paving': plan.paving ?? 'concrete' }
 
@@ -157,11 +173,12 @@ function pave(put, x0, z0, w, d, plan, { alleyZ, alley }) {
             // An apron at each frontage: the walk from the pavement to the door.
             const apron = z < 2 || z >= d - 2
 
-            put(x0 + x, 0, worldZ, STREET_BLOCKS.base)
+            for (let y = 0; y < datum; y++) put(x0 + x, y, worldZ, 'minecraft:stone')
+            put(x0 + x, datum, worldZ, STREET_BLOCKS.base)
             if (inAlley || apron || paved) {
-                put(x0 + x, 1, worldZ, STREET_BLOCKS.paving, inAlley ? { 'cb:paving': 'concrete' } : paving)
+                put(x0 + x, datum + 1, worldZ, STREET_BLOCKS.paving, inAlley ? { 'cb:paving': 'concrete' } : paving)
             } else {
-                put(x0 + x, 1, worldZ, STREET_BLOCKS.soil)
+                put(x0 + x, datum + 1, worldZ, STREET_BLOCKS.soil)
             }
         }
     }
@@ -175,7 +192,7 @@ function pave(put, x0, z0, w, d, plan, { alleyZ, alley }) {
  * corner. A building that will not fit the remaining frontage is skipped rather
  * than truncated.
  */
-function placeBuildings(plan, buildFor, put, { interiorX, interiorZ, interiorW, alleyZ }) {
+function placeBuildings(plan, buildFor, put, { interiorX, interiorZ, interiorW, alleyZ, datum = 0 }) {
     const placed = []
     const list = plan.buildings ?? []
     if (!list.length) return placed
@@ -200,8 +217,8 @@ function placeBuildings(plan, buildFor, put, { interiorX, interiorZ, interiorW, 
 
             // The south row faces the far street, so it is turned to face out.
             const z = row.facing === 'north' ? row.z : row.z + plan.lot_depth - md
-            stampBuilding(module, put, interiorX + x, GRADE, z, row.facing === 'south')
-            placed.push({ id, at: [interiorX + x, GRADE, z], facing: row.facing })
+            stampBuilding(module, put, interiorX + x, GRADE + datum, z, row.facing === 'south')
+            placed.push({ id, at: [interiorX + x, GRADE + datum, z], facing: row.facing })
             x += mw
         }
     }
@@ -224,6 +241,36 @@ function pickBuilding(list, index, buildFor, remaining, lotDepth) {
         if (mw <= remaining && md <= lotDepth) return module
     }
     return null
+}
+
+/**
+ * Lay the tile's transit line, if it has one.
+ *
+ * An elevated line is stamped on top of the street it runs over — the structure
+ * is the same width as that street's right of way, so the two line up exactly.
+ * A subway is stamped at the bottom of the dug volume, with the whole city
+ * sitting on top of it.
+ */
+function layTransit(plan, put, stamp, { width, depth, westWidth, northWidth, datum }) {
+    const transit = plan.transit
+    if (!transit) return
+
+    const line = transitLine(transit.line)
+    const overNorth = transit.over === 'north'
+    const street = overNorth ? plan.north_street : plan.west_street
+    const length = overNorth ? width - westWidth : depth - northWidth
+    const station = Boolean(transit.station)
+
+    if (line.kind === 'subway') {
+        const module = generateSubway(street, transit.line, { length, station })
+        if (overNorth) stampRotated(module, put, westWidth, 0, 0)
+        else stamp(module, 0, 0, northWidth)
+        return
+    }
+
+    const module = generateElevated(street, transit.line, { length, offset: 0, station })
+    if (overNorth) stampRotated(module, put, westWidth, datum, 0)
+    else stamp(module, 0, datum, northWidth)
 }
 
 /** Place a building, optionally turned to face the opposite street. */

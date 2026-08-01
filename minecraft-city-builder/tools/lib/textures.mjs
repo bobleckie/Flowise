@@ -595,3 +595,75 @@ export function roadMarking(name, kind, base = [46, 47, 50]) {
     }
     return tex
 }
+
+/**
+ * Riveted steel plate: the structural steel of an elevated railway, with rivet
+ * lines along the flanges. Flat grey paint is what makes a girder read as a
+ * concrete beam instead.
+ */
+export function rivetedSteel(name, base) {
+    const random = rng(name)
+    const tex = new Tex()
+    for (let y = 0; y < 16; y++) {
+        for (let x = 0; x < 16; x++) {
+            let tone = 0.94 + random() * 0.1
+            // Flange plates top and bottom, web between.
+            if (y < 3 || y > 12) tone *= 1.06
+            if (y === 3 || y === 12) tone *= 0.72
+            // Rivets, on the flanges only.
+            if ((y === 1 || y === 14) && x % 3 === 1) tone *= 1.24
+            tex.set(x, y, shade(base, tone))
+        }
+    }
+    return tex
+}
+
+/** Lattice bracing: a steel column seen as diagonals rather than a solid post. */
+export function lattice(name, base) {
+    const random = rng(name)
+    const tex = new Tex()
+    for (let y = 0; y < 16; y++) {
+        for (let x = 0; x < 16; x++) {
+            const onDiagonal = (x + y) % 8 < 2 || (x - y + 16) % 8 < 2
+            const onFlange = x < 3 || x > 12
+            let tone = onFlange ? 1.04 : onDiagonal ? 0.98 : 0.62
+            tone *= 0.96 + random() * 0.08
+            tex.set(x, y, shade(base, tone))
+        }
+    }
+    return tex
+}
+
+/** Glazed platform tile: a white field with a coloured band, as in a subway. */
+export function stationTile(name, field, band) {
+    const random = rng(name)
+    const tex = new Tex()
+    for (let y = 0; y < 16; y++) {
+        for (let x = 0; x < 16; x++) {
+            const joint = x % 4 === 0 || y % 8 === 0
+            const inBand = y >= 10 && y < 14
+            const base = inBand ? band : field
+            let tone = 0.97 + random() * 0.06
+            if (joint) tone *= 0.8
+            else if (y % 8 === 1) tone *= 1.05
+            tex.set(x, y, shade(base, tone))
+        }
+    }
+    return tex
+}
+
+/** Timber ties on ballast, for the deck a rail sits on. */
+export function trackBed(name, tie, ballast) {
+    const random = rng(name)
+    const tex = new Tex()
+    for (let y = 0; y < 16; y++) {
+        const onTie = y % 4 < 3
+        for (let x = 0; x < 16; x++) {
+            const base = onTie ? tie : ballast
+            let tone = 0.88 + random() * 0.24
+            if (onTie && y % 4 === 0) tone *= 0.78
+            tex.set(x, y, shade(base, tone))
+        }
+    }
+    return tex
+}

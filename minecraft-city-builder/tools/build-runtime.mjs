@@ -38,6 +38,7 @@ const materials = JSON.parse(readFileSync(join(ROOT, 'data', 'palettes', 'materi
 const rotationTable = JSON.parse(readFileSync(join(ROOT, 'data', 'block-states', 'rotation.json'), 'utf8'))
 const streets = JSON.parse(readFileSync(join(ROOT, 'data', 'streets', 'chicago.json'), 'utf8'))
 const districts = JSON.parse(readFileSync(join(ROOT, 'data', 'districts', 'chicago.json'), 'utf8')).tiles
+const transit = JSON.parse(readFileSync(join(ROOT, 'data', 'transit', 'chicago.json'), 'utf8'))
 
 /** Only the fields the runtime generator actually reads. */
 function slim(entry) {
@@ -65,7 +66,8 @@ const data =
     `export const MATERIAL_SYSTEMS = ${JSON.stringify(materials)}\n\n` +
     `export const ROTATION_TABLE = ${JSON.stringify(rotationTable)}\n\n` +
     `export const STREETS = ${JSON.stringify(streets)}\n\n` +
-    `export const DISTRICTS = ${JSON.stringify(districts)}\n`
+    `export const DISTRICTS = ${JSON.stringify(districts)}\n\n` +
+    `export const TRANSIT = ${JSON.stringify(transit)}\n`
 
 writeFileSync(join(LIB, 'catalog_data.js'), data)
 
@@ -75,7 +77,7 @@ writeFileSync(join(LIB, 'catalog_data.js'), data)
 // are copied verbatim rather than transpiled. If either ever grows a `node:`
 // import this build fails loudly instead of shipping a pack that will not load.
 
-for (const name of ['generate.mjs', 'interior.mjs', 'rotation.mjs', 'fitout.mjs', 'street.mjs', 'district.mjs']) {
+for (const name of ['generate.mjs', 'interior.mjs', 'rotation.mjs', 'fitout.mjs', 'street.mjs', 'transit.mjs', 'district.mjs']) {
     const source = readFileSync(join(ROOT, 'tools', 'lib', name), 'utf8')
     if (/from ['"]node:/.test(source)) {
         console.error(`lib/${name} imports a node: module and cannot run inside Bedrock.`)
